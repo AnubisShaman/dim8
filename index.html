@@ -66,7 +66,14 @@ nav.tabs .wrap{max-width:520px;margin:0 auto}
 @keyframes sk{to{background-position:-200% 0}}
 .center{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
 .dark{background:var(--ink);color:#fff}
-.admin-line{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}
+.lifts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lift{height:44px;border:none;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:14px}
+.lift i{width:8px;height:8px;border-radius:4px;display:block}
+.lift.ok{background:var(--ok-bg);color:var(--ok)} .lift.ok i{background:var(--ok)}
+.lift.bad{background:var(--bad-bg);color:var(--bad)} .lift.bad i{background:#C4302A}
+.chatbtn{height:36px;padding:0 12px;border-radius:18px;border:none;background:var(--info-bg);color:var(--info);font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.admin-line{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:8px 0;border-bottom:1px solid var(--line)}
+.admin-line:last-child{border-bottom:none}
 a{color:var(--navy)}
 </style>
 </head>
@@ -78,7 +85,10 @@ a{color:var(--navy)}
 // ===== НАЛАШТУВАННЯ =====
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbwZusNukQJGfcCYb0bNezcIblO2jTyeeixw_vY1DfL0Q0Dyq79y_-4UGUJPuOYzasYW/exec', // https://script.google.com/macros/s/.../exec
-  BOT_USERNAME: 'rusanivgavanbot'           // без @
+  BOT_USERNAME: 'rusanivgavanbot',          // без @
+  GROUP: '4422230766',                      // ID групи без -100
+  // ID тем групи (число з посилання t.me/c/4422230766/ЧИСЛО/...). 0 = відкриється просто група
+  TOPICS: { general: 1, reports: 0, lifts: 0, urgent: 0, receipts: 0, discuss: 0 }
 };
 // =======================
 
@@ -101,12 +111,22 @@ const ICON = {
   bulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/>',
   swap: '<path d="M7 16V4"/><path d="M3 8l4-4 4 4"/><path d="M17 8v12"/><path d="M21 16l-4 4-4-4"/>',
   plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
+  chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
   back: '<path d="M15 18l-6-6 6-6"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
   gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
 };
 function ic(name, color, size) {
   return '<svg width="' + (size || 22) + '" height="' + (size || 22) + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[name] + '</svg>';
+}
+function openChat(key) {
+  const t = CONFIG.TOPICS[key];
+  const url = 'https://t.me/c/' + CONFIG.GROUP + (t ? '/' + t : '');
+  haptic();
+  if (tg && tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
+}
+function chatBtn(key, label) {
+  return '<button class="chatbtn" onclick="openChat(\'' + key + '\')">' + ic('chat', '#233F86', 16) + esc(label) + '</button>';
 }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function ago(t) {
@@ -228,19 +248,23 @@ function markLight(on) { ui.myLight = on ? 'on' : 'off'; haptic(); run('light', 
 
 function home() {
   const me = D.me;
-  const st = D.statuses.filter(s => !s.entrance || s.entrance === me.entrance);
+  const st = D.statuses.filter(s => !isLift(s) && (!s.entrance || s.entrance === me.entrance));
+  const myLifts = D.statuses.filter(s => isLift(s) && me.entrance && s.entrance === me.entrance);
+  const liftCard = myLifts.length ? '<div class="card"><div class="row"><span style="font-weight:700">Ліфти · під’їзд ' + me.entrance + '</span><span class="sub" style="font-weight:500">зелений — працює</span></div><div class="lifts">' +
+    myLifts.map(s => '<div class="lift ' + (s.tone === 'ok' ? 'ok' : 'bad') + '"><i></i>' + esc(liftName(s)) + '</div>').join('') + '</div></div>' : '';
   const tiles = st.map(s => '<div class="tile"><span class="k">' + esc(s.name + (s.entrance ? ' п. ' + s.entrance : '')) + '</span><span class="v t-' + esc(s.tone) + '">' + esc(s.value) + '</span></div>').join('');
   const feed = [].concat(
-    D.news.filter(n => visible(n.entrance)).map(n => ({ t: n.time, html: '<div class="card" style="gap:4px"><div class="row"><span class="tag ' + (n.entrance ? 'info' : 'bad') + '">' + (n.entrance ? entName(n.entrance) : 'Терміново') + '</span><span class="sub" style="font-weight:500">' + ago(n.time) + '</span></div><div style="font-weight:700;white-space:pre-line">' + esc(n.text) + '</div></div>' })),
+    D.news.filter(n => visible(n.entrance)).map(n => ({ t: n.time, html: '<div class="card" style="gap:4px"><div class="row"><span class="tag ' + (n.entrance ? 'info' : 'bad') + '">' + (n.entrance ? entName(n.entrance) : 'Терміново') + '</span><span class="sub" style="font-weight:500">' + ago(n.time) + '</span></div><div style="font-weight:700;white-space:pre-line">' + esc(n.text) + '</div>' + (n.entrance ? '' : '<div><button class="chatbtn" style="height:30px;margin-top:4px" onclick="openChat(\'urgent\')">' + ic('chat', '#233F86', 14) + 'Термінові</button></div>') + '</div>' })),
     D.problems.filter(p => p.status !== 'Вирішено' && visible(p.entrance)).map(p => ({ t: p.created, html: '<div class="card" style="gap:4px" onclick="go(\'problems\')"><div class="row"><span class="tag ' + (p.entrance === me.entrance && p.entrance ? 'info' : p.entrance ? 'soft' : 'bad') + '">' + entName(p.entrance) + '</span><span class="sub" style="font-weight:500">' + ago(p.created) + '</span></div><div style="font-weight:700">' + esc(p.category) + ': ' + esc(p.text) + '</div><div class="sub" style="font-weight:500">' + p.count + ' ' + plural(p.count, 'квартира', 'квартири', 'квартир') + ' · ' + esc(p.status.toLowerCase()) + '</div></div>' }))
   ).sort((a, b) => b.t - a.t).slice(0, 5);
   return '<div class="row"><div><div class="sub">' + (me.entrance ? 'Під’їзд ' + me.entrance + ' · ' : '') + (me.apt ? 'кв. ' + esc(me.apt) : 'адміністратор') + '</div><div class="h1">8 будинок</div></div>' +
     '<button class="iconbtn" aria-label="Корисне" onclick="go(\'useful\')">' + ic('phone', '#16202E', 20) + '</button></div>' +
     lightCard() +
-    (tiles ? '<div class="grid3">' + tiles + '</div>' : '') +
+    (tiles ? '<div class="grid3">' + tiles + '</div>' : '') + liftCard +
     '<div class="row"><div style="font-size:16px;font-weight:700">Що відбувається</div>' + scopeBtn() + '</div>' +
     (feed.length ? feed.map(f => f.html).join('') : '<div class="empty">Усе спокійно</div>') +
-    '<button class="btn clay" onclick="go(\'new\')">Повідомити про проблему</button>';
+    '<button class="btn clay" onclick="go(\'new\')">Повідомити про проблему</button>' +
+    '<div class="chips">' + chatBtn('general', 'Чат будинку') + chatBtn('discuss', 'Обговорення') + '</div>';
 }
 
 function problemCard(p) {
@@ -266,6 +290,7 @@ function problems() {
   const list = D.problems.filter(p => (p.status !== 'Вирішено') === open && visible(p.entrance));
   return '<div class="row"><div class="h1">Проблеми</div><button class="iconbtn" style="background:var(--clay)" aria-label="Нова проблема" onclick="go(\'new\')">' + ic('plus', '#fff') + '</button></div>' +
     '<div class="row"><div class="chips">' + [['open', 'Актуальні'], ['done', 'Вирішені']].map(x => '<button class="chip' + (ui.ptab === x[0] ? ' on' : '') + '" onclick="ui.ptab=\'' + x[0] + '\';render()">' + x[1] + '</button>').join('') + '</div>' + scopeBtn() + '</div>' +
+    '<div>' + (open ? chatBtn('lifts', 'Чат: Ліфти та дотягувачі') : chatBtn('reports', 'Чат: Звіти')) + '</div>' +
     (list.length ? list.map(problemCard).join('') : '<div class="empty">' + (open ? 'Відкритих проблем немає' : 'Поки нічого не вирішено') + '</div>');
 }
 
@@ -302,7 +327,7 @@ function pollCard(p) {
   let h = '<div class="card" style="gap:12px;padding:16px;border-radius:22px"><div class="row"><span class="tag ' + (p.open ? 'bad' : 'soft') + '">' + (p.open ? 'Триває' : 'Завершено') + '</span><span class="sub" style="font-weight:500">1 квартира = 1 голос</span></div>' +
     '<div style="font-family:Unbounded,sans-serif;font-size:18px;font-weight:700;line-height:1.3">' + esc(p.question) + '</div>';
   if (showRes) {
-    h += '<div class="row sub"><span>Проголосувало квартир</span><span>' + p.total + ' з ' + D.totalApts + '</span></div>';
+    h += '<div class="row sub"><span>Проголосувало квартир</span><span>' + p.total + '</span></div>';
     h += p.options.map((o, i) => {
       const pct = p.total ? Math.round(p.counts[i] / p.total * 100) : 0;
       return '<div style="display:flex;flex-direction:column;gap:4px"><div class="row" style="font-size:14px;font-weight:600"><span>' + esc(o) + (p.voted === o ? ' · ваш голос' : '') + '</span><span>' + p.counts[i] + ' (' + pct + '%)</span></div><div class="bar" style="height:8px"><i style="width:' + pct + '%;background:' + colors[i % colors.length] + '"></i></div></div>';
@@ -314,9 +339,18 @@ function pollCard(p) {
   } else if (p.open && p.ownersOnly && !isOwner()) {
     h += '<div class="note">Голосують власники. Ви бачите результати.</div>';
   }
-  if (D.me.isAdmin && p.open) h += '<button class="btn sm ghost" onclick="run(\'closePoll\',{id:' + p.id + '},\'Опитування закрито\')">Завершити опитування</button>';
+  if (D.me.isAdmin) {
+    h += '<div class="row" style="justify-content:flex-start;gap:8px">' +
+      (p.open ? '<button class="btn sm ghost" onclick="run(\'closePoll\',{id:' + p.id + '},\'Опитування завершено\')">Завершити</button>' : '') +
+      '<button class="btn sm ghost" style="color:var(--bad)" onclick="delPoll(' + p.id + ')">Видалити</button></div>';
+  }
   h += '<div style="font-size:12px;color:var(--muted);line-height:1.45">Це опитування для оцінки думки мешканців, не офіційне голосування ОСББ.</div>';
   return h + '</div>';
+}
+function delPoll(id) {
+  const go2 = ok => { if (ok) run('deletePoll', { id: id }, 'Опитування видалено'); };
+  const q = 'Видалити опитування разом з усіма голосами? Це не можна скасувати.';
+  if (tg && tg.showConfirm && tg.initData) tg.showConfirm(q, go2); else go2(window.confirm(q));
 }
 function vote(id, o) { haptic(); run('vote', { id: id, option: o }, 'Голос враховано'); }
 
@@ -332,9 +366,18 @@ function cabinet() {
     '<div style="display:flex;align-items:center;gap:8px;background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:600">' + ic('shield', '#1E5E45', 18) + 'Підтверджено адміністратором</div>' : '') +
     '</div>' +
     (me.isAdmin ? '<button class="btn navy" onclick="go(\'admin\')">Панель адміністратора</button>' : '') +
+    '<div class="chips">' + chatBtn('receipts', 'Квитанції') + chatBtn('general', 'Чат будинку') + '</div>' +
     '<div class="label">Мої заявки</div>' +
     (mine.length ? mine.map(p => '<div class="card"><div class="row"><div><div style="font-weight:700">' + esc(p.category) + '</div><div class="sub" style="font-weight:500">№ ' + p.id + ' · ' + ago(p.created) + '</div></div><span class="tag ' + (p.status === 'Вирішено' ? 'ok' : p.status === 'В роботі' ? 'info' : 'bad') + '">' + esc(p.status) + '</span></div></div>').join('') : '<div class="empty">Заявок ще немає</div>') +
     '<div style="font-size:12px;color:var(--muted);line-height:1.5">Телефон і ПІБ бачить лише адміністратор. Змінити квартиру чи статус можна через адміністратора. Сповіщення про ваші заявки приходять у чат із ботом.</div>';
+}
+function isLift(s) { return /^Ліфт/.test(s.name); }
+function liftName(s) { return cap(String(s.name).replace(/^Ліфт\s*/, '')) || 'Ліфт'; }
+function toggleLift(row) {
+  const s = D.statuses.find(x => x.row === row);
+  const o = (s.options || []).find(x => x.value !== s.value) || { value: s.tone === 'ok' ? 'Не працює' : 'Працює', tone: s.tone === 'ok' ? 'bad' : 'ok' };
+  haptic();
+  run('setStatus', { row: row, value: o.value, tone: o.tone }, liftName(s) + ', під’їзд ' + s.entrance + ': ' + o.value.toLowerCase());
 }
 function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
 
@@ -359,14 +402,22 @@ function admin() {
   return '<div class="row" style="justify-content:flex-start"><button class="iconbtn" aria-label="Назад" onclick="back()">' + ic('back', '#16202E', 20) + '</button><div class="h2">Керування</div></div>' +
     '<div class="grid3"><div class="tile"><span class="v" style="font-size:22px">' + fresh.length + '</span><span class="k">нові проблеми</span></div><div class="tile"><span class="v" style="font-size:22px">' + D.problems.filter(p => p.status === 'В роботі').length + '</span><span class="k">в роботі</span></div><div class="tile"><span class="v" style="font-size:22px">' + D.polls.filter(p => p.open).length + '</span><span class="k">опитування</span></div></div>' +
     '<div class="label">Світло (ручне виправлення)</div><div class="grid2"><button class="btn green" onclick="run(\'lightSet\',{on:true},\'Світло: є\')">Світло є</button><button class="btn" onclick="run(\'lightSet\',{on:false},\'Світло: немає\')">Світла немає</button></div>' +
+    '<div class="label">Ліфти · тап перемикає</div><div class="card" style="gap:0">' +
+    ents.map(e => {
+      const ls = D.statuses.filter(s => isLift(s) && s.entrance === e);
+      if (!ls.length) return '';
+      return '<div class="admin-line"><span style="font-weight:600">Під’їзд ' + e + '</span><div class="lifts" style="width:100%">' +
+        ls.map(s => '<button class="lift ' + (s.tone === 'ok' ? 'ok' : 'bad') + '" onclick="toggleLift(' + s.row + ')"><i></i>' + esc(liftName(s)) + '</button>').join('') + '</div></div>';
+    }).join('') + '</div>' +
     '<div class="label">Статуси будинку · тап змінює</div><div class="card" style="gap:0">' +
-    D.statuses.map(s => '<div class="admin-line"><span style="font-weight:600">' + esc(s.name) + (s.entrance ? ' · п. ' + s.entrance : '') + '</span><div class="chips" style="justify-content:flex-end">' +
+    D.statuses.filter(s => !isLift(s)).map(s => '<div class="admin-line"><span style="font-weight:600">' + esc(s.name) + (s.entrance ? ' · під’їзд ' + s.entrance : '') + '</span><div class="chips">' +
       s.options.map(o => '<button class="chip' + (o.value === s.value ? ' on' : '') + '" style="height:32px;font-size:12px;padding:0 10px" onclick="run(\'setStatus\',{row:' + s.row + ',value:this.dataset.v,tone:this.dataset.t},\'Оновлено\')" data-v="' + esc(o.value) + '" data-t="' + esc(o.tone) + '">' + esc(o.value) + '</button>').join('') + '</div></div>').join('') + '</div>' +
     '<div class="label">Нові проблеми</div>' + (fresh.length ? fresh.map(problemCard).join('') : '<div class="empty">Нових немає</div>') +
     '<div class="card" style="background:var(--clay);color:#fff;gap:10px"><div style="font-weight:700;font-size:16px">Термінове повідомлення</div>' +
     '<div class="chips">' + [0].concat(ents).map(e => '<button class="chip" style="height:32px;font-size:12px;' + (u.ent === e ? 'background:var(--ink);color:#fff;border-color:var(--ink)' : 'background:transparent;color:#fff;border-color:#FFD3C2') + '" onclick="ui.urgent.ent=' + e + ';render()">' + (e ? 'Під’їзд ' + e : 'Весь будинок') + '</button>').join('') + '</div>' +
     '<textarea class="input" style="height:80px" maxlength="1000" placeholder="Напр.: завтра 9:00–13:00 не буде холодної води" oninput="ui.urgent.text=this.value">' + esc(u.text) + '</textarea>' +
-    '<button class="btn" onclick="sendUrgent()">Надіслати в застосунок і групу</button></div>' +
+    '<div style="font-size:12px;line-height:1.45;color:#FFE6DC">' + (u.ent ? 'Отримають особисто лише мешканці під’їзду ' + u.ent + '. У загальну групу не піде.' : 'Піде в групу і особисто кожному мешканцю.') + '</div>' +
+    '<button class="btn" onclick="sendUrgent()">Надіслати</button></div>' +
     '<div class="card" style="gap:10px"><div style="font-weight:700;font-size:16px">Нове опитування</div>' +
     '<input class="input" placeholder="Питання" value="' + esc(pl.q) + '" oninput="ui.poll.q=this.value">' +
     '<textarea class="input" style="height:90px" placeholder="Варіанти, кожен з нового рядка" oninput="ui.poll.opts=this.value">' + esc(pl.opts) + '</textarea>' +
@@ -417,9 +468,10 @@ function demoApi(action, d) {
       statuses: [
         { row: 2, name: 'Гаряча вода', value: 'Немає', tone: 'bad', entrance: 0, options: [{ value: 'Є', tone: 'ok' }, { value: 'Немає', tone: 'bad' }, { value: 'Ремонт', tone: 'bad' }] },
         { row: 3, name: 'Опалення', value: 'Пуск', tone: 'info', entrance: 0, options: [{ value: 'Є', tone: 'ok' }, { value: 'Немає', tone: 'bad' }, { value: 'Пуск', tone: 'info' }] },
-        { row: 4, name: 'Ліфт', value: 'Не працює', tone: 'bad', entrance: 1, options: [{ value: 'Працює', tone: 'ok' }, { value: 'Не працює', tone: 'bad' }] },
-        { row: 5, name: 'Ліфт', value: 'Працює', tone: 'ok', entrance: 2, options: [{ value: 'Працює', tone: 'ok' }, { value: 'Не працює', tone: 'bad' }] }
-      ],
+      ].concat([1, 2, 3, 4].reduce((a, e) => a.concat(['лівий', 'правий', 'вантажний'].map((n, k) => {
+        const bad = (e === 1 && k === 0) || (e === 2 && k === 2);
+        return { row: 10 + e * 3 + k, name: 'Ліфт ' + n, value: bad ? 'Не працює' : 'Працює', tone: bad ? 'bad' : 'ok', entrance: e, options: [{ value: 'Працює', tone: 'ok' }, { value: 'Не працює', tone: 'bad' }] };
+      })), [])),
       light: { status: 'on', at: now - 3 * 60000, count: 14, by: 'neighbors' },
       problems: [
         { id: 14, created: now - 2 * H, entrance: 2, category: 'Двері / доводчик', place: 'вхід', text: 'Вхідні двері не зачиняються', status: 'В роботі', count: 8, mine: false, own: false, authorApt: '81' },
@@ -439,7 +491,7 @@ function demoApi(action, d) {
         { section: 'Контакти', name: 'Аварійна служба УК', desc: 'цілодобово', phone: '[номер]' },
         { section: 'Контакти', name: 'Гаряча лінія міста', desc: 'скарги на комунальні служби', phone: '1551' }
       ],
-      totalApts: 566, entrances: 5, now: now
+      totalApts: 566, entrances: 4, now: now
     };
   }
   const db = DEMO_DB;
@@ -453,6 +505,7 @@ function demoApi(action, d) {
   if (action === 'urgent') db.news.unshift({ time: now, entrance: d.entrance, text: d.text });
   if (action === 'newPoll') db.polls.unshift({ id: 3, question: d.question, options: d.options, counts: d.options.map(() => 0), open: true, ownersOnly: d.ownersOnly, voted: null, total: 0 });
   if (action === 'closePoll') db.polls.find(x => x.id === d.id).open = false;
+  if (action === 'deletePoll') db.polls = db.polls.filter(x => x.id !== d.id);
   return new Promise(r => setTimeout(() => r(JSON.parse(JSON.stringify(db))), 250));
 }
 
