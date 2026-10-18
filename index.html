@@ -99,7 +99,7 @@ let D = null;               // усі дані з сервера
 let route = 'home';
 let stack = [];
 let busy = false;
-const ui = { all: false, ptab: 'open', form: { cat: 'Ліфт', whole: false, place: '', text: '' }, poll: { q: '', opts: '', owners: true }, urgent: { text: '', ent: 0 } };
+const ui = { all: false, ptab: 'open', form: { cat: 'Ліфт', whole: false, place: '', text: '' }, poll: { q: '', opts: '', owners: true, multi: false }, urgent: { text: '', ent: 0 }, sel: {}, editing: {} };
 try { ui.all = localStorage.getItem('b8_all') === '1'; } catch (e) {}
 
 const ICON = {
@@ -318,7 +318,56 @@ function polls() {
     (open.length ? open.map(pollCard).join('') : '<div class="empty">Активних опитувань немає</div>') +
     (closed.length ? '<div class="label">Завершені</div>' + closed.map(pollCard).join('') : '');
 }
+function shortOpt(o) { return String(o).replace(/:00/g, ''); }
+function multiPollCard(p) {
+  const canVote = p.open && (!p.ownersOnly || isOwner()) && D.me.apt;
+  const editing = canVote && (!p.voted || ui.editing[p.id]);
+  if (editing && !ui.sel[p.id]) ui.sel[p.id] = (p.voted || []).slice();
+  const sel = ui.sel[p.id] || [];
+  const max = Math.max.apply(null, p.counts.concat([1]));
+  const top = p.counts.map((c, i) => [c, i]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0]).slice(0, 3).map(x => x[1]);
+  let h = '<div class="card" style="gap:12px;padding:16px;border-radius:22px"><div class="row"><span class="tag ' + (p.open ? 'bad' : 'soft') + '">' + (p.open ? 'Триває' : 'Завершено') + '</span><span class="sub" style="font-weight:500">можна обрати кілька</span></div>' +
+    '<div style="font-family:Unbounded,sans-serif;font-size:18px;font-weight:700;line-height:1.3">' + esc(p.question) + '</div>';
+  if (editing) {
+    h += '<div class="sub">Позначте всі зручні для вас варіанти</div><div class="grid3">' +
+      p.options.map((o, i) => '<button class="chip' + (sel.indexOf(o) >= 0 ? ' on' : '') + '" style="height:42px;padding:0 4px" onclick="pickMulti(' + p.id + ',' + i + ')">' + esc(shortOpt(o)) + '</button>').join('') + '</div>' +
+      '<div class="row" style="gap:8px"><button class="btn green" style="flex:1" onclick="saveMulti(' + p.id + ')"' + (sel.length ? '' : ' disabled') + '>Зберегти' + (sel.length ? ' (' + sel.length + ')' : '') + '</button>' +
+      (p.voted ? '<button class="btn ghost" onclick="ui.editing[' + p.id + ']=false;ui.sel[' + p.id + ']=null;render()">Скасувати</button>' : '') + '</div>';
+  } else if (p.voted) {
+    h += '<div style="background:var(--ok-bg);color:var(--ok);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:600;line-height:1.45">Ваш вибір: ' + p.voted.map(shortOpt).map(esc).join(', ') + '</div>' +
+      (canVote ? '<button class="btn sm ghost" style="align-self:flex-start" onclick="ui.editing[' + p.id + ']=true;render()">Змінити вибір</button>' : '');
+  } else if (p.open && p.ownersOnly && !isOwner()) {
+    h += '<div class="note">Голосують власники. Ви бачите результати.</div>';
+  }
+  if (!editing || D.me.isAdmin) {
+    h += '<div class="row sub"><span>Проголосувало квартир</span><span>' + p.total + '</span></div>';
+    if (top.length) h += '<div style="font-size:14px;font-weight:700">Найпопулярніші: ' + top.map(i => esc(shortOpt(p.options[i]))).join(', ') + '</div>';
+    h += '<div style="display:flex;flex-direction:column;gap:5px">' + p.options.map((o, i) => {
+      const w = Math.round(p.counts[i] / max * 100);
+      return '<div style="display:grid;grid-template-columns:62px 1fr 32px;align-items:center;gap:8px;font-size:13px;font-weight:600"><span>' + esc(shortOpt(o)) + '</span>' +
+        '<div class="bar" style="height:10px"><i style="width:' + w + '%;background:' + (top.indexOf(i) >= 0 ? 'var(--clay)' : 'var(--navy)') + '"></i></div><span style="text-align:right">' + p.counts[i] + '</span></div>';
+    }).join('') + '</div>';
+  }
+  if (D.me.isAdmin) {
+    h += '<div class="row" style="justify-content:flex-start;gap:8px">' +
+      (p.open ? '<button class="btn sm ghost" onclick="run(\'closePoll\',{id:' + p.id + '},\'Опитування завершено\')">Завершити</button>' : '') +
+      '<button class="btn sm ghost" style="color:var(--bad)" onclick="delPoll(' + p.id + ')">Видалити</button></div>';
+  }
+  return h + '</div>';
+}
+function pickMulti(id, i) {
+  const p = D.polls.find(x => x.id === id); const o = p.options[i];
+  const s = ui.sel[id] || (ui.sel[id] = []);
+  const k = s.indexOf(o); if (k >= 0) s.splice(k, 1); else s.push(o);
+  haptic(); render();
+}
+async function saveMulti(id) {
+  const s = ui.sel[id] || [];
+  if (!s.length) return;
+  if (await run('vote', { id: id, options: s }, 'Вибір збережено')) { ui.sel[id] = null; ui.editing[id] = false; render(); }
+}
 function pollCard(p) {
+  if (p.multi) return multiPollCard(p);
   const canVote = p.open && (!p.ownersOnly || isOwner()) && D.me.apt;
   const showRes = !p.open || p.voted || !canVote || D.me.isAdmin;
   const colors = ['var(--green)', 'var(--clay)', '#8C93A0', 'var(--navy)', '#B08900'];
@@ -416,9 +465,11 @@ function admin() {
     '<textarea class="input" style="height:80px" maxlength="1000" placeholder="Напр.: завтра 9:00–13:00 не буде холодної води" oninput="ui.urgent.text=this.value">' + esc(u.text) + '</textarea>' +
     '<div style="font-size:12px;line-height:1.45;color:#FFE6DC">' + (u.ent ? 'Отримають особисто лише мешканці під’їзду ' + u.ent + '. У загальну групу не піде.' : 'Піде в групу і особисто кожному мешканцю.') + '</div>' +
     '<button class="btn" onclick="sendUrgent()">Надіслати</button></div>' +
-    '<div class="card" style="gap:10px"><div style="font-weight:700;font-size:16px">Нове опитування</div>' +
+    '<div class="card" style="gap:10px"><div class="row"><div style="font-weight:700;font-size:16px">Нове опитування</div>' +
+    '<button class="btn sm ghost" onclick="genTemplate()">Шаблон: генератор</button></div>' +
     '<input class="input" placeholder="Питання" value="' + esc(pl.q) + '" oninput="ui.poll.q=this.value">' +
     '<textarea class="input" style="height:90px" placeholder="Варіанти, кожен з нового рядка" oninput="ui.poll.opts=this.value">' + esc(pl.opts) + '</textarea>' +
+    '<label style="display:flex;align-items:center;gap:8px;font-weight:600"><input type="checkbox" ' + (pl.multi ? 'checked' : '') + ' onchange="ui.poll.multi=this.checked" style="width:20px;height:20px;accent-color:var(--navy)">Можна обрати кілька варіантів</label>' +
     '<label style="display:flex;align-items:center;gap:8px;font-weight:600"><input type="checkbox" ' + (pl.owners ? 'checked' : '') + ' onchange="ui.poll.owners=this.checked" style="width:20px;height:20px;accent-color:var(--navy)">Голосують лише власники</label>' +
     '<button class="btn navy" onclick="sendPoll()">Створити опитування</button></div>';
 }
@@ -429,7 +480,13 @@ async function sendUrgent() {
 async function sendPoll() {
   const opts = ui.poll.opts.split('\n').map(s => s.trim()).filter(Boolean);
   if (!ui.poll.q.trim() || opts.length < 2) { toast('Потрібне питання і мінімум 2 варіанти'); return; }
-  if (await run('newPoll', { question: ui.poll.q, options: opts, ownersOnly: ui.poll.owners }, 'Опитування створено')) { ui.poll = { q: '', opts: '', owners: true }; render(); }
+  if (await run('newPoll', { question: ui.poll.q, options: opts, ownersOnly: ui.poll.owners, multi: ui.poll.multi }, 'Опитування створено')) { ui.poll = { q: '', opts: '', owners: true, multi: false }; render(); }
+}
+function genTemplate() {
+  const p = n => ('0' + (n % 24)).slice(-2) + ':00';
+  const hours = []; for (let h = 7; h <= 23; h++) hours.push(p(h) + '–' + p(h + 1));
+  ui.poll = { q: 'У які години для вас найважливіше, щоб працював генератор?', opts: hours.join('\n'), owners: false, multi: true };
+  haptic(); render();
 }
 
 // ---------- старт ----------
@@ -496,12 +553,13 @@ function demoApi(action, d) {
   if (action === 'light') { if (d.on) { db.light.status = 'on'; db.light.count++; } else { db.light = { status: 'off', at: now, count: 2, by: 'neighbors' }; } db.light.at = now; }
   if (action === 'metoo') { const p = db.problems.find(x => x.id === d.id); p.mine = !p.mine; p.count += p.mine ? 1 : -1; }
   if (action === 'newProblem') db.problems.unshift({ id: 15, created: now, entrance: d.wholeHouse ? 0 : 2, category: d.category, place: d.place, text: d.text, status: 'Нова', count: 1, mine: false, own: true, authorApt: '76' });
-  if (action === 'vote') { const p = db.polls.find(x => x.id === d.id); if (p.voted) { p.counts[p.options.indexOf(p.voted)]--; } else p.total++; p.voted = d.option; p.counts[p.options.indexOf(d.option)]++; }
+  if (action === 'vote' && d.options) { const p = db.polls.find(x => x.id === d.id); if (p.voted) p.voted.forEach(o => p.counts[p.options.indexOf(o)]--); else p.total++; p.voted = p.options.filter(o => d.options.indexOf(o) >= 0); p.voted.forEach(o => p.counts[p.options.indexOf(o)]++); }
+  else if (action === 'vote') { const p = db.polls.find(x => x.id === d.id); if (p.voted) { p.counts[p.options.indexOf(p.voted)]--; } else p.total++; p.voted = d.option; p.counts[p.options.indexOf(d.option)]++; }
   if (action === 'problemStatus') db.problems.find(x => x.id === d.id).status = d.status;
   if (action === 'setStatus') { const s = db.statuses.find(x => x.row === d.row); s.value = d.value; s.tone = d.tone; }
   if (action === 'lightSet') db.light = { status: d.on ? 'on' : 'off', at: now, count: 0, by: 'admin' };
   if (action === 'urgent') db.news.unshift({ time: now, entrance: d.entrance, text: d.text });
-  if (action === 'newPoll') db.polls.unshift({ id: 3, question: d.question, options: d.options, counts: d.options.map(() => 0), open: true, ownersOnly: d.ownersOnly, voted: null, total: 0 });
+  if (action === 'newPoll') db.polls.unshift({ id: 3, question: d.question, options: d.options, counts: d.options.map((_, i) => [3, 2, 4, 6, 5, 4, 3, 4, 5, 7, 9, 14, 18, 21, 19, 12, 6][i] || 0), open: true, ownersOnly: d.ownersOnly, multi: d.multi, voted: null, total: 31 });
   if (action === 'closePoll') db.polls.find(x => x.id === d.id).open = false;
   if (action === 'deletePoll') db.polls = db.polls.filter(x => x.id !== d.id);
   return new Promise(r => setTimeout(() => r(JSON.parse(JSON.stringify(db))), 250));
