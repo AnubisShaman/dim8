@@ -67,6 +67,15 @@ button{cursor:pointer}
 .pend.on{background:#F2C12E} .pend.off{background:#4A4F57}
 .legend .pdot{background:linear-gradient(90deg,#F2C12E 50%,#4A4F57 50%);border-radius:6px}
 .pendbox{background:var(--yel-bg);color:var(--yel-ink);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.4}
+.fuel{border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.fuel.on{background:var(--card)} .fuel.grace{background:var(--yel-bg)} .fuel.off{background:var(--bad-bg)}
+.keyrow{display:flex;align-items:center;gap:12px}
+.keyic{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fuel.on .keyic{background:var(--ok-bg)} .fuel.grace .keyic{background:var(--yellow)} .fuel.off .keyic{background:#fff}
+.banner{border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;border:none;text-align:left;width:100%}
+.banner.grace{background:var(--yel-bg);color:var(--yel-ink)} .banner.off{background:var(--bad-bg);color:var(--bad)}
+.aptlist{display:flex;flex-wrap:wrap;gap:6px}
+.aptlist span{background:var(--bg);border-radius:8px;padding:4px 8px;font-size:13px;font-weight:700}
 .field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
 .input{height:48px;border-radius:14px;border:1px solid var(--line2);background:var(--card);padding:0 14px;color:var(--ink);font-size:15px}
 textarea.input{height:96px;padding:12px 14px;resize:none;line-height:1.4}
@@ -151,7 +160,7 @@ nav.tabs .pill{position:absolute;z-index:0;top:8px;bottom:8px;left:8px;width:cal
 @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .in-push .bar>i,.in-pop .bar>i,.in-tab .bar>i,.in-bars .bar>i{transform-origin:left;animation:grow 500ms var(--spring) 60ms backwards}
 
-/* зміна статусу світла в секції: колонка «осідає» */
+/* зміна статусу світла в під’їзді: колонка «осідає» */
 @keyframes settle{from{transform:scale(.93);filter:brightness(1.1)}to{transform:none;filter:none}}
 .col.changed{animation:settle 520ms var(--spring)}
 
@@ -196,6 +205,35 @@ body{text-wrap:pretty}
 /* запит триває довше 150 мс: кнопки притухають */
 .is-busy{cursor:progress}
 .is-busy .btn{opacity:.6}
+
+/* ===== Коментарі до заявок ===== */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cmts{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.cmt{background:var(--bg);border-radius:14px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
+.cmt.adm{background:var(--yel-bg)}
+.cmt .h{display:flex;gap:8px;align-items:baseline;font-size:12px;font-weight:700;color:var(--muted)}
+.cmt .h b{color:var(--ink)}
+.cmt .x{font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+.cmt .del{margin-left:auto;border:none;background:none;color:var(--muted);font:inherit;font-size:12px;font-weight:600;padding:4px;position:relative}
+.cmt .del::before{content:"";position:absolute;inset:-10px}
+.cmtlink{align-self:flex-start;border:none;background:none;padding:6px 0;color:var(--ink);font:inherit;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+/* ===== Пальне: адмін ===== */
+[hidden]{display:none!important}
+.tag.bad{background:var(--bad-bg);color:var(--bad)}
+.seg{display:flex;gap:4px;padding:4px;background:var(--soft);border-radius:14px}
+.seg button{flex:1;min-width:0;height:36px;border:none;border-radius:10px;background:transparent;color:var(--muted);font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow-1)}
+.pay{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-top:1px solid var(--line)}
+.pay:first-child{border-top:none;padding-top:0}
+.pay .amt{font-weight:800;font-size:16px}
+.pay .who{font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.pay .what{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.hint{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--yel-bg);color:var(--yel-ink);border-radius:12px;padding:8px 10px;font-size:13px;font-weight:600}
+.aptrow{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;padding:6px 2px;border:none;border-top:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font:inherit}
+.aptrow:first-child{border-top:none}
+.aptrow .n{font-weight:800;font-size:16px;min-width:64px}
+.aptrow .s{margin-left:auto;font-weight:700;font-size:14px}
+.aptopen{background:var(--bg);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;margin:2px 0 8px}
 </style>
 </head>
 <body>
@@ -221,7 +259,7 @@ let D = null;
 let route = 'home';
 let stack = [];
 let busy = false;
-const ui = { all: false, ptab: 'open', form: { cat: 'Ліфт', whole: false, place: '', text: '' }, poll: { q: '', opts: '', owners: true, multi: false }, urgent: { text: '', ent: 0 }, lsec: 0, sel: {}, editing: {}, invite: '' };
+const ui = { all: false, ptab: 'open', form: { cat: 'Ліфт', whole: false, place: '', text: '' }, poll: { q: '', opts: '', owners: true, multi: false }, urgent: { text: '', ent: 0 }, lsec: 0, sel: {}, editing: {}, invite: '', cmt: {}, cmtOpen: {}, fuelTx: {}, fuelApt: '', fuelTab: 'unknown', fuelQ: '', fuelF: 'all', fuelOpen: '', fuelMore: 30, fuelS: '' };
 try { ui.all = localStorage.getItem('b8n_all') === '1'; } catch (e) {}
 
 const ICON = {
@@ -238,6 +276,7 @@ const ICON = {
   back: '<path d="M15 18l-6-6 6-6"/>',
   share: '<path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/>',
   copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/><path d="M14 9l2 2"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>'
 };
 function ic(name, color, size) {
@@ -316,7 +355,7 @@ function save() { try { const c = Object.assign({}, D); delete c.invite; localSt
 
 // ---------- навігація ----------
 function go(r) {
-  if (['new', 'useful', 'admin'].indexOf(r) >= 0) { stack.push(route); ui.anim = 'push'; }
+  if (['new', 'useful', 'admin', 'fuel'].indexOf(r) >= 0) { stack.push(route); ui.anim = 'push'; }
   else { stack = []; ui.anim = r === route ? '' : 'tab'; }
   route = r; render(); window.scrollTo(0, 0);
 }
@@ -330,7 +369,7 @@ function syncBack() {
 function render() {
   if (!D) { $app.innerHTML = skeleton(); return; }
   if (D.me.state !== 'accepted' && !D.me.isAdmin) { $app.innerHTML = gate(); return; }
-  const s = { home: home, problems: problems, polls: polls, me: cabinet, new: newProblem, useful: useful, admin: admin }[route] || home;
+  const s = { home: home, problems: problems, polls: polls, me: cabinet, new: newProblem, useful: useful, admin: admin, fuel: fuelScreen }[route] || home;
   let scr = document.getElementById('scr');
   if (!scr) { $app.innerHTML = '<div class="screen" id="scr"></div>' + tabs(); scr = document.getElementById('scr'); }
   const anim = ui.anim; ui.anim = '';
@@ -367,7 +406,7 @@ function openBot() {
 }
 
 const TAB_KEYS = ['home', 'problems', 'polls', 'me'];
-function tabCur() { return { new: 'problems', useful: 'home', admin: 'me' }[route] || route; }
+function tabCur() { return { new: 'problems', useful: 'home', admin: 'me', fuel: 'me' }[route] || route; }
 function tabs() {
   const t = [['home', 'home', 'Будинок'], ['problems', 'tool', 'Заявки'], ['polls', 'vote', 'Голосування'], ['me', 'user', 'Кабінет']];
   const cur = tabCur();
@@ -473,7 +512,7 @@ function home() {
   ).sort((a, b) => b.t - a.t).slice(0, 5);
   return '<div class="row"><div><div class="sub">' + (me.entrance ? 'Під’їзд ' + me.entrance + ' · ' : '') + (me.apt ? 'кв.\u00a0' + esc(me.apt) : 'адміністратор') + '</div><div class="h1" role="heading" aria-level="1">8 будинок</div></div>' +
     '<button class="iconbtn" aria-label="Корисне" onclick="go(\'useful\')">' + ic('phone', '#23262B', 20) + '</button></div>' +
-    confirmCards() + lightCard() +
+    confirmCards() + fuelBanner() + lightCard() +
     (tiles ? '<div class="grid3">' + tiles + '</div>' : '') + liftCard +
     '<div class="row"><div style="font-size:16px;font-weight:700">Що відбувається</div>' + scopeBtn() + '</div>' +
     (feed.length ? feed.map(f => f.html).join('') : '<div class="empty">Усе спокійно</div>') +
@@ -497,8 +536,36 @@ function problemCard(p) {
   if (D.me.isAdmin) {
     html += '<div class="chips">' + ['Нова', 'В роботі', 'Вирішено'].map(s => '<button class="chip' + (p.status === s ? ' on' : '') + '" onclick="setProblem(' + p.id + ',\'' + s + '\')">' + s + '</button>').join('') + '</div>';
   }
-  return html + '</div>';
+  return html + commentsBlock(p) + '</div>';
 }
+function canComment(p) { return D.me.isAdmin || p.own || (isOwner() && !isFamily()); }
+function commentsBlock(p) {
+  const list = p.comments || [], open = !!ui.cmtOpen[p.id], can = canComment(p);
+  if (!list.length && !can) return '';
+  const shown = open ? list : list.slice(-2);
+  let h = '<div class="cmts">';
+  if (list.length > shown.length) h += '<button class="cmtlink" onclick="ui.cmtOpen[' + p.id + ']=true;render()">Показати всі коментарі · ' + list.length + '</button>';
+  h += shown.map(c => '<div class="cmt' + (c.who === 'Адміністратор' ? ' adm' : '') + '"><div class="h"><b>' + esc(c.mine ? 'Ви' : c.who) + '</b>' +
+    (c.apt && D.me.isAdmin && !c.mine ? '<span>кв. ' + esc(c.apt) + '</span>' : '') + '<span>' + ago(c.t) + '</span>' +
+    (c.mine || D.me.isAdmin ? '<button class="del" data-c="' + esc(c.id) + '" onclick="delComment(this.dataset.c)">Видалити</button>' : '') + '</div>' +
+    '<div class="x">' + esc(c.text) + '</div></div>').join('');
+  if (can) {
+    if (open) {
+      h += '<label class="sr-only" for="cmt' + p.id + '">Ваш коментар до заявки № ' + p.id + '</label>' +
+        '<textarea class="input" id="cmt' + p.id + '" style="height:72px" maxlength="500" placeholder="' + (D.me.isAdmin ? 'Відповідь мешканцям…' : 'Ваш коментар…') + '" oninput="ui.cmt[' + p.id + ']=this.value">' + esc(ui.cmt[p.id] || '') + '</textarea>' +
+        '<div class="row"><span class="sub" style="font-weight:500">' + (D.me.isAdmin ? 'Автор заявки отримає сповіщення' : 'Бачать усі мешканці, квартиру — лише адміністратор') + '</span>' +
+        '<button class="btn sm graph" onclick="sendComment(' + p.id + ')">Надіслати</button></div>';
+    } else h += '<button class="cmtlink" onclick="ui.cmtOpen[' + p.id + ']=true;ui.cmt[' + p.id + ']=ui.cmt[' + p.id + ']||\'\';render();setTimeout(function(){var t=document.getElementById(\'cmt' + p.id + '\');if(t)t.focus()},50)">' + (list.length ? 'Відповісти' : 'Коментувати') + '</button>';
+  }
+  return h + '</div>';
+}
+async function sendComment(id) {
+  const t = (ui.cmt[id] || '').trim();
+  if (!t) { toast('Напишіть коментар'); return; }
+  haptic();
+  if (await run('comment', { id: id, text: t }, 'Коментар додано')) { ui.cmt[id] = ''; ui.cmtOpen[id] = true; render(); }
+}
+function delComment(cid) { ask('Видалити коментар?', ok => { if (ok) run('delComment', { cid: cid }, 'Коментар видалено'); }); }
 function confirmCards() {
   return D.problems.filter(p => p.own && p.status === 'Вирішено' && !p.confirm).map(p =>
     '<div class="card" style="gap:10px;border:2px solid var(--ok)"><div style="font-weight:700;font-size:15px">Заявку №\u00a0' + p.id + ' (' + esc(p.category) + ') позначено вирішеною</div>' +
@@ -668,7 +735,7 @@ async function makeInvite() {
   if (await run('invite', {}, 'Посилання створено')) { ui.invite = D.invite || ''; render(); }
 }
 function shareInvite() {
-  const u = 'https://t.me/share/url?url=' + encodeURIComponent(ui.invite) + '&text=' + encodeURIComponent('Запрошення в застосунок 10 будинку, кв.\u00a0' + D.me.apt);
+  const u = 'https://t.me/share/url?url=' + encodeURIComponent(ui.invite) + '&text=' + encodeURIComponent('Запрошення в застосунок 8 будинку, кв.\u00a0' + D.me.apt);
   if (tg && tg.openTelegramLink && tg.initData) tg.openTelegramLink(u); else window.open(u, '_blank');
 }
 function copyInvite() {
@@ -691,13 +758,275 @@ function cabinet() {
     (me.apt ? '<div class="grid3"><div class="tile" style="background:var(--bg)"><span class="k">Квартира</span><span class="v">' + esc(me.apt) + '</span></div><div class="tile" style="background:var(--bg)"><span class="k">Під’їзд</span><span class="v">' + (me.entrance || '—') + '</span></div><div class="tile" style="background:var(--bg)"><span class="k">Статус</span><span class="v">' + esc(cap(me.role)) + '</span></div></div>' +
       '<div style="display:flex;align-items:center;gap:8px;background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:600">' + ic('shield', '#1E6B4A', 18) + (me.family ? 'Додано мешканцем квартири' : 'Підтверджено адміністратором') + '</div>' : '') +
     '</div>' +
-    (me.isAdmin ? '<button class="btn graph" onclick="go(\'admin\')">Панель адміністратора</button>' : '') +
+    fuelCard() +
+    (me.isAdmin ? '<button class="btn graph" onclick="go(\'admin\')">Панель адміністратора</button>' + (D.fuel && D.fuel.admin ? '<button class="btn ghost" onclick="go(\'fuel\')">Пальне: оплати' + ((D.fuel.admin.unknown || []).length ? ' · без квартири ' + D.fuel.admin.unknown.length : '') + '</button>' : '') : '') +
     flatCard() +
     '<div class="chips">' + chatBtn('general', 'Чат будинку') + '</div>' +
     '<div class="label">Мої заявки</div>' +
     (mine.length ? mine.map(p => '<div class="card"><div class="row"><div><div style="font-weight:700">' + esc(p.category) + '</div><div class="sub" style="font-weight:500">№\u00a0' + p.id + ' · ' + ago(p.created) + '</div></div><span class="tag ' + (p.status === 'Вирішено' ? 'ok' : p.status === 'В роботі' ? 'yel' : 'bad') + '">' + esc(p.status) + '</span></div></div>').join('') : '<div class="empty">Заявок ще немає</div>') +
     '<div style="font-size:12px;color:var(--muted);line-height:1.5">Телефон і ПІБ бачить лише адміністратор. Змінити квартиру чи статус можна через адміністратора. Сповіщення про ваші заявки приходять у чат із ботом.</div>';
 }
+// ---------- паливо / ключ від ліфта (добровільний внесок) ----------
+function monthName(k) { try { return new Date(k + '-01T12:00:00').toLocaleDateString('uk-UA', { month: 'long' }); } catch (e) { return k; } }
+function fuelState() { const f = D.fuel; return f && !f.soon && D.me.apt ? f.key : null; }
+function payFuel() {
+  const f = D.fuel; haptic();
+  const u = f.link + (f.link.indexOf('?') >= 0 ? '&' : '?') + 'a=' + f.amount + '&t=' + encodeURIComponent('кв ' + D.me.apt);
+  if (tg && tg.openLink && tg.initData) tg.openLink(u); else window.open(u, '_blank');
+}
+function copyText(t, ok) { try { navigator.clipboard.writeText(t).then(() => toast(ok || 'Скопійовано'), () => toast('Не вдалося скопіювати')); } catch (e) { toast('Не вдалося скопіювати'); } }
+const KEY_TXT = {
+  on: ['Ключ від ліфта активний', 'Внесок за {m} зараховано'],
+  claimed: ['Оплату заявлено', 'Ключ працює. Чекаємо звірки з випискою банки'],
+  grace: ['Ключ працює до {d} числа', 'Внесок за {m} ще не надійшов'],
+  part: ['Ключ від ліфта неактивний', 'Внесено {s} з {a} грн за {m}'],
+  off: ['Ключ від ліфта неактивний', 'Внесок за {m} ще не надійшов']
+};
+function keyTxt(i) {
+  const f = D.fuel;
+  return KEY_TXT[f.key][i].replace('{m}', monthName(f.month)).replace('{d}', f.due).replace('{s}', Math.round(f.sum || 0)).replace('{a}', f.amount);
+}
+function fuelBanner() {
+  const k = fuelState();
+  if (!k || k === 'on' || k === 'claimed') return '';
+  const cls = k === 'grace' ? 'grace' : 'off';
+  return '<button class="banner ' + cls + '" onclick="go(\'me\')">' + ic('key', null, 22) + '<span style="font-size:14px;font-weight:700;line-height:1.35">' +
+    esc(keyTxt(0) + ' · ' + keyTxt(1)) + '</span></button>';
+}
+function fuelSoonCard() {
+  return '<div class="label">Пальне для генератора</div><div class="card" style="gap:6px">' +
+    '<div class="row"><span style="font-size:16px;font-weight:800">Незабаром</span><span class="tag info">з наступного місяця</span></div>' +
+    '<div style="font-size:14px;line-height:1.5;color:var(--muted)">Плануємо спільний добровільний збір на пальне для генератора. Коли почнемо, тут зʼявляться всі деталі: сума, як долучитися і статус вашої квартири.</div></div>';
+}
+function fuelCard() {
+  const f = D.fuel, k = fuelState();
+  if (f && f.soon && !D.me.isAdmin) return fuelSoonCard();
+  if (!k) return '';
+  const cls = k === 'on' ? 'on' : (k === 'claimed' || k === 'grace') ? 'grace' : 'off';
+  let h = '<div class="label">Пальне для генератора · кв.\u00a0' + esc(D.me.apt) + '</div><div class="fuel ' + cls + '">' +
+    '<div class="keyrow"><div class="keyic">' + ic('key', cls === 'on' ? '#1E6B4A' : cls === 'off' ? '#8A2E12' : '#23262B', 24) + '</div>' +
+    '<div><div style="font-size:17px;font-weight:800">' + esc(keyTxt(0)) + '</div><div class="sub" style="font-weight:500;color:' + (cls === 'off' ? 'var(--bad)' : 'var(--muted)') + '">' + esc(keyTxt(1)) + '</div></div></div>';
+  if (k === 'part') h += '<div class="bar" style="height:8px;background:#fff"><i style="width:' + Math.min(100, Math.round(f.sum / f.amount * 100)) + '%;background:var(--yellow-d)"></i></div>';
+  if (k !== 'on') {
+    const left = Math.max(0, f.amount - Math.round(f.sum || 0));
+    h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">Добровільний внесок на пальне — <b>' + f.amount + ' грн</b> з квартири на місяць.</div>';
+    if (f.link) h += '<button class="btn yellow" onclick="payFuel()">Внести ' + (k === 'part' ? left : f.amount) + ' грн у банку</button>';
+    if (f.card) h += '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Або переказом на картку</div>' +
+      '<div style="font-weight:800;letter-spacing:.04em">' + esc(f.card) + '</div></div><button class="btn sm ghost" onclick="copyText(\'' + esc(f.card.replace(/\s/g, '')) + '\',\'Номер картки скопійовано\')">' + ic('copy', null, 16) + '</button></div>';
+    h += '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Обовʼязково вкажіть у коментарі</div>' +
+      '<div style="font-weight:800">кв ' + esc(D.me.apt) + '</div></div><button class="btn sm ghost" onclick="copyText(\'кв ' + esc(D.me.apt) + '\',\'Скопійовано\')">' + ic('copy', null, 16) + '</button></div>';
+    if (k !== 'claimed') h += '<button class="btn ghost" onclick="fuelClaim()">Я вже оплатив(ла)</button>';
+    h += '<div style="font-size:12px;line-height:1.45;color:var(--graph)">Статус оновлюється після звірки з випискою банки' + (f.updated ? ' (остання — ' + ago(f.updated) + ')' : '') + '.</div>';
+  }
+  if (f.paidCount) h += '<div class="sub" style="font-weight:500">У ' + monthName(f.month) + ' вже долучились ' + f.paidCount + ' ' + plural(f.paidCount, 'квартира', 'квартири', 'квартир') + ' 💛</div>';
+  return h + '</div>';
+}
+async function fuelClaim() {
+  ask('Підтвердіть, що ви вже внесли ' + D.fuel.amount + ' грн за кв.\u00a0' + D.me.apt + '. Адміністратор звірить з випискою банки.', async ok => {
+    if (ok) await run('fuelClaim', {}, 'Дякуємо! Оплату буде звірено');
+  });
+}
+
+function fuelEntry() {
+  const f = D.fuel;
+  if (!f || !f.admin) return '';
+  const n = (f.admin.unknown || []).length;
+  return '<button class="card" style="flex-direction:row;align-items:center;justify-content:space-between;border:none;text-align:left;font:inherit;color:inherit" onclick="go(\'fuel\')">' +
+    '<span style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:800;font-size:16px">Пальне: оплати</span><span class="sub" style="font-weight:500">' +
+    (f.soon ? 'Збір ще не розпочато · мешканці бачать «незабаром»' : f.paidCount + ' кв.\u00a0внесли' + (n ? ' · без квартири ' + n : '')) + '</span></span>' + (n ? '<span class="tag yel">' + n + '</span>' : '') + '</button>';
+}
+function fuelScreen() {
+  if (!D.me.isAdmin || !D.fuel || !D.fuel.admin) return '<div class="empty">Немає доступу</div>';
+  return '<div class="row" style="justify-content:flex-start"><button class="iconbtn" aria-label="Назад" onclick="back()">' + ic('back', '#23262B', 20) + '</button><div class="h2" role="heading" aria-level="2">Пальне: оплати</div></div>' +
+    '<input class="input" id="fuelS" type="search" aria-label="Пошук платежу" autocomplete="off" placeholder="Пошук: сума, імʼя, коментар або кв.…" value="' + esc(ui.fuelS) + '" oninput="ui.fuelS=this.value;fuelSearchUpdate()">' +
+    '<div id="fuelSearch">' + fuelSearchHtml() + '</div>' +
+    (D.fuel.soon ? '<div class="note">Збір ще не розпочато. Мешканці бачать картку «Незабаром», реквізитів і нагадувань немає. Щоб почати, у Code.gs поставте FUEL_ON = true, вкажіть суму, банку і картку, і оновіть розгортання.</div>' : '') +
+    '<div id="fuelMain"' + (ui.fuelS.trim() ? ' hidden' : '') + ' style="display:flex;flex-direction:column;gap:12px">' + fuelAdmin() + '</div>';
+}
+// пошук по всіх платежах: без квартири, привʼязаних і відкладених
+function fuelSearchHtml() {
+  const q = ui.fuelS.trim().toLowerCase();
+  if (!q) return '';
+  const a = D.fuel.admin, num = q.replace(/[\s,.]/g, '');
+  const all = (a.unknown || []).map(p => [p, 'free']).concat((a.pays || []).map(p => [p, 'linked']), (a.ignored || []).map(p => [p, 'ign']));
+  const hit = all.filter(x => {
+    const p = x[0];
+    if (/^\d+$/.test(num) && (String(Math.round(p.sum)) === num || String(p.sum) === num)) return true;
+    return (p.sender || '').toLowerCase().indexOf(q) >= 0 || (p.comment || '').toLowerCase().indexOf(q) >= 0 || (p.apt && p.apt.toLowerCase() === q.replace(/^кв\.?\s*/, ''));
+  }).sort((x, y) => y[0].date - x[0].date).slice(0, 40);
+  if (!hit.length) return '<div class="card"><div class="empty">Нічого не знайдено за «' + esc(ui.fuelS) + '». Пошук іде за поточний місяць і всі нерозпізнані.</div></div>';
+  return '<div class="sub" style="font-weight:500">Знайдено: ' + hit.length + '</div><div class="card" style="gap:0">' + hit.map(x => {
+    const p = x[0], where = x[1];
+    const tag = where === 'linked' ? '<span class="tag ok">кв.\u00a0' + esc(p.apt) + '</span>' : where === 'ign' ? '<span class="tag info">' + esc(p.source) + '</span>' : '<span class="tag yel">без квартири</span>';
+    let act = '';
+    if (where === 'free') act = fuelHintsFor(p).map(o => '<div class="hint"><span>Кв.\u00a0' + esc(o.apt) + ' бракує саме ' + fmtMoney(o.need) + ' грн</span><button class="btn sm graph" data-t="' + esc(p.tx) + '" data-a="' + esc(o.apt) + '" onclick="fuelAssignTo(this.dataset.t,this.dataset.a)">До кв.\u00a0' + esc(o.apt) + '</button></div>').join('') + fuelAssignRow(p);
+    if (where === 'linked') act = '<button class="btn sm ghost" style="align-self:flex-start" data-t="' + esc(p.tx) + '" data-a="' + esc(p.apt) + '" onclick="fuelUnassign(this.dataset.t,this.dataset.a)">Відвʼязати від кв.\u00a0' + esc(p.apt) + '</button>';
+    if (where === 'ign') act = '<button class="btn sm ghost" style="align-self:flex-start" data-t="' + esc(p.tx) + '" onclick="fuelIgnore(this.dataset.t,false)">Повернути в нерозпізнані</button>';
+    return '<div class="pay"><div class="row"><span class="amt">' + fmtMoney(p.sum) + ' грн</span>' + tag + '</div>' +
+      '<div class="who">' + esc(p.sender || 'Відправник прихований') + ' · ' + esc(payDate(p.date)) + '</div>' +
+      '<div class="what">' + esc(p.comment || 'без коментаря') + (p.source && where === 'linked' ? ' · ' + esc(p.source) : '') + '</div>' + act + '</div>';
+  }).join('') + '</div>';
+}
+function fuelSearchUpdate() {
+  const r = document.getElementById('fuelSearch'), m = document.getElementById('fuelMain');
+  if (r) r.innerHTML = fuelSearchHtml();
+  if (m) m.hidden = !!ui.fuelS.trim();
+}
+function fuelAssignRow(u) {
+  return '<div class="row" style="gap:8px"><input class="input" style="flex:1;min-width:0;height:40px" aria-label="Номер квартири для платежу ' + esc(fmtMoney(u.sum)) + ' грн" autocomplete="off" placeholder="Номер квартири…" value="' + esc(ui.fuelTx[u.tx] || '') + '" oninput="ui.fuelTx[this.dataset.t]=this.value" data-t="' + esc(u.tx) + '">' +
+    '<button class="btn sm graph" data-t="' + esc(u.tx) + '" onclick="fuelAssign(this.dataset.t)">Привʼязати</button></div>';
+}
+function fuelAdmin() {
+  const f = D.fuel;
+  if (!f || !f.admin) return '';
+  const a = f.admin, imp = a.lastImport || {};
+  const paidReg = a.regCount - a.unpaid.length;
+  const pct = a.regCount ? Math.round(paidReg / a.regCount * 100) : 0;
+  const unk = a.unknown || [], ign = a.ignored || [];
+  let h = '<div class="label">Пальне · ' + esc(monthName(f.month)) + '</div><div class="card" style="gap:12px">' +
+    '<label class="btn graph" style="cursor:pointer">' + ic('plus', '#F2C12E', 18) + 'Завантажити виписку банки (CSV)<input type="file" accept=".csv,text/csv" style="display:none" onchange="importCsv(this)"></label>' +
+    '<div class="sub" style="font-weight:500;line-height:1.45">' + (imp.at ? 'Остання виписка: ' + ago(imp.at) + ' · нових платежів ' + imp.added : 'Виписку ще не завантажували') +
+    '<br>monobank → банка → ⋯ → Виписка → CSV. Можна завантажувати повторно — дублів не буде.</div>' +
+    '<div class="grid3"><div class="tile" style="background:var(--bg)"><span class="v" style="font-size:20px">' + f.paidCount + '</span><span class="k">кв. внесли</span></div>' +
+    '<div class="tile" style="background:var(--bg)"><span class="v" style="font-size:20px">' + a.unpaid.length + '</span><span class="k">зареєстр. ще ні</span></div>' +
+    '<div class="tile" style="background:var(--bg)"><span class="v" style="font-size:20px">' + unk.length + '</span><span class="k">без квартири</span></div></div>' +
+    '<div class="bar" style="height:8px"><i style="width:' + pct + '%;background:var(--ok)"></i></div>' +
+    '<div class="sub" style="font-weight:500">' + paidReg + ' з ' + a.regCount + ' зареєстрованих квартир внесли · ' + fmtMoney(a.total) + ' грн за місяць</div></div>';
+  const tabs = [['unknown', 'Без квартири · ' + unk.length], ['apts', 'Квартири'], ['ignored', 'Відкладені' + (ign.length ? ' · ' + ign.length : '')]];
+  h += '<div class="seg" role="tablist">' + tabs.map(t => '<button role="tab" aria-selected="' + (ui.fuelTab === t[0]) + '" class="' + (ui.fuelTab === t[0] ? 'on' : '') + '" onclick="ui.fuelTab=\'' + t[0] + '\';ui.fuelMore=30;render()">' + esc(t[1]) + '</button>').join('') + '</div>';
+  if (ui.fuelTab === 'apts') h += fuelAptsView();
+  else if (ui.fuelTab === 'ignored') h += fuelIgnoredView();
+  else h += fuelUnknownView();
+  return h;
+}
+function fmtMoney(n) { return Math.round(n || 0).toLocaleString('uk-UA').replace(/\s/g, ' '); }
+function payDate(t) { try { return new Date(t).toLocaleString('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ago(t); } }
+
+// квартири: зведення з платежів місяця + зареєстрованих + заяв «оплатив»
+function fuelApts() {
+  const f = D.fuel, a = f.admin, by = {};
+  const get = apt => by[apt] || (by[apt] = { apt: apt, sum: 0, pays: [], reg: false, claim: false });
+  (a.reg || []).forEach(x => { get(x).reg = true; });
+  (a.pays || []).forEach(p => { const o = get(p.apt); o.sum += p.sum; o.pays.push(p); });
+  (a.claims || []).forEach(c => { get(c.apt).claim = true; });
+  return Object.keys(by).map(k => {
+    const o = by[k];
+    o.need = Math.max(0, Math.round((f.amount - o.sum) * 100) / 100);
+    o.st = o.sum >= f.amount + 100 ? 'over' : o.sum >= f.amount - 0.01 ? 'paid' : o.sum > 0 ? 'part' : o.claim ? 'claim' : 'none';
+    o.pays.sort((x, y) => y.date - x.date);
+    return o;
+  }).sort((x, y) => parseInt(x.apt, 10) - parseInt(y.apt, 10) || x.apt.localeCompare(y.apt));
+}
+const FUEL_ST = { paid: ['ok', 'внесено'], over: ['info', 'переплата'], part: ['yel', 'частково'], claim: ['yel', 'заявили'], none: ['bad', 'ще ні'] };
+// нерозпізнані платежі, що закривають борг квартири (сума = скільки бракує)
+function fuelCandidates(apt) {
+  return (D.fuel.admin.unknown || []).filter(u => apt.need > 0 && Math.abs(u.sum - apt.need) < 0.5);
+}
+function fuelHintsFor(u) {
+  return fuelApts().filter(o => o.st === 'part' && Math.abs(u.sum - o.need) < 0.5);
+}
+function fuelSenderHint(u) {
+  if (!u.sender) return '';
+  const k = u.sender.toLowerCase(), apts = [];
+  (D.fuel.admin.pays || []).forEach(p => { if (p.sender && p.sender.toLowerCase() === k && apts.indexOf(p.apt) < 0) apts.push(p.apt); });
+  return apts.length ? '<div class="sub" style="font-weight:500">Цей відправник цього місяця вже платив за кв.\u00a0' + apts.map(esc).join(', ') + '. Перевірте, чи це та сама квартира.</div>' : '';
+}
+
+function fuelUnknownView() {
+  const unk = D.fuel.admin.unknown || [];
+  if (!unk.length) return '<div class="card"><div class="empty">Усі платежі привʼязані до квартир</div></div>';
+  return '<div class="sub" style="font-weight:500">Нові зверху. Квартира визначається лише з коментаря, тож решту привʼяжіть вручну. Шукайте за сумою, наприклад 1470.</div>' +
+    '<div class="card" style="gap:0">' + unk.slice(0, ui.fuelMore).map(u => {
+      const hints = fuelHintsFor(u);
+      return '<div class="pay"><div class="row"><span class="amt">' + fmtMoney(u.sum) + ' грн</span><span class="sub" style="font-weight:500">' + esc(payDate(u.date)) + '</span></div>' +
+        '<div class="who">' + esc(u.sender || 'Відправник прихований') + '</div>' +
+        '<div class="what">' + esc(u.comment || 'без коментаря') + '</div>' +
+        hints.map(o => '<div class="hint"><span>Кв. ' + esc(o.apt) + ' бракує саме ' + fmtMoney(o.need) + ' грн</span><button class="btn sm graph" data-t="' + esc(u.tx) + '" data-a="' + esc(o.apt) + '" onclick="fuelAssignTo(this.dataset.t,this.dataset.a)">До кв. ' + esc(o.apt) + '</button></div>').join('') +
+        fuelSenderHint(u) + fuelAssignRow(u) +
+        '<button class="btn sm ghost" style="align-self:flex-start" data-t="' + esc(u.tx) + '" onclick="fuelIgnore(this.dataset.t,true)">Не внесок</button></div>';
+    }).join('') + '</div>' +
+    (unk.length > ui.fuelMore ? '<button class="btn ghost" onclick="ui.fuelMore+=30;render()">Показати ще ' + Math.min(30, unk.length - ui.fuelMore) + ' з ' + (unk.length - ui.fuelMore) + '</button>' : '');
+}
+
+function fuelAptsView() {
+  const list = fuelApts(), cnt = {};
+  list.forEach(o => { cnt[o.st] = (cnt[o.st] || 0) + 1; });
+  const fl = [['all', 'Усі'], ['part', 'Частково'], ['none', 'Ще ні'], ['claim', 'Заявили'], ['over', 'Переплата']];
+  let h = '<div class="card" style="gap:10px">' +
+    '<input class="input" id="fuelQ" type="search" aria-label="Пошук квартири" autocomplete="off" inputmode="text" placeholder="Номер квартири, напр. 276…" value="' + esc(ui.fuelQ) + '" oninput="ui.fuelQ=this.value;ui.fuelOpen=\'\';fuelListUpdate()">' +
+    '<div class="chips">' + fl.map(x => '<button class="chip' + (ui.fuelF === x[0] ? ' on' : '') + '" style="height:32px;font-size:12px;padding:0 10px" onclick="ui.fuelF=\'' + x[0] + '\';ui.fuelOpen=\'\';render()">' + x[1] + (x[0] === 'all' ? '' : ' · ' + (cnt[x[0]] || 0)) + '</button>').join('') + '</div>' +
+    (ui.fuelF === 'none' && list.some(o => o.st === 'none') ? '<button class="btn sm ghost" style="align-self:flex-start" onclick="copyUnpaid()">' + ic('copy', null, 16) + 'Скопіювати список</button>' : '') +
+    '<div id="fuelList">' + fuelListHtml(list) + '</div></div>';
+  h += '<div class="label">Готівка або вручну</div><div class="card" style="gap:8px">' +
+    '<div class="row" style="gap:8px"><input class="input" style="flex:1;min-width:0" aria-label="Номер квартири" autocomplete="off" inputmode="text" placeholder="Кв., напр. 317-1…" value="' + esc(ui.fuelApt) + '" oninput="ui.fuelApt=this.value">' +
+    '<button class="btn sm green" style="height:48px" onclick="fuelManual()">Внесено</button>' +
+    '<button class="btn sm ghost" style="height:48px" onclick="fuelUnmark()">Зняти</button></div>' +
+    '<div class="sub" style="font-weight:500">Для квартир, які ще не в списку, або для оплати готівкою</div></div>';
+  return h;
+}
+function fuelListUpdate() { const el = document.getElementById('fuelList'); if (el) el.innerHTML = fuelListHtml(fuelApts()); }
+function fuelListHtml(list) {
+  const q = ui.fuelQ.trim().toLowerCase().replace(/\s+/g, '').replace(/^кв\.?/, '');
+  let rows = list.filter(o => (ui.fuelF === 'all' || o.st === ui.fuelF) && (!q || o.apt.toLowerCase().indexOf(q) === 0));
+  if (!rows.length) return '<div class="empty">' + (q ? 'Квартиру ' + esc(ui.fuelQ) + ' не знайдено серед зареєстрованих і платників. Відмітьте готівку нижче.' : 'Тут порожньо') + '</div>';
+  const more = rows.length > 150;
+  rows = rows.slice(0, 150);
+  return rows.map(o => {
+    const st = FUEL_ST[o.st], open = ui.fuelOpen === o.apt;
+    let r = '<button class="aptrow" aria-expanded="' + open + '" data-a="' + esc(o.apt) + '" onclick="fuelToggle(this.dataset.a)"><span class="n">' + esc(o.apt) + '</span>' +
+      '<span class="tag ' + st[0] + '">' + st[1] + '</span>' + (o.reg ? '' : '<span class="sub" style="font-weight:500">не в боті</span>') +
+      '<span class="s">' + (o.sum ? fmtMoney(o.sum) + ' грн' : '—') + '</span></button>';
+    if (open) r += fuelAptDetail(o);
+    return r;
+  }).join('') + (more ? '<div class="sub" style="padding-top:8px">Показано 150. Уточніть номер у пошуку.</div>' : '');
+}
+function fuelAptDetail(o) {
+  const cands = fuelCandidates(o);
+  let h = '<div class="aptopen">';
+  if (o.need > 0 && o.sum > 0) h += '<div style="font-weight:700">Бракує ' + fmtMoney(o.need) + ' грн</div>';
+  if (o.claim && o.st !== 'paid' && o.st !== 'over') h += '<div class="note">Мешканці натиснули «Я оплатив(ла)», але у виписці платіж не знайдено. Перевірте нерозпізнані.</div>';
+  h += o.pays.length ? o.pays.map(p => '<div class="pay"><div class="row"><span class="amt">' + fmtMoney(p.sum) + ' грн</span><span class="sub" style="font-weight:500">' + esc(payDate(p.date)) + '</span></div>' +
+    '<div class="who">' + esc(p.sender || (p.source === 'готівка / вручну' ? 'Готівка / вручну' : 'Відправник прихований')) + '</div>' +
+    '<div class="what">' + esc(p.comment || 'без коментаря') + ' · ' + esc(p.source || '') + '</div>' +
+    '<button class="btn sm ghost" style="align-self:flex-start" data-t="' + esc(p.tx) + '" data-a="' + esc(o.apt) + '" onclick="fuelUnassign(this.dataset.t,this.dataset.a)">' + (p.source === 'готівка / вручну' ? 'Видалити відмітку' : 'Відвʼязати') + '</button></div>').join('')
+    : '<div class="sub" style="font-weight:500">Платежів за цей місяць немає</div>';
+  if (cands.length) h += '<div style="font-weight:700;margin-top:4px">Може підійти з нерозпізнаних</div>' + cands.map(u =>
+    '<div class="hint"><span>' + fmtMoney(u.sum) + ' грн · ' + esc(u.sender || 'прихований') + ' · ' + esc(payDate(u.date)) + '</span><button class="btn sm graph" data-t="' + esc(u.tx) + '" data-a="' + esc(o.apt) + '" onclick="fuelAssignTo(this.dataset.t,this.dataset.a)">Сюди</button></div>').join('');
+  if (o.st !== 'paid' && o.st !== 'over') h += '<button class="btn sm green" style="align-self:flex-start" data-a="' + esc(o.apt) + '" onclick="ui.fuelApt=this.dataset.a;fuelManual()">Внесено готівкою</button>';
+  return h + '</div>';
+}
+function fuelToggle(apt) { ui.fuelOpen = ui.fuelOpen === apt ? '' : apt; haptic(); fuelListUpdate(); }
+
+function fuelIgnoredView() {
+  const ign = D.fuel.admin.ignored || [];
+  if (!ign.length) return '<div class="card"><div class="empty">Тут будуть платежі, позначені «не внесок» або відвʼязані вручну. Наступні виписки їх не чіпають.</div></div>';
+  return '<div class="card" style="gap:0">' + ign.map(u => '<div class="pay"><div class="row"><span class="amt">' + fmtMoney(u.sum) + ' грн</span><span class="tag info">' + esc(u.source) + '</span></div>' +
+    '<div class="who">' + esc(u.sender || 'Відправник прихований') + ' · ' + esc(payDate(u.date)) + '</div>' +
+    '<div class="what">' + esc(u.comment || 'без коментаря') + '</div>' +
+    '<button class="btn sm ghost" style="align-self:flex-start" data-t="' + esc(u.tx) + '" onclick="fuelIgnore(this.dataset.t,false)">Повернути в нерозпізнані</button></div>').join('') + '</div>';
+}
+function importCsv(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = async () => {
+    input.value = '';
+    if (await run('importCsv', { csv: r.result })) {
+      const x = D.importResult || {};
+      toast('Нових платежів: ' + (x.added || 0) + ' · розпізнано ' + (x.known || 0) + ' · без квартири ' + (x.unknown || 0));
+      haptic('ok');
+    }
+  };
+  r.onerror = () => toast('Не вдалося прочитати файл');
+  r.readAsText(file, 'utf-8');
+}
+function copyUnpaid() { const f = D.fuel; copyText('Ще не внесли на пальне за ' + monthName(f.month) + ' (' + f.admin.unpaid.length + '):\n' + f.admin.unpaid.join(', '), 'Список скопійовано'); }
+async function fuelManual() { if (!ui.fuelApt.trim()) { toast('Вкажіть квартиру'); return; } if (await run('fuelManual', { apt: ui.fuelApt }, 'Внесок відмічено')) { ui.fuelApt = ''; render(); } }
+function fuelUnmark() { if (!ui.fuelApt.trim()) { toast('Вкажіть квартиру'); return; } ask('Зняти ручну відмітку для кв.\u00a0' + ui.fuelApt + '?', ok => { if (ok) run('fuelUnmark', { apt: ui.fuelApt }, 'Відмітку знято'); }); }
+async function fuelAssignTo(tx, apt) { haptic(); if (await run('fuelAssign', { txId: tx, apt: apt }, 'Платіж привʼязано до кв.\u00a0' + apt)) { delete ui.fuelTx[tx]; render(); } }
+function fuelUnassign(tx, apt) { ask('Відвʼязати цей платіж від кв.\u00a0' + apt + '? Він перейде у «Відкладені», і наступні виписки не привʼяжуть його знову.', ok => { if (ok) run('fuelUnassign', { txId: tx }, 'Платіж відвʼязано'); }); }
+function fuelIgnore(tx, on) { haptic(); run('fuelIgnore', { txId: tx, on: on }, on ? 'Перенесено у «Відкладені»' : 'Повернуто в нерозпізнані'); }
+async function fuelAssign(tx) { const apt = ui.fuelTx[tx] || ''; if (!apt.trim()) { toast('Вкажіть квартиру'); return; } if (await run('fuelAssign', { txId: tx, apt: apt }, 'Платіж привʼязано')) { delete ui.fuelTx[tx]; render(); } }
 function isLift(s) { return /^Ліфт/.test(s.name); }
 function liftName(s) { return cap(String(s.name).replace(/^Ліфт\s*/, '')) || 'Ліфт'; }
 function toggleLift(row) {
@@ -728,6 +1057,7 @@ function admin() {
   const ents = []; for (let i = 1; i <= D.entrances; i++) ents.push(i);
   const chipSel = (on) => on ? 'background:var(--yellow);color:var(--ink);border-color:var(--yellow)' : 'background:transparent;color:#fff;border-color:#6B7079';
   return '<div class="row" style="justify-content:flex-start"><button class="iconbtn" aria-label="Назад" onclick="back()">' + ic('back', '#23262B', 20) + '</button><div class="h2" role="heading" aria-level="2">Керування</div></div>' +
+    fuelEntry() +
     '<div class="grid3"><div class="tile"><span class="v" style="font-size:22px">' + fresh.length + '</span><span class="k">потребують уваги</span></div><div class="tile"><span class="v" style="font-size:22px">' + D.problems.filter(p => p.status === 'В роботі').length + '</span><span class="k">в роботі</span></div><div class="tile"><span class="v" style="font-size:22px">' + D.polls.filter(p => p.open).length + '</span><span class="k">опитування</span></div></div>' +
     '<div class="label">Світло (ручне виправлення)</div><div class="card"><div class="chips">' + [0].concat(ents).map(e => '<button class="chip' + (ui.lsec === e ? ' on' : '') + '" style="height:32px;font-size:12px;padding:0 10px" onclick="ui.lsec=' + e + ';render()">' + (e ? 'Під’їзд ' + e : 'Усі під’їзди') + '</button>').join('') + '</div>' +
     '<div class="grid2"><button class="btn yellow" onclick="run(\'lightSet\',{on:true,section:ui.lsec},\'Світло: є\')">Світло є</button><button class="btn graph" onclick="run(\'lightSet\',{on:false,section:ui.lsec},\'Світло: немає\')">Світла немає</button></div></div>' +
@@ -795,6 +1125,40 @@ async function start() {
 }
 
 // ---------- демо-режим (?demo=1; &admin=1, &family=1, &state=pending) ----------
+// ---------- демо: пальне в адмінці ----------
+function demoFuelAdmin(now, H) {
+  const pay = (tx, apt, sum, h, sender, comment, source) => ({ tx: tx, apt: apt, sum: sum, date: now - h * H, month: '', comment: comment, sender: sender, source: source || 'виписка: коментар' });
+  const pays = [pay('p1', '276', 30, 1, '', 'Кв 276 на додаток до 1470'), pay('p2', '319', 1500, 3, '', 'Кв. 319'), pay('p3', '475-1', 1500, 6, 'Роман Лящук', 'Кв 475-1'),
+    pay('p4', '494', 1500, 26, '', 'Будинок 10, квартира 494'), pay('p5', '289', 500, 200, 'Руслан Кас’ян', '10 буд 289 кв'), pay('p6', '448', 2500, 80, 'Олександр Левицький', 'Пальне, кв 448'),
+    pay('p7', '448', 4000, 80, 'Олександр Левицький', 'Довнесок за генератор, кв 448'), pay('p8', '248', 1000, 200, 'Катерина Годлевська', 'Кв 248; ще 500 окремо'),
+    pay('p9', '248', 503, 200, 'Катерина Годлевська', 'Поповнення рахунку Банки', 'виписка: відправник (памʼять)'), pay('p10', '317-1', 1500, 30, '', 'кв 317-1'), pay('p11', '12', 1500, 100, 'Юлія Бех', 'квартира 12')];
+  const unknown = [pay('u1', '', 1470, 9, 'Kuliba Mihaylo', '', 'виписка'), pay('u2', '', 1500, 4, 'Kulyba Mykhailo', '', 'виписка'), pay('u3', '', 1500, 30, 'Наталія Черненко', 'Поповнення рахунку Банки', 'виписка'),
+    pay('u4', '', 3000, 120, 'Андрій Варченко', 'Поповнення рахунку Банки', 'виписка'), pay('u5', '', 1000, 170, '', 'Нежитлове приміщення 639', 'виписка'), pay('u6', '', 1000, 190, 'Оксана Моспан', 'Поповнення рахунку Банки', 'виписка')];
+  const a = { regCount: 0, total: 0, lastImport: { at: now - 3 * H, added: 270, known: 199, unknown: 71 }, reg: ['12', '45', '101', '158-1', '204', '248', '276', '289', '317-1', '319', '389', '402', '448', '475-1', '477-1', '494', '512', '593-2'],
+    pays: pays, unknown: unknown, ignored: [], claims: [{ apt: '204' }], unpaid: [], partial: [] };
+  demoFuelRecalc({ fuel: { amount: 1500, admin: a } });
+  return a;
+}
+function demoFuelRecalc(db) {
+  const f = db.fuel, a = f.admin, sums = {};
+  a.pays.forEach(p => { sums[p.apt] = (sums[p.apt] || 0) + p.sum; });
+  a.regCount = a.reg.length;
+  a.unpaid = a.reg.filter(x => !(sums[x] >= f.amount - 0.01));
+  a.partial = Object.keys(sums).filter(x => sums[x] < f.amount - 0.01).map(x => ({ apt: x, sum: sums[x] }));
+  a.total = a.pays.concat(a.unknown).reduce((t, p) => t + p.sum, 0);
+  f.paidCount = Object.keys(sums).filter(x => sums[x] >= f.amount - 0.01).length;
+}
+function demoFuelAct(db, action, d, now) {
+  const a = db.fuel.admin, take = (list, tx) => { const i = list.findIndex(p => p.tx === tx); return i < 0 ? null : list.splice(i, 1)[0]; };
+  if (action === 'fuelAssign') { const p = take(a.unknown, d.txId); if (p) { p.apt = String(d.apt).trim(); p.source = 'привʼязано вручну'; a.pays.push(p); } }
+  if (action === 'fuelUnassign') { const p = take(a.pays, d.txId); if (p && p.source !== 'готівка / вручну') { p.apt = ''; p.source = 'відвʼязано вручну'; a.ignored.unshift(p); } }
+  if (action === 'fuelIgnore') { if (d.on) { const p = take(a.unknown, d.txId); if (p) { p.source = 'не внесок'; a.ignored.unshift(p); } } else { const p = take(a.ignored, d.txId); if (p) { p.source = 'виписка'; a.unknown.unshift(p); } } }
+  if (action === 'fuelManual') a.pays.push({ tx: 'm' + now, apt: String(d.apt).trim(), sum: 1500, date: now, comment: 'відмітив адміністратор', sender: '', source: 'готівка / вручну' });
+  if (action === 'fuelUnmark') { const i = a.pays.map(p => p.apt === String(d.apt).trim() && p.source === 'готівка / вручну').lastIndexOf(true); if (i < 0) throw new Error('Ручних відміток за цей місяць немає'); a.pays.splice(i, 1); }
+  demoFuelRecalc(db);
+  const mine = a.pays.filter(p => p.apt === db.me.apt).reduce((t, p) => t + p.sum, 0);
+  if (db.me.apt) { db.fuel.sum = mine; if (mine >= 1500) db.fuel.key = 'on'; }
+}
 let DEMO_DB = null;
 function demoApi(action, d) {
   const now = Date.now(), H = 3600000, q = location.search;
@@ -804,8 +1168,8 @@ function demoApi(action, d) {
       state: /state=(\w+)/.test(q) ? q.match(/state=(\w+)/)[1] : 'accepted', isAdmin: /admin=1/.test(q) };
     me.flat = { apt: '76', canManage: !fam, openInvites: fam ? 0 : 1, max: 3, left: fam ? 0 : 1,
       members: [{ id: 1, name: 'Олена Коваль', role: 'власник', family: false, isMe: !fam }, { id: 3, name: 'Андрій Коваль', role: 'член сімʼї', family: true, isMe: fam }] };
-    if (fam) me.flat.members.reverse();
     me.flat = null;
+    if (fam && me.flat) me.flat.members.reverse();
     DEMO_DB = {
       me: me,
       statuses: [
@@ -818,7 +1182,7 @@ function demoApi(action, d) {
       })), [])),
       light: { sections: { 1: { status: 'on', since: now - 26 * H, at: now - 6 * 60000, by: 'neighbors' }, 2: { status: 'on', since: now - 3 * H, at: now - 4 * 60000, by: 'neighbors' }, 3: { status: 'off', since: now - 2 * H, at: now - 40 * 60000, by: 'neighbors', pending: { dir: 'on', at: now - 3 * 60000 } }, 4: { status: 'unknown', since: 0, at: 0 } }, mine: null },
       problems: [
-        { id: 14, created: now - 2 * H, entrance: 2, category: 'Ліфт', place: 'вантажний', text: 'Зупиняється між 7 і 8 поверхом', status: 'В роботі', count: 8, mine: false, own: false, authorApt: '301', authorRole: 'власник' },
+        { id: 14, comments: [{ id: 'c1', t: now - 90 * 60000, who: 'Власник', text: 'Сьогодні вранці теж застряг на 7 поверсі.', mine: false, apt: '188' }, { id: 'c2', t: now - 40 * 60000, who: 'Адміністратор', text: 'Викликали ліфтову службу, обіцяють до 18:00.', mine: false }], created: now - 2 * H, entrance: 2, category: 'Ліфт', place: 'вантажний', text: 'Зупиняється між 7 і 8 поверхом', status: 'В роботі', count: 8, mine: false, own: false, authorApt: '301', authorRole: 'власник' },
         { id: 13, created: now - 5 * H, entrance: 0, category: 'Вода', place: '', text: 'Слабкий тиск холодної води вечорами', status: 'Нова', count: 23, mine: true, own: false, authorApt: '12', authorRole: 'член сімʼї' },
         { id: 9, created: now - 140 * H, entrance: 2, category: 'Світло в під’їзді', place: '26 поверх', text: 'Не світить лампа на сходах', status: 'Вирішено', count: 3, mine: false, own: true, authorApt: '76', confirm: '' }
       ],
@@ -833,13 +1197,18 @@ function demoApi(action, d) {
         { section: 'Контакти', name: 'Аварійна служба УК', desc: 'цілодобово', phone: '[номер]' },
         { section: 'Контакти', name: 'Гаряча лінія міста', desc: 'скарги на комунальні служби', phone: '1551' }
       ],
+      fuel: { soon: true, month: new Date().toISOString().slice(0, 7), amount: 1500, due: 5, link: '', card: '', paidCount: 190, updated: now - 3 * H,
+        sum: /fuel=part/.test(q) ? 1000 : /fuel=on/.test(q) ? 1500 : 0, key: (q.match(/fuel=(\w+)/) || [0, 'off'])[1], lastPay: { date: now - 30 * 24 * H, sum: 1500 },
+        admin: /admin=1/.test(q) ? demoFuelAdmin(now, H) : null },
       totalApts: 566, entrances: 4, now: now
     };
   }
   const db = DEMO_DB;
-  delete db.invite;
+  delete db.invite; delete db.importResult;
   const L = db.light.sections;
   if (action === 'light') { const s = L[db.me.entrance], dd = d.on ? 'on' : 'off'; db.light.mine = dd; if (s.status === 'unknown' || s.status === dd) { s.status = dd; s.at = now; if (!s.since) s.since = now; delete s.pending; } else if (s.pending && s.pending.dir === dd) { s.status = dd; s.since = now; s.at = now; s.by = 'neighbors'; delete s.pending; } else s.pending = { dir: dd, at: now }; }
+  if (action === 'comment') { const p = db.problems.find(x => x.id === d.id); (p.comments = p.comments || []).push({ id: 'c' + now, t: now, who: db.me.isAdmin ? 'Адміністратор' : p.own ? 'Автор заявки' : 'Власник', text: d.text, mine: true }); }
+  if (action === 'delComment') db.problems.forEach(p => { p.comments = (p.comments || []).filter(c => c.id !== d.cid); });
   if (action === 'metoo') { const p = db.problems.find(x => x.id === d.id); p.mine = !p.mine; p.count += p.mine ? 1 : -1; }
   if (action === 'newProblem') db.problems.unshift({ id: 15, created: now, entrance: d.wholeHouse ? 0 : 2, category: d.category, place: d.place, text: d.text, status: 'Нова', count: 1, mine: false, own: true, authorApt: '76' });
   if (action === 'vote' && d.options) { const p = db.polls.find(x => x.id === d.id); if (p.voted) p.voted.forEach(o => p.counts[p.options.indexOf(o)]--); else p.total++; p.voted = p.options.filter(o => d.options.indexOf(o) >= 0); p.voted.forEach(o => p.counts[p.options.indexOf(o)]++); }
@@ -853,6 +1222,9 @@ function demoApi(action, d) {
   if (action === 'closePoll') db.polls.find(x => x.id === d.id).open = false;
   if (action === 'deletePoll') db.polls = db.polls.filter(x => x.id !== d.id);
   const f = db.me.flat;
+  if (db.fuel && db.fuel.admin && /^fuel(Manual|Assign|Unassign|Ignore|Unmark)$/.test(action)) demoFuelAct(db, action, d, now);
+  if (action === 'fuelClaim') db.fuel.key = 'claimed';
+  if (action === 'importCsv') { db.importResult = { added: 12, known: 10, unknown: 2 }; db.fuel.admin.lastImport = { at: now, added: 12 }; }
   if (action === 'invite') { if (!f.left) return Promise.reject(new Error('На квартиру вже додано або запрошено 3 людини')); f.openInvites++; f.left--; db.invite = 'https://t.me/budynok10_bot?start=inv_' + Math.random().toString(16).slice(2, 14); }
   if (action === 'cancelInvites') { f.left += f.openInvites; f.openInvites = 0; }
   if (action === 'removeMember') { f.members = f.members.filter(m => m.id !== d.id); f.left++; }
