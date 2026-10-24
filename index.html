@@ -63,6 +63,12 @@ button{cursor:pointer}
 .mark{background:var(--bg);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px}
 .mark .btn{background:var(--card);color:var(--ink)}
 .mark .btn.pon{background:var(--yellow)} .mark .btn.poff{background:var(--graph);color:#fff}
+.sec .age{font-size:11px;font-weight:500;color:var(--muted);margin-top:-6px}
+.col{position:relative}
+.pend{position:absolute;top:7px;right:7px;width:12px;height:12px;border-radius:6px;border:2px solid #fff;box-sizing:border-box}
+.pend.on{background:#F2C12E} .pend.off{background:#4A4F57}
+.legend .pdot{background:linear-gradient(90deg,#F2C12E 50%,#4A4F57 50%);border-radius:6px}
+.pendbox{background:var(--yel-bg);color:var(--yel-ink);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.4}
 .field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
 .input{height:48px;border-radius:14px;border:1px solid var(--line2);background:var(--card);padding:0 14px;color:var(--ink);font-size:15px}
 textarea.input{height:96px;padding:12px 14px;resize:none;line-height:1.4}
@@ -264,6 +270,23 @@ function scopeBtn() {
 function toggleScope() { ui.all = !ui.all; try { localStorage.setItem('b8n_all', ui.all ? '1' : '0'); } catch (e) {} haptic(); render(); }
 
 // ---------- світло по під’їздх ----------
+function shortAgo(t) {
+  if (!t) return '';
+  const m = Math.round((Date.now() - t) / 60000);
+  if (m < 1) return 'щойно';
+  if (m < 60) return m + ' хв';
+  const h = Math.round(m / 60);
+  return h < 24 ? h + ' год' : Math.round(h / 24) + ' д';
+}
+function sinceTxt(t) {
+  if (!t) return '';
+  const d = new Date(t), n = new Date();
+  const hm = d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+  if (d.toDateString() === n.toDateString()) return 'з ' + hm;
+  const y = new Date(n); y.setDate(n.getDate() - 1);
+  if (d.toDateString() === y.toDateString()) return 'з учора, ' + hm;
+  return 'з ' + d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' }) + ', ' + hm;
+}
 function lightCard() {
   const L = (D.light && D.light.sections) || {};
   const me = D.me, n = D.entrances || 4;
@@ -274,24 +297,34 @@ function lightCard() {
     if (x.status === 'on') on++;
     if (x.status !== 'unknown') known++;
     const isMe = s === me.entrance;
-    const word = x.status === 'on' ? 'світло є' : x.status === 'off' ? 'світла немає' : 'мало даних';
+    const word = x.status === 'on' ? 'світло є' : x.status === 'off' ? 'світла немає' : 'ще не відмічали';
     cols.push('<div class="sec' + (isMe ? ' me' : '') + '"><div class="col ' + x.status + (isMe ? ' me' : '') + '" role="img" aria-label="Під’їзд ' + s + ': ' + word + '">' +
-      (x.status === 'on' ? ic('bulb', '#23262B', 20) : x.status === 'off' ? ic('nobulb', '#C6CBD1', 18) : '') + '</div><span class="lb">Під. ' + s + '</span></div>');
+      (x.pending ? '<i class="pend ' + x.pending.dir + '" title="очікує підтвердження"></i>' : '') +
+      (x.status === 'on' ? ic('bulb', '#23262B', 20) : x.status === 'off' ? ic('nobulb', '#C6CBD1', 18) : '') + '</div>' +
+      '<span class="lb">Під. ' + s + '</span><span class="age">' + (x.status === 'unknown' ? '—' : shortAgo(x.at)) + '</span></div>');
   }
   const title = known ? on + ' з ' + n + ' під’їздів зі світлом' : 'Поки невідомо';
   let h = '<div class="lightc"><div style="display:flex;flex-direction:column;gap:4px"><div class="label">Світло в будинку</div><div class="h2">' + title + '</div></div>' +
     '<div class="secs">' + cols.join('') + '</div>' +
-    '<div class="legend"><span><i style="background:#F2C12E"></i>є світло</span><span><i style="background:#4A4F57"></i>немає</span><span><i style="background:#D5D9DE"></i>мало даних</span></div>';
+    '<div class="legend"><span><i style="background:#F2C12E"></i>є світло</span><span><i style="background:#4A4F57"></i>немає</span><span><i style="background:#D5D9DE"></i>ще не відмічали</span><span><i class="pdot"></i>чекає підтвердження</span></div>';
   if (me.entrance) {
-    const my = L[me.entrance] || { status: 'unknown', count: 0 };
-    const sub = my.status === 'unknown' ? (my.count ? 'Поки ' + my.count + ' ' + plural(my.count, 'відмітка', 'відмітки', 'відміток') + ', потрібно більше' : 'Ще ніхто не відмітився')
-      : my.by === 'admin' ? 'Оновив адміністратор · ' + ago(my.at)
-      : 'За відмітками ' + my.count + ' ' + plural(my.count, 'сусіда', 'сусідів', 'сусідів') + ' · ' + ago(my.at);
+    const my = L[me.entrance] || { status: 'unknown' };
     const mine = ui.myLight || (D.light && D.light.mine);
+    let sub;
+    if (my.status === 'unknown') sub = 'Ще ніхто не відмітився. Будьте першим!';
+    else sub = (my.status === 'on' ? 'Світло є ' : 'Світла немає ') + sinceTxt(my.since) + ' · ' +
+      (my.by === 'admin' ? 'оновив адміністратор ' + ago(my.at) : 'підтверджено ' + ago(my.at));
+    let pend = '';
+    if (my.pending) {
+      const pw = my.pending.dir === 'on' ? '«світло є»' : '«світла немає»';
+      pend = '<div class="pendbox">' + (mine === my.pending.dir
+        ? 'Вашу відмітку ' + pw + ' враховано. Статус зміниться, щойно це підтвердить ще одна квартира.'
+        : 'Сусід ' + ago(my.pending.at) + ' відмітив ' + pw + '. Якщо у вас так само — натисніть, і статус зміниться.') + '</div>';
+    }
     h += '<div class="mark"><div style="font-size:14px">Як у вас у <b>під’їзді ' + me.entrance + '</b> зараз?</div>' +
       '<div class="grid2"><button class="btn' + (mine === 'on' ? ' pon' : '') + '" onclick="markLight(true)">' + ic('bulb', null, 18) + 'Світло є</button>' +
       '<button class="btn' + (mine === 'off' ? ' poff' : '') + '" onclick="markLight(false)">' + ic('nobulb', null, 18) + 'Нема</button></div>' +
-      '<div class="sub" style="font-weight:500">' + esc(sub) + '</div></div>';
+      '<div class="sub" style="font-weight:500">' + esc(sub) + '</div>' + pend + '</div>';
   }
   return h + '</div>';
 }
@@ -644,7 +677,7 @@ function demoApi(action, d) {
         const bad = (e === 2 && k === 2);
         return { row: 10 + e * 3 + k, name: 'Ліфт ' + n, value: bad ? 'Не працює' : 'Працює', tone: bad ? 'bad' : 'ok', entrance: e, options: [{ value: 'Працює', tone: 'ok' }, { value: 'Не працює', tone: 'bad' }] };
       })), [])),
-      light: { sections: { 1: { status: 'on', at: now - 6 * 60000, count: 9, by: 'neighbors' }, 2: { status: 'on', at: now - 4 * 60000, count: 14, by: 'neighbors' }, 3: { status: 'off', at: now - 12 * 60000, count: 7, by: 'neighbors' }, 4: { status: 'unknown', at: now - 20 * 60000, count: 1, by: 'neighbors' } }, mine: null },
+      light: { sections: { 1: { status: 'on', since: now - 26 * H, at: now - 6 * 60000, by: 'neighbors' }, 2: { status: 'on', since: now - 3 * H, at: now - 4 * 60000, by: 'neighbors' }, 3: { status: 'off', since: now - 2 * H, at: now - 40 * 60000, by: 'neighbors', pending: { dir: 'on', at: now - 3 * 60000 } }, 4: { status: 'unknown', since: 0, at: 0 } }, mine: null },
       problems: [
         { id: 14, created: now - 2 * H, entrance: 2, category: 'Ліфт', place: 'вантажний', text: 'Зупиняється між 7 і 8 поверхом', status: 'В роботі', count: 8, mine: false, own: false, authorApt: '301', authorRole: 'власник' },
         { id: 13, created: now - 5 * H, entrance: 0, category: 'Вода', place: '', text: 'Слабкий тиск холодної води вечорами', status: 'Нова', count: 23, mine: true, own: false, authorApt: '12', authorRole: 'член сімʼї' },
@@ -667,7 +700,7 @@ function demoApi(action, d) {
   const db = DEMO_DB;
   delete db.invite;
   const L = db.light.sections;
-  if (action === 'light') { const s = L[db.me.entrance]; db.light.mine = d.on ? 'on' : 'off'; s.count++; s.at = now; s.by = 'neighbors'; if (s.count >= 3) s.status = d.on ? 'on' : 'off'; }
+  if (action === 'light') { const s = L[db.me.entrance], dd = d.on ? 'on' : 'off'; db.light.mine = dd; if (s.status === 'unknown' || s.status === dd) { s.status = dd; s.at = now; if (!s.since) s.since = now; delete s.pending; } else if (s.pending && s.pending.dir === dd) { s.status = dd; s.since = now; s.at = now; s.by = 'neighbors'; delete s.pending; } else s.pending = { dir: dd, at: now }; }
   if (action === 'metoo') { const p = db.problems.find(x => x.id === d.id); p.mine = !p.mine; p.count += p.mine ? 1 : -1; }
   if (action === 'newProblem') db.problems.unshift({ id: 15, created: now, entrance: d.wholeHouse ? 0 : 2, category: d.category, place: d.place, text: d.text, status: 'Нова', count: 1, mine: false, own: true, authorApt: '76' });
   if (action === 'vote' && d.options) { const p = db.polls.find(x => x.id === d.id); if (p.voted) p.voted.forEach(o => p.counts[p.options.indexOf(o)]--); else p.total++; p.voted = p.options.filter(o => d.options.indexOf(o) >= 0); p.voted.forEach(o => p.counts[p.options.indexOf(o)]++); }
@@ -675,7 +708,7 @@ function demoApi(action, d) {
   if (action === 'problemStatus') { const x = db.problems.find(y => y.id === d.id); x.status = d.status; if (d.status === 'Вирішено') x.confirm = ''; }
   if (action === 'confirmProblem') { const x = db.problems.find(y => y.id === d.id); if (d.ok) x.confirm = 'підтверджено'; else { x.status = 'В роботі'; x.confirm = 'не вирішено'; } }
   if (action === 'setStatus') { const s = db.statuses.find(x => x.row === d.row); s.value = d.value; s.tone = d.tone; }
-  if (action === 'lightSet') [1, 2, 3, 4].forEach(n => { if (!d.section || d.section === n) L[n] = { status: d.on ? 'on' : 'off', at: now, count: 0, by: 'admin' }; });
+  if (action === 'lightSet') [1, 2, 3, 4].forEach(n => { if (!d.section || d.section === n) L[n] = { status: d.on ? 'on' : 'off', since: now, at: now, by: 'admin' }; });
   if (action === 'urgent') db.news.unshift({ time: now, entrance: d.entrance, text: d.text });
   if (action === 'newPoll') db.polls.unshift({ id: 3, question: d.question, options: d.options, counts: d.options.map((_, i) => [3, 2, 4, 6, 5, 4, 3, 4, 5, 7, 9, 14, 18, 21, 19, 12, 6][i] || 0), open: true, ownersOnly: d.ownersOnly, multi: d.multi, voted: null, total: 31 });
   if (action === 'closePoll') db.polls.find(x => x.id === d.id).open = false;
