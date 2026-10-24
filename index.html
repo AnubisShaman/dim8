@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>8 будинок</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ===== Кольори 8 будинку ===== */
 :root{
@@ -15,7 +13,7 @@
   --ok-bg:#DCEFE5; --ok:#1E6B4A; --bad-bg:#F7E0DA; --bad:#8A2E12; --info-bg:#E6E8EB; --info:#3A3F47; --soft:#EEF0F2; --yel-bg:#FCEFC2; --yel-ink:#6B5300;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,sans-serif;font-size:15px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;font-size:.9375rem;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 button,input,textarea{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer}
 .app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
@@ -101,11 +99,94 @@ nav.tabs button.on{background:var(--yellow);color:var(--ink);font-weight:800}
 .invite{background:var(--yel-bg);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .invite code{font-size:13px;word-break:break-all;color:var(--yel-ink);font-family:inherit;font-weight:700}
 a{color:var(--graph)}
+
+/* ===== Apple-шар (скилл apple-design) =====
+   §1 відгук на натискання · §3-4 пружини (damping 1.0) · §7 просторова узгодженість
+   §12 матеріали і глибина · §14 reduced motion / transparency / contrast · §15 типографіка */
+:root{
+  --spring:cubic-bezier(.22,1,.36,1);
+  --press:100ms;
+  --glass:rgba(255,255,255,.72);
+  --shadow-1:0 1px 2px rgba(35,38,43,.05);
+  --shadow-2:0 1px 2px rgba(35,38,43,.05),0 8px 24px rgba(35,38,43,.07);
+  --shadow-3:0 2px 4px rgba(35,38,43,.06),0 14px 36px rgba(35,38,43,.14);
+}
+
+/* типографіка: великий текст стискаємо, дрібний трохи розкриваємо */
+.h1{font-weight:700;font-size:1.625rem;line-height:1.08;letter-spacing:-.022em;text-wrap:balance}
+.h2{font-weight:700;font-size:1.3125rem;line-height:1.15;letter-spacing:-.016em;text-wrap:balance}
+.label{font-weight:600;letter-spacing:.07em}
+.sub,.tile .k,.tag,.legend,.sec .lb,.sec .age{letter-spacing:.01em}
+
+/* §1 відгук одразу на дотик, повернення пружиною */
+button,a.iconbtn,.card[onclick]{touch-action:manipulation;transition:transform 380ms var(--spring),background-color 160ms ease,color 160ms ease,border-color 160ms ease,opacity 160ms ease}
+button:active,a.iconbtn:active{transform:scale(.97);transition-duration:var(--press),160ms,160ms,160ms,160ms}
+.card[onclick]:active{transform:scale(.985);transition-duration:var(--press),160ms,160ms,160ms,160ms}
+button:disabled:active{transform:none}
+nav.tabs button:active{transform:scale(.94)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.input:focus{border-color:var(--graph);outline:none;box-shadow:0 0 0 3px rgba(242,193,46,.45)}
+
+/* §12 глибина: чим більша поверхня, тим глибша тінь */
+.card{box-shadow:var(--shadow-1)}
+.card.dark{box-shadow:var(--shadow-2)}
+.lightc{box-shadow:var(--shadow-2);border-radius:28px}
+
+/* §12 нижня панель як скляний матеріал, контент ковзає під нею */
+nav.tabs{background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);box-shadow:var(--shadow-3),inset 0 0 0 1px rgba(255,255,255,.55),inset 0 1px 0 rgba(255,255,255,.9);z-index:5;isolation:isolate}
+nav.tabs button{position:relative;z-index:1;color:var(--graph);font-weight:600;letter-spacing:.01em}
+nav.tabs button.on{background:transparent;color:var(--ink);font-weight:700}
+nav.tabs .pill{position:absolute;z-index:0;top:8px;bottom:8px;left:8px;width:calc((100% - 28px) / 4);border-radius:20px;background:var(--yellow);transform:translateX(calc(var(--i,0) * (100% + 4px)));transition:transform 420ms var(--spring)}
+/* §12 замість жорсткої межі: м'яке згасання знизу там, де плаваюча панель накладається на контент */
+.edge{position:fixed;left:0;right:0;bottom:0;height:calc(100px + env(safe-area-inset-bottom));pointer-events:none;z-index:4;background:linear-gradient(to top,rgba(242,243,245,.94),rgba(242,243,245,0));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);-webkit-mask-image:linear-gradient(to top,#000 45%,transparent);mask-image:linear-gradient(to top,#000 45%,transparent)}
+
+/* §7 екрани: вхід і вихід тим самим шляхом. Вперед справа, назад зліва, вкладки без зсуву */
+@keyframes enter-r{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes enter-l{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+@keyframes enter-f{from{opacity:0}to{opacity:1}}
+@keyframes fade-out{to{opacity:0}}
+.screen.in-push{animation:enter-r 420ms var(--spring) backwards}
+.screen.in-pop{animation:enter-l 420ms var(--spring) backwards}
+.screen.in-tab{animation:enter-f 220ms ease-out backwards}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.in-push .bar>i,.in-pop .bar>i,.in-tab .bar>i{transform-origin:left;animation:grow 600ms var(--spring) 80ms backwards}
+
+/* зміна статусу світла в секції: колонка «осідає» */
+@keyframes settle{from{transform:scale(.93);filter:brightness(1.1)}to{transform:none;filter:none}}
+.col.changed{animation:settle 520ms var(--spring)}
+
+/* тост матеріалізується (розмиття і масштаб разом), а не просто з'являється */
+.toast{background:rgba(35,38,43,.84);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);box-shadow:var(--shadow-3);letter-spacing:.005em;animation:mat-in 380ms var(--spring) backwards}
+.toast.out{animation:mat-out 200ms ease-in forwards}
+@keyframes mat-in{from{opacity:0;filter:blur(10px);transform:translateX(-50%) translateY(10px) scale(.94)}to{opacity:1;filter:none;transform:translateX(-50%)}}
+@keyframes mat-out{to{opacity:0;filter:blur(8px);transform:translateX(-50%) scale(.96)}}
+
+/* §14 зменшений рух: перехід через прозорість замість зсувів і пружин */
+@media (prefers-reduced-motion:reduce){
+  .screen.in-push,.screen.in-pop{animation:enter-f 200ms ease-out backwards}
+  .in-push .bar>i,.in-pop .bar>i,.in-tab .bar>i{animation:none}
+  .col.changed{animation:none}
+  .toast{animation:enter-f 200ms ease-out backwards}
+  .toast.out{animation:fade-out 150ms ease-in forwards}
+  nav.tabs .pill{transition:none}
+  button:active,a.iconbtn:active,.card[onclick]:active,nav.tabs button:active{transform:none;opacity:.7}
+}
+@media (prefers-reduced-transparency:reduce){
+  nav.tabs{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .edge{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(to top,var(--bg),rgba(242,243,245,0))}
+  .toast{background:var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-contrast:more){
+  nav.tabs{background:#fff;box-shadow:var(--shadow-3),inset 0 0 0 1.5px var(--graph)}
+  .card{box-shadow:inset 0 0 0 1px var(--line2)}
+  .sub,.tile .k{color:var(--ink)}
+}
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
 <div id="toast"></div>
+<div class="edge" aria-hidden="true"></div>
 
 <script>
 // ===== НАЛАШТУВАННЯ =====
@@ -174,7 +255,11 @@ function haptic(type) { try { tg && tg.HapticFeedback && (type === 'ok' ? tg.Hap
 function toast(msg) {
   const el = document.getElementById('toast');
   el.innerHTML = '<div class="toast">' + esc(msg) + '</div>';
-  clearTimeout(toast.t); toast.t = setTimeout(() => { el.innerHTML = ''; }, 2600);
+  clearTimeout(toast.t); clearTimeout(toast.t2);
+  toast.t = setTimeout(() => {
+    const t = el.firstChild; if (t) t.classList.add('out');
+    toast.t2 = setTimeout(() => { el.innerHTML = ''; }, 200);
+  }, 2600);
 }
 function entName(e) { return e ? 'Під’їзд ' + e : 'Весь будинок'; }
 function visible(e) { return ui.all || !e || !D.me.entrance || e === D.me.entrance; }
@@ -215,10 +300,11 @@ function save() { try { const c = Object.assign({}, D); delete c.invite; localSt
 
 // ---------- навігація ----------
 function go(r) {
-  if (['new', 'useful', 'admin'].indexOf(r) >= 0) stack.push(route); else stack = [];
+  if (['new', 'useful', 'admin'].indexOf(r) >= 0) { stack.push(route); ui.anim = 'push'; }
+  else { stack = []; ui.anim = r === route ? '' : 'tab'; }
   route = r; render(); window.scrollTo(0, 0);
 }
-function back() { route = stack.pop() || 'home'; render(); window.scrollTo(0, 0); }
+function back() { route = stack.pop() || 'home'; ui.anim = 'pop'; render(); window.scrollTo(0, 0); }
 function syncBack() {
   if (!tg || !tg.BackButton) return;
   if (stack.length) tg.BackButton.show(); else tg.BackButton.hide();
@@ -229,7 +315,13 @@ function render() {
   if (!D) { $app.innerHTML = skeleton(); return; }
   if (D.me.state !== 'accepted' && !D.me.isAdmin) { $app.innerHTML = gate(); return; }
   const s = { home: home, problems: problems, polls: polls, me: cabinet, new: newProblem, useful: useful, admin: admin }[route] || home;
-  $app.innerHTML = '<div class="screen">' + s() + '</div>' + tabs();
+  let scr = document.getElementById('scr');
+  if (!scr) { $app.innerHTML = '<div class="screen" id="scr"></div>' + tabs(); scr = document.getElementById('scr'); }
+  const anim = ui.anim; ui.anim = '';
+  scr.className = 'screen';
+  scr.innerHTML = s();
+  if (anim) { void scr.offsetWidth; scr.className = 'screen in-' + anim; }
+  setNav();
   syncBack();
 }
 
@@ -258,10 +350,22 @@ function openBot() {
   if (tg && tg.openTelegramLink) { tg.openTelegramLink(url); tg.close(); } else location.href = url;
 }
 
+const TAB_KEYS = ['home', 'problems', 'polls', 'me'];
+function tabCur() { return { new: 'problems', useful: 'home', admin: 'me' }[route] || route; }
 function tabs() {
-  const t = [['home', 'home', 'Дім'], ['problems', 'tool', 'Заявки'], ['polls', 'vote', 'Голосування'], ['me', 'user', 'Кабінет']];
-  const cur = { new: 'problems', useful: 'home', admin: 'me' }[route] || route;
-  return '<nav class="tabs">' + t.map(x => '<button class="' + (cur === x[0] ? 'on' : '') + '" onclick="go(\'' + x[0] + '\')">' + ic(x[1], null, 20) + x[2] + '</button>').join('') + '</nav>';
+  const t = [['home', 'home', 'Будинок'], ['problems', 'tool', 'Заявки'], ['polls', 'vote', 'Голосування'], ['me', 'user', 'Кабінет']];
+  const cur = tabCur();
+  return '<nav class="tabs" id="nav" style="--i:' + Math.max(0, TAB_KEYS.indexOf(cur)) + '"><i class="pill" aria-hidden="true"></i>' + t.map(x => '<button class="' + (cur === x[0] ? 'on' : '') + '" onclick="go(\'' + x[0] + '\')">' + ic(x[1], null, 20) + x[2] + '</button>').join('') + '</nav>';
+}
+function setNav() {
+  const nav = document.getElementById('nav'); if (!nav) return;
+  const cur = tabCur();
+  nav.style.setProperty('--i', Math.max(0, TAB_KEYS.indexOf(cur)));
+  Array.prototype.forEach.call(nav.querySelectorAll('button'), function (b, k) {
+    const on = TAB_KEYS[k] === cur;
+    b.classList.toggle('on', on);
+    if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
 }
 
 function scopeBtn() {
@@ -291,18 +395,23 @@ function lightCard() {
   const L = (D.light && D.light.sections) || {};
   const me = D.me, n = D.entrances || 4;
   let on = 0, known = 0;
+  const nextLight = {};
   const cols = [];
   for (let s = 1; s <= n; s++) {
     const x = L[s] || { status: 'unknown' };
     if (x.status === 'on') on++;
     if (x.status !== 'unknown') known++;
     const isMe = s === me.entrance;
+    const prevSt = ui.prevLight && ui.prevLight[s];
+    const chg = !!prevSt && prevSt !== x.status;
+    nextLight[s] = x.status;
     const word = x.status === 'on' ? 'світло є' : x.status === 'off' ? 'світла немає' : 'ще не відмічали';
-    cols.push('<div class="sec' + (isMe ? ' me' : '') + '"><div class="col ' + x.status + (isMe ? ' me' : '') + '" role="img" aria-label="Під’їзд ' + s + ': ' + word + '">' +
+    cols.push('<div class="sec' + (isMe ? ' me' : '') + '"><div class="col ' + x.status + (isMe ? ' me' : '') + (chg ? ' changed' : '') + '" role="img" aria-label="Під’їзд ' + s + ': ' + word + '">' +
       (x.pending ? '<i class="pend ' + x.pending.dir + '" title="очікує підтвердження"></i>' : '') +
       (x.status === 'on' ? ic('bulb', '#23262B', 20) : x.status === 'off' ? ic('nobulb', '#C6CBD1', 18) : '') + '</div>' +
       '<span class="lb">Під. ' + s + '</span><span class="age">' + (x.status === 'unknown' ? '—' : shortAgo(x.at)) + '</span></div>');
   }
+  ui.prevLight = nextLight;
   const title = known ? on + ' з ' + n + ' під’їздів зі світлом' : 'Поки невідомо';
   let h = '<div class="lightc"><div style="display:flex;flex-direction:column;gap:4px"><div class="label">Світло в будинку</div><div class="h2">' + title + '</div></div>' +
     '<div class="secs">' + cols.join('') + '</div>' +
@@ -404,7 +513,7 @@ function newProblem() {
 async function sendProblem() {
   const f = ui.form;
   if (!f.text.trim()) { toast('Опишіть проблему кількома словами'); return; }
-  if (await run('newProblem', { category: f.cat, wholeHouse: f.whole, place: f.place, text: f.text }, 'Заявку надіслано')) { ui.form = { cat: 'Ліфт', whole: false, place: '', text: '' }; ui.ptab = 'open'; stack = []; route = 'problems'; render(); }
+  if (await run('newProblem', { category: f.cat, wholeHouse: f.whole, place: f.place, text: f.text }, 'Заявку надіслано')) { ui.form = { cat: 'Ліфт', whole: false, place: '', text: '' }; ui.ptab = 'open'; stack = []; route = 'problems'; ui.anim = 'tab'; render(); }
 }
 
 // ---------- голосування ----------
