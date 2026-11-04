@@ -865,7 +865,7 @@ function sinceTxt(t) {
 }
 // ---------- світло: схема будинку ----------
 // 8 будинок: 4 секції по 23 житлові поверхи, FL0 — перший житловий поверх
-const FL0 = 2, FLN = 24;
+const FL0 = 3, FLN = 25;
 const LSECS = [{ n: 1, from: 1, to: 161, per: 7 }, { n: 2, from: 162, to: 276, per: 5 }, { n: 3, from: 277, to: 414, per: 6 }, { n: 4, from: 415, to: 575, per: 7 }];
 const LFLOORS = []; for (let f = FLN; f >= FL0; f--) LFLOORS.push(f);
 const _lay = {};
@@ -2153,8 +2153,8 @@ function demoApi(action, d) {
       if (sn === 1 && f % 4 === 1) st = 'on';
       if (st) F[sn + ':' + f] = { status: st, since: now - (2 + f % 5) * H, at: now - (5 + f * 3) * 60000, n: 2 + f % 3 };
     } });
-    F['2:13'] = { status: 'on', since: now - 3 * H, at: now - 12 * 60000, n: 2, pending: { dir: 'off', at: now - 6 * 60000 } };
-    db.light.floors = F; db.light.myFloor = 13;
+    F['2:14'] = { status: 'on', since: now - 3 * H, at: now - 12 * 60000, n: 2, pending: { dir: 'off', at: now - 6 * 60000 } };
+    db.light.floors = F; db.light.myFloor = 14;
     db.light.gen = { state: 'on', at: now - 95 * 60000 };
     db.light.hist = [['s1', 'on', now - 20 * H], ['s1', 'off', now - 7 * H], ['s1', 'on', now - 6 * H], ['s2', 'on', now - 20 * H], ['s2', 'off', now - 9 * H], ['s2', 'on', now - 3 * H], ['s3', 'off', now - 20 * H], ['s3', 'on', now - 8 * H], ['s3', 'off', now - 2 * H], ['s4', 'on', now - 20 * H], ['gen', 'off', now - 20 * H], ['gen', 'on', now - 9 * H], ['gen', 'off', now - 6 * H], ['gen', 'on', now - 95 * 60000]];
   }
