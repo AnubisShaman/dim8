@@ -3679,11 +3679,24 @@ function loadXlsxLib() {
   if (window.XLSX) return Promise.resolve(window.XLSX);
   return new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload = () => ok(window.XLSX); sc.onerror = () => no(new Error('Не вдалося завантажити модуль для xlsx. Збережіть таблицю як CSV і спробуйте ще раз.')); document.head.appendChild(sc); });
 }
-// з таблиці беремо 1-шу колонку (квартира) і суму: колонку G, якщо в таблиці 7+ колонок, інакше 2-гу
+// з таблиці беремо колонку квартири і колонку суми.
+// Є шапка з «Квартира» / «Кв.» — колонки за шапкою (напр. «№ з/п | Квартира | 31.10.2026»):
+//   сума — колонка з «сума / внесок / грн» або датою в шапці, інакше наступна за квартирою.
+// Шапки немає — як раніше: квартира в 1-й колонці, сума в G (якщо 7+ колонок) або в 2-й.
 function tableRows(grid) {
-  const wide = grid.some(r => r && r.length >= 7);
-  return grid.filter(r => r && r[0] !== undefined && r[0] !== null && String(r[0]).trim() !== '').map(r => [String(r[0]).trim(), wide ? r[6] : r[1]])
-    .filter(r => !/^(кв|квартира|№|внески|разом|всього)/i.test(r[0]));
+  const txt = v => String(v === undefined || v === null ? '' : v).trim();
+  let ac = 0, sc = -1, from = 0;
+  for (let i = 0; i < Math.min(grid.length, 15); i++) {
+    const r = grid[i] || [], k = r.findIndex(v => /^(кв\.?|квартира|№\s*кв\.?|номер квартири)$/i.test(txt(v)));
+    if (k < 0) continue;
+    ac = k; from = i + 1;
+    for (let j = k + 1; j < r.length; j++) { const v = r[j]; if (v instanceof Date || (typeof v === 'number' && v > 40000) || /сум|внес|грн|оплач|\d{1,2}[.\/]\d{1,2}/i.test(txt(v))) { sc = j; break; } }
+    if (sc < 0) sc = k + 1;
+    break;
+  }
+  if (sc < 0) sc = grid.some(r => r && r.length >= 7) ? 6 : 1;
+  return grid.slice(from).filter(r => r && txt(r[ac]) !== '').map(r => [txt(r[ac]), r[sc]])
+    .filter(r => !/^(кв|квартира|№|внески|разом|всього|кількість|%)/i.test(r[0]) && !/[а-яіїєґa-z]{3}/i.test(r[0]));
 }
 function fuelTableFile(input) {
   const file = input.files && input.files[0];
