@@ -3443,12 +3443,8 @@ function fuelMonthsCard(a) {
       '<label class="fmu" title="Завантажити таблицю за ' + esc(monthName(o.m)) + '" aria-label="Завантажити таблицю за ' + esc(monthName(o.m)) + '">' + ic('plus', null, 16) + '<span>Таблиця</span><input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="fuelTableFor(\'' + o.m + '\',this)"></label></div>';
   }).join('') + '<div class="sub" style="font-weight:500;line-height:1.45;padding:8px 10px 6px">Натисніть місяць, щоб побачити квартири. «Таблиця» — завантажити свіжу або виправлену таблицю саме за цей місяць: вона замінить попередню, інші місяці не зміняться.</div></div>';
 }
-function fuelTableFor(m, input) {
-  const file = input.files && input.files[0]; if (!file) return;
-  const go2 = () => { ui.fMonth = m; ui.fSel = ''; fuelTableFile(input); };
-  if (m === fMon()) { go2(); return; }
-  ask('Завантажити таблицю за ' + monthName(m) + '? Таблиця за ' + monthName(m) + ' заміниться новою.', ok => { if (ok) go2(); else input.value = ''; });
-}
+// кнопка «Таблиця» біля місяця: місяць і підсумок перевіряються перед завантаженням (fuelTableFile)
+function fuelTableFor(m, input) { fuelTableFile(input, m); }
 // ---------- кабінет мешканця: мої внески по місяцях ----------
 function fuelHistHtml() {
   const H = (D.fuel && D.fuel.hist) || [];
@@ -3698,7 +3694,40 @@ function tableRows(grid) {
   return grid.slice(from).filter(r => r && txt(r[ac]) !== '').map(r => [txt(r[ac]), r[sc]])
     .filter(r => !/^(кв|квартира|№|внески|разом|всього|кількість|%)/i.test(r[0]) && !/[а-яіїєґa-z]{3}/i.test(r[0]));
 }
-function fuelTableFile(input) {
+// сума з клітинки: 1500, «1 500», «1500 грн», «1500,50»
+function cellMoney(v) {
+  if (typeof v === 'number') return v;
+  const n = Number(String(v === undefined || v === null ? '' : v).replace(/[\s ]|грн\.?/gi, '').replace(',', '.'));
+  return isFinite(n) ? n : 0;
+}
+// місяць і підсумок, які написані в самій таблиці:
+// дата в шапці (Excel-число, «01.11.2026») або «ВНЕСКИ за ЛИСТОПАД»; підсумок — рядок «Внески за … / Разом / Всього»
+const MON_STEM = ['січ', 'лют', 'берез', 'квіт', 'трав', 'черв', 'лип', 'серп', 'верес', 'жо[вт]', 'листоп', 'груд'];
+function tableMeta(grid) {
+  let month = '', total = null, mNum = 0;
+  grid.slice(0, 15).some(r => (r || []).some(v => {
+    let d = null;
+    if (v instanceof Date) d = v;
+    else if (typeof v === 'number' && v > 40000 && v < 60000) d = new Date(Date.UTC(1899, 11, 30) + v * 864e5);
+    else { const m = String(v || '').match(/^\s*\d{1,2}[.\/](\d{1,2})[.\/](\d{4})\s*$/); if (m) d = new Date(Date.UTC(+m[2], +m[1] - 1, 15)); }
+    if (d && !isNaN(d)) { month = d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0'); return true; }
+    return false;
+  }));
+  grid.forEach(r => {
+    const lbl = (r || []).find(v => typeof v === 'string' && /^\s*(внески|разом|всього|сума|итого)/i.test(v));
+    if (!lbl) return;
+    const k = MON_STEM.findIndex(s => new RegExp(s, 'i').test(lbl.replace(/^\s*внески\s*(на\s*паливо)?/i, '')));
+    if (k >= 0 && !mNum) mNum = k + 1;
+    const num = (r || []).find(v => typeof v === 'number');
+    if (num !== undefined && total === null) total = num;
+  });
+  if (!month && mNum) {   // лише назва місяця — беремо найближчий такий місяць збору
+    const ms = ((D.fuel && D.fuel.admin && D.fuel.admin.months) || []).filter(m => +m.slice(5, 7) === mNum);
+    month = ms.length ? ms[ms.length - 1] : '';
+  }
+  return { month: month, total: total };
+}
+function fuelTableFile(input, target) {
   const file = input.files && input.files[0];
   if (!file) return;
   input.value = '';
@@ -3712,11 +3741,29 @@ function fuelTableFile(input) {
       else { const X = await loadXlsxLib(); const wb = X.read(r.result, { type: 'array' }); grid = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true }); }
       const rows = tableRows(grid);
       if (!rows.length) { toast('У таблиці не знайдено квартир'); return; }
-      if (await run('fuelTable', { rows: rows })) {
-        const t = D.tableResult || {};
-        toast('Таблиця за ' + monthName(fMon()) + ': ' + t.rows + ' кв. на ' + fmtMoney(t.sum) + ' грн');
-        ui.fSel = ''; haptic('ok'); render();
+      const meta = tableMeta(grid), months = (D.fuel.admin && D.fuel.admin.months) || [];
+      let m = target || fMon();
+      const upload = async () => {
+        const paid = rows.filter(x => cellMoney(x[1]) > 0), sum = paid.reduce((t, x) => t + cellMoney(x[1]), 0);
+        const diff = meta.total !== null && Math.abs(meta.total - sum) > 0.5;
+        ask('Таблиця за ' + monthName(m) + ': внесли ' + paid.length + ' кв., разом ' + fmtMoney(sum) + ' грн.' +
+          (diff ? '\n\nУВАГА: у самій таблиці підсумок ' + fmtMoney(meta.total) + ' грн — не збігається. Перевірте колонки.' : '') +
+          '\n\nТаблиця за ' + monthName(m) + ' заміниться новою. Завантажити?', async ok => {
+          if (!ok) return;
+          ui.fMonth = m; ui.fSel = '';
+          if (await run('fuelTable', { rows: rows, fm: m })) {
+            const t = D.tableResult || {};
+            toast('Таблиця за ' + monthName(m) + ': ' + t.rows + ' кв. на ' + fmtMoney(t.sum) + ' грн');
+            haptic('ok'); render();
+          }
+        });
+      };
+      if (meta.month && meta.month !== m) {
+        if (months.indexOf(meta.month) < 0) { toast('У таблиці ' + monthName(meta.month) + ' ' + meta.month.slice(0, 4) + ' — такого місяця збору немає'); return; }
+        ask('У таблиці — ' + monthName(meta.month) + ', а вибрано ' + monthName(m) + '. Завантажити її за ' + monthName(meta.month) + '?', ok => { if (ok) { m = meta.month; upload(); } });
+        return;
       }
+      upload();
     } catch (e) { toast(e.message || 'Не вдалося розібрати таблицю'); }
   };
   if (isCsv) r.readAsText(file, 'utf-8'); else r.readAsArrayBuffer(file);
