@@ -3499,10 +3499,8 @@ function genFundFile(input) {
       const rows = tableRows(grid);
       if (!rows.length) { toast('У таблиці не знайдено квартир'); return; }
       const T = (D.genFund && D.genFund.target) || 10500, paid = rows.filter(x => cellMoney(x[1]) > 0), sum = paid.reduce((t, x) => t + cellMoney(x[1]), 0);
-      const full = paid.filter(x => cellMoney(x[1]) >= T - 0.01).length, meta = tableMeta(grid);
-      const diff = meta.total !== null && Math.abs(meta.total - sum) > 0.5;
+      const full = paid.filter(x => cellMoney(x[1]) >= T - 0.01).length;   // підсумок унизу не звіряємо: у шаблоні Михайла там лишаються старі числа від пального
       ask('Генератор: ' + paid.length + ' кв., разом ' + fmtMoney(sum) + ' грн. Внесли ' + fmtMoney(T) + '+: ' + full + ' кв.' +
-        (diff ? '\n\nУВАГА: у самій таблиці підсумок ' + fmtMoney(meta.total) + ' грн — не збігається. Перевірте колонки.' : '') +
         '\n\nПопередня таблиця генератора заміниться новою. Завантажити?', async ok => {
         if (!ok) return;
         if (await run('genFundTable', { rows: rows })) { const t = D.genTableResult || {}; toast('Генератор: ' + t.rows + ' кв. на ' + fmtMoney(t.sum) + ' грн'); haptic('ok'); render(); }
