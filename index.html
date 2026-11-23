@@ -1458,7 +1458,7 @@ function save() { try { const c = Object.assign({}, D, { _t: Date.now() }); dele
 // ---------- навігація ----------
 function go(r) {
   if (r !== route) haptic('sel');
-  if (['new', 'useful', 'admin', 'fuel', 'osbb', 'light', 'fpub', 'games', 'game', 'problems', 'polls', 'adnew'].indexOf(r) >= 0) { if (r !== route) stack.push(route); ui.anim = 'push'; }
+  if (['new', 'useful', 'admin', 'fuel', 'osbb', 'light', 'fpub', 'games', 'game', 'problems', 'polls', 'adnew', 'genfund'].indexOf(r) >= 0) { if (r !== route) stack.push(route); ui.anim = 'push'; }
   else { stack = []; ui.anim = r === route ? '' : 'tab'; }
   route = r; render(); window.scrollTo(0, 0);
 }
@@ -1472,7 +1472,7 @@ function syncBack() {
 function render() {
   if (!D) { $app.innerHTML = skeleton(); return; }
   if (D.me.state !== 'accepted' && !D.me.isAdmin) { $app.innerHTML = gate(); return; }
-  const s = { home: home, problems: problems, polls: polls, me: cabinet, new: newProblem, useful: useful, admin: admin, fuel: fuelScreen, osbb: osbbScreen, light: lightScreen, fpub: fpubScreen, games: gamesScreen, game: gameScreen, board: boardScreen, adnew: adNewScreen }[route] || home;
+  const s = { home: home, problems: problems, polls: polls, me: cabinet, new: newProblem, useful: useful, admin: admin, fuel: fuelScreen, osbb: osbbScreen, light: lightScreen, fpub: fpubScreen, genfund: genFundScreen, games: gamesScreen, game: gameScreen, board: boardScreen, adnew: adNewScreen }[route] || home;
   let scr = document.getElementById('scr');
   if (!scr) { $app.innerHTML = '<div class="screen" id="scr"></div>' + tabs(); scr = document.getElementById('scr'); }
   const anim = ui.anim; ui.anim = '';
@@ -1511,7 +1511,7 @@ function openBot() {
 
 // нижня панель: 3 вкладки + «Повідомити» по центру (сигнал або заявка)
 const TAB_KEYS = ['home', 'board', 'new', 'me'];
-function tabCur() { if (route === 'new') return 'new'; if (stack.length && TAB_KEYS.indexOf(stack[0]) >= 0) return stack[0]; return { adnew: 'board', admin: 'me', fuel: 'me', osbb: 'me', light: 'home', fpub: 'home', problems: 'home', polls: 'home', games: 'me', game: 'me', useful: 'me' }[route] || route; }
+function tabCur() { if (route === 'new') return 'new'; if (stack.length && TAB_KEYS.indexOf(stack[0]) >= 0) return stack[0]; return { adnew: 'board', admin: 'me', fuel: 'me', genfund: 'me', osbb: 'me', light: 'home', fpub: 'home', problems: 'home', polls: 'home', games: 'me', game: 'me', useful: 'me' }[route] || route; }
 function report() { if (route === 'new') return; ui.nmode = 'sig'; go('new'); }
 function tabs() {
   const t = [['home', 'home', 'Будинок'], ['board', 'board', 'Дошка'], ['new', 'plus', 'Повідомити'], ['me', 'user', 'Кабінет']];
@@ -3106,8 +3106,8 @@ function cabinet() {
     (me.apt ? (apt ? '' : '<div class="grid3"><div class="tile" style="background:var(--bg)"><span class="k">Квартира</span><span class="v">' + esc(me.apt) + '</span></div><div class="tile" style="background:var(--bg)"><span class="k">Секція</span><span class="v">' + (me.entrance || '—') + '</span></div><div class="tile" style="background:var(--bg)"><span class="k">Статус</span><span class="v">' + esc(cap(me.role)) + '</span></div></div>') +
       '<div style="display:flex;align-items:center;gap:8px;background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:600">' + ic('shield', '#1E6B4A', 18) + (me.family ? 'Додано мешканцем квартири' : 'Підтверджено адміністратором') + '</div>' : '') +
     '</div>' +
-    fuelCard() +
-    (me.isAdmin ? '<button class="btn graph" onclick="go(\'admin\')">Панель адміністратора</button>' + (D.fuel && D.fuel.admin ? '<button class="btn ghost" onclick="go(\'fuel\')">⛽ Внесок на генератор' + ((D.fuel.admin.unknown || []).length ? ' · без квартири ' + D.fuel.admin.unknown.length : '') + '</button>' : '') : '') +
+    fuelCard() + genCard() +
+    (me.isAdmin ? '<button class="btn graph" onclick="go(\'admin\')">Панель адміністратора</button>' + '<button class="btn ghost" onclick="go(\'genfund\')">🔌 Генератор: внески і депозити</button>' + (D.fuel && D.fuel.admin ? '<button class="btn ghost" onclick="go(\'fuel\')">⛽ Внесок на пальне' + ((D.fuel.admin.unknown || []).length ? ' · без квартири ' + D.fuel.admin.unknown.length : '') + '</button>' : '') : '') +
     flatCard() +
     '<div class="label">Мої заявки</div>' +
     (mine.length ? mine.map(p => '<div class="card" role="button" tabindex="0" onclick="ui.ptab=\'' + (p.status === 'Вирішено' ? 'done' : 'open') + '\';go(\'problems\')"><div class="row"><div><div style="font-weight:700">' + esc(p.category) + '</div><div class="sub" style="font-weight:500">№ ' + p.id + ' · ' + ago(p.created) + '</div></div><span class="tag ' + (p.status === 'Вирішено' ? 'ok' : p.status === 'В роботі' ? 'yel' : 'bad') + '">' + esc(p.status) + '</span></div></div>').join('') : '<div class="empty">Заявок ще немає</div>') +
@@ -3346,7 +3346,7 @@ function fuelScreen() {
   const f = D.fuel, a = f.admin, list = fuelApts(), allN = list.length || 1;
   const paid = list.filter(o => o.st === 'paid' || o.st === 'over').length, pct = Math.round(paid / allN * 100);
   const part = list.filter(o => o.st === 'part').length;
-  let h = '<div class="row" style="justify-content:flex-start"><button class="iconbtn" aria-label="Назад" onclick="back()">' + ic('back', '#23262B', 20) + '</button><div class="h2" role="heading" aria-level="2">Внесок на генератор</div></div>' + fuelMonthsCard(a) +
+  let h = '<div class="row" style="justify-content:flex-start"><button class="iconbtn" aria-label="Назад" onclick="back()">' + ic('back', '#23262B', 20) + '</button><div class="h2" role="heading" aria-level="2">Внесок на пальне</div></div>' + fuelMonthsCard(a) +
     '<div class="label">Паливо · ' + esc(monthName(fMon())) + '</div>';
   h += '<div class="card" style="gap:10px"><div class="grid3">' +
     '<div class="tile" style="background:var(--bg)"><span class="v" style="font-size:20px">' + fmtMoney(a.total) + '</span><span class="k">грн зібрано</span></div>' +
@@ -3432,7 +3432,86 @@ function fuelEditor(o) {
   return h + '<button class="cmtlink" onclick="ui.fSel=\'\';render()">Закрити</button></div>';
 }
 
-// ---------- «Внесок на генератор»: усі місяці збору, таблиця для кожного ----------
+// ---------- ГЕНЕРАТОР: окремий разовий збір (мета 10 500 з квартири) ----------
+// мешканець: скільки внесено і скільки рекомендуємо довнести (депозит бачить лише адміністратор)
+function genCard() {
+  const G = D.genFund;
+  if (!G || !D.me.apt || G.paid === undefined) return '';
+  const pct = Math.min(100, Math.round(G.paid / G.target * 100)), done = G.left <= 0;
+  return '<div class="label">Генератор · кв. ' + esc(D.me.apt) + '</div><div class="fuel ' + (done ? 'on' : 'grace') + '">' +
+    '<div class="keyrow"><div class="keyic" style="font-size:22px">🔌</div><div><div style="font-size:17px;font-weight:800">' + (done ? 'Внесок на генератор зроблено' : 'Внесено ' + fmtMoney(G.paid) + ' з ' + fmtMoney(G.target) + ' грн') + '</div>' +
+    '<div class="sub" style="font-weight:500">' + (done ? 'Дякуємо! ' + fmtMoney(G.target) + ' грн з квартири зібрано' : 'Рекомендуємо довнести ' + fmtMoney(G.left) + ' грн до ' + esc(G.due)) + '</div></div></div>' +
+    (done ? '' : '<div class="bar" style="height:8px;background:#fff"><i style="width:' + pct + '%;background:var(--yellow-d)"></i></div>' +
+      '<div style="font-size:13px;line-height:1.45;color:var(--graph)">Мета — <b>' + fmtMoney(G.target) + ' грн</b> з кожної квартири на генератор будинку. Це окремий збір, не щомісячне пальне.</div>') + '</div>';
+}
+// адміністратор: таблиця «квартира → внесено всього», хто не довніс, депозити (понад мету) і переказ депозиту на пальне
+function genFundScreen() {
+  const G = D.genFund;
+  let h = '<div class="row" style="justify-content:flex-start"><button class="iconbtn" aria-label="Назад" onclick="back()">' + ic('back', '#23262B', 20) + '</button><div class="h2" role="heading" aria-level="2">Генератор</div></div>';
+  const up = '<label class="btn graph" style="cursor:pointer">' + ic('plus', '#F2C12E', 18) + 'Завантажити таблицю (xlsx / csv)<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="genFundFile(this)"></label>' +
+    '<div class="sub" style="font-weight:500;line-height:1.45">Таблиця «Квартира → скільки внесено ВСЬОГО на генератор». Нова таблиця повністю замінює попередню. Мета — ' + fmtMoney((G && G.target) || 10500) + ' грн з квартири; що більше — депозит квартири.</div>';
+  if (!G || !G.apts) return h + '<div class="card" style="gap:10px">' + up + '</div>';
+  const A = G.apts, T = G.target, q = (ui.gQ || '').trim().toLowerCase().replace(/^кв\.?/, '');
+  const less = A.filter(a => a[1] < T - 0.01), dep = A.filter(a => a[2] > 0.009), sum = A.reduce((t, a) => t + a[1], 0);
+  h += '<div class="card" style="gap:8px"><div style="font-size:26px;font-weight:800">' + fmtMoney(sum) + ' <span class="sub" style="font-size:14px">грн зібрано</span></div>' +
+    '<div class="sub" style="font-weight:600;line-height:1.5">' + (A.length - less.length) + ' кв. внесли ' + fmtMoney(T) + '+ · ' + less.length + ' кв. менше' +
+    ' · на депозитах ' + fmtMoney(dep.reduce((t, a) => t + a[2], 0)) + ' грн' + (G.at ? '<br>Таблиця від ' + esc(ago(G.at)) : '') + '</div></div>';
+  const tab = ui.gTab || 'less';
+  h += '<div class="chips">' + [['less', 'Менше ' + fmtMoney(T) + ' · ' + less.length], ['dep', 'Депозит · ' + dep.length], ['all', 'Усі · ' + A.length]].map(x => '<button class="chip' + (tab === x[0] ? ' on' : '') + '" onclick="ui.gTab=\'' + x[0] + '\';ui.gSel=\'\';render()">' + x[1] + '</button>').join('') + '</div>' +
+    '<input class="input" type="search" aria-label="Знайти квартиру" autocomplete="off" placeholder="Знайти квартиру…" value="' + esc(ui.gQ || '') + '" oninput="ui.gQ=this.value;clearTimeout(ui.gT);ui.gT=setTimeout(()=>{render();const i=document.querySelector(\'input[type=search]\');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},250)">';
+  let list = tab === 'less' ? less : tab === 'dep' ? dep : A;
+  if (q) list = A.filter(a => a[0].toLowerCase() === q || a[0].toLowerCase().startsWith(q));
+  list = list.slice().sort((x, y) => parseInt(x[0], 10) - parseInt(y[0], 10) || x[0].localeCompare(y[0]));
+  h += '<div class="card" style="gap:0;padding:4px 14px">' + (list.length ? list.slice(0, 200).map(a => {
+    const st = a[1] < T - 0.01 ? '<span class="tag bad">ще ' + fmtMoney(T - a[1]) + '</span>' : a[2] > 0.009 ? '<span class="tag ok">депозит ' + fmtMoney(a[2]) + '</span>' : '<span class="tag soft">✓</span>';
+    let r = '<div style="padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px"><div class="row"><div><b>Кв. ' + esc(a[0]) + '</b><div class="sub" style="font-weight:500">внесено ' + fmtMoney(a[1]) + ' грн' + (a[3] ? ' · на пальне вже ' + fmtMoney(a[3]) : '') + '</div></div>' + st + '</div>';
+    if (a[2] > 0.009) {
+      if (ui.gSel === a[0]) {
+        const ms = G.months || [], m = ui.gMon && ms.indexOf(ui.gMon) >= 0 ? ui.gMon : ms[ms.length - 1];
+        r += '<div class="chips">' + ms.slice().reverse().map(k => '<button class="chip' + (k === m ? ' on' : '') + '" onclick="ui.gMon=\'' + k + '\';render()">' + esc(cap(monthName(k))) + '</button>').join('') + '</div>' +
+          '<div class="row" style="gap:8px"><input class="input" id="gSum" style="flex:1;min-width:0" inputmode="decimal" aria-label="Сума на пальне" value="' + esc(String(Math.min(a[2], (D.fuel && D.fuel.amount) || 1500))) + '">' +
+          '<button class="btn sm green" data-a="' + esc(a[0]) + '" data-m="' + esc(m) + '" onclick="genMove(this.dataset.a,this.dataset.m)">На пальне</button></div>' +
+          '<div class="sub" style="font-weight:500">Сума піде в «Внесок на пальне» кв. ' + esc(a[0]) + ' за ' + esc(monthName(m)) + '. Скасувати — видалити цей платіж у пальному, депозит повернеться.</div>';
+      } else r += '<button class="btn sm ghost" style="align-self:flex-start" data-a="' + esc(a[0]) + '" onclick="ui.gSel=this.dataset.a;render()">З депозиту на пальне…</button>';
+    }
+    return r + '</div>';
+  }).join('') : '<div class="empty">Нічого не знайдено</div>') + '</div>';
+  return h + '<div class="label">Дані</div><div class="card" style="gap:10px">' + up + '</div>';
+}
+async function genMove(apt, m) {
+  const el = document.getElementById('gSum'), sum = cellMoney(el ? el.value : '');
+  if (!(sum > 0)) { toast('Вкажіть суму'); return; }
+  ask('Переказати ' + fmtMoney(sum) + ' грн з депозиту кв. ' + apt + ' на пальне за ' + monthName(m) + '?', async ok => {
+    if (ok && await run('genToFuel', { apt: apt, month: m, sum: sum }, 'Зараховано на пальне за ' + monthName(m))) { ui.gSel = ''; render(); }
+  });
+}
+function genFundFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  input.value = '';
+  const isCsv = /\.csv$/i.test(file.name), r = new FileReader();
+  r.onerror = () => toast('Не вдалося прочитати файл');
+  r.onload = async () => {
+    try {
+      let grid;
+      if (isCsv) grid = String(r.result).split(/\r?\n/).map(l => l.split(/[;,\t]/));
+      else { const X = await loadXlsxLib(); const wb = X.read(r.result, { type: 'array' }); grid = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true }); }
+      const rows = tableRows(grid);
+      if (!rows.length) { toast('У таблиці не знайдено квартир'); return; }
+      const T = (D.genFund && D.genFund.target) || 10500, paid = rows.filter(x => cellMoney(x[1]) > 0), sum = paid.reduce((t, x) => t + cellMoney(x[1]), 0);
+      const full = paid.filter(x => cellMoney(x[1]) >= T - 0.01).length, meta = tableMeta(grid);
+      const diff = meta.total !== null && Math.abs(meta.total - sum) > 0.5;
+      ask('Генератор: ' + paid.length + ' кв., разом ' + fmtMoney(sum) + ' грн. Внесли ' + fmtMoney(T) + '+: ' + full + ' кв.' +
+        (diff ? '\n\nУВАГА: у самій таблиці підсумок ' + fmtMoney(meta.total) + ' грн — не збігається. Перевірте колонки.' : '') +
+        '\n\nПопередня таблиця генератора заміниться новою. Завантажити?', async ok => {
+        if (!ok) return;
+        if (await run('genFundTable', { rows: rows })) { const t = D.genTableResult || {}; toast('Генератор: ' + t.rows + ' кв. на ' + fmtMoney(t.sum) + ' грн'); haptic('ok'); render(); }
+      });
+    } catch (e) { toast(e.message || 'Не вдалося розібрати таблицю'); }
+  };
+  if (isCsv) r.readAsText(file, 'utf-8'); else r.readAsArrayBuffer(file);
+}
+// ---------- «Внесок на пальне»: усі місяці збору, таблиця для кожного ----------
 function fuelMonthsCard(a) {
   const ov = a.overview || (a.months || []).slice().reverse().map(m => ({ m: m }));
   return '<div class="card fmon" style="gap:0;padding:6px 6px">' + ov.map(o => {
@@ -3959,6 +4038,16 @@ async function start() {
 
 // ---------- демо-режим (?demo=1; &admin=1, &family=1, &state=pending) ----------
 // ---------- демо: пальне в адмінці ----------
+// демо: збір на генератор (мешканець — 6 000 з 10 500; адміністратор — список квартир із депозитами)
+function demoGen(me, admin) {
+  const g = { target: 10500, due: '1 грудня', at: Date.now() - 26 * 3600e3, paid: 6000, left: 4500 };
+  if (admin) {
+    let seed = 11; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    g.apts = []; for (let n = 1; n <= 300; n++) { if (rnd() < .35) continue; const s = [3000, 6000, 10500, 10500, 10500, 12000, 13500, 15000][Math.floor(rnd() * 8)]; g.apts.push([String(n), s, Math.max(0, s - 10500), 0]); }
+    g.months = ['2026-10', '2026-11'];
+  }
+  return g;
+}
 function demoOsbb() {
   const apts = [];
   let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
@@ -4083,6 +4172,7 @@ function demoApi(action, d) {
         sum: /fuel=part/.test(q) ? 1000 : /fuel=on/.test(q) ? 1500 : 0, key: (q.match(/fuel=(\w+)/) || [0, 'off'])[1], lastPay: { date: now - 30 * 24 * H, sum: 1500 },
         admin: /admin=1/.test(q) ? demoFuelAdmin(now, H) : null },
       osbb: /admin=1/.test(q) ? demoOsbb() : undefined,
+      genFund: demoGen(me, /admin=1/.test(q)),
       _pub: 1,
       totalApts: 566, entrances: 4, now: now
     };
@@ -4090,6 +4180,8 @@ function demoApi(action, d) {
   const db = DEMO_DB;
   if (db._pub === 1) { db.fuel.pub = demoPub(now, H); db._pub = 2; }
   if (action === 'fuelSpendAdd') { db.fuel.pub.spend.unshift({ row: now, date: d.date ? new Date(d.date + 'T12:00').getTime() : now, sum: Number(d.sum) || 0, liters: Number(d.liters) || 0, note: d.note }); const x = db.fuel.pub[monthKeyJs(db.fuel.pub.spend[0].date)]; if (x) { x.spent += Number(d.sum) || 0; x.liters += Number(d.liters) || 0; } db.fuel.pub.spent += Number(d.sum) || 0; db.fuel.pub.balance -= Number(d.sum) || 0; }
+  if (action === 'genToFuel' && db.genFund && db.genFund.apts) { const a = db.genFund.apts.find(x => x[0] === d.apt); if (a) { if (d.sum > a[2] + 0.001) throw new Error('На депозиті кв. ' + d.apt + ' лише ' + a[2] + ' грн'); a[2] -= d.sum; a[3] += d.sum; } }
+  if (action === 'genFundTable' && db.genFund) { const m = {}; d.rows.forEach(r => { const s = cellMoney(r[1]); if (s > 0) m[String(r[0]).trim()] = (m[String(r[0]).trim()] || 0) + s; }); db.genFund.apts = Object.keys(m).map(a => [a, m[a], Math.max(0, m[a] - 10500), 0]); db.genFund.at = now; db.genTableResult = { rows: Object.keys(m).length, sum: Object.keys(m).reduce((t, a) => t + m[a], 0) }; }
   if (action === 'fuelSpendDel') { const z = db.fuel.pub.spend.find(y => y.row === d.row); if (z) { db.fuel.pub.spend = db.fuel.pub.spend.filter(y => y !== z); db.fuel.pub.spent -= z.sum; db.fuel.pub.balance += z.sum; const x = db.fuel.pub[monthKeyJs(z.date)]; if (x) x.spent -= z.sum; } }
   if (!db.light.floors) {
     const F = {}, H = 3600e3;
