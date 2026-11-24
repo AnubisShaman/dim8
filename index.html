@@ -3369,11 +3369,7 @@ function fuelCard() {
       '<div style="font-weight:800">кв ' + esc(D.me.apt) + '</div></div><button class="btn sm ghost" onclick="copyText(\'кв ' + esc(D.me.apt) + '\',\'Скопійовано\')">' + ic('copy', null, 16) + '</button></div>';
     if (k !== 'claimed') h += '<button class="btn ghost" onclick="fuelClaim()">Я вже оплатив(ла)</button>';
   }
-  // скільки долучились
-  const gm = monthName(f.gov || f.month);
-  h += '<div class="sub" style="font-weight:500;line-height:1.5">За ' + gm + ' внесли: ' + (f.sec ? 'у вашій секції ' + f.sec.n + ' — <b>' + f.sec.paid + ' з ' + f.sec.all + '</b>, ' : '') + 'у будинку — <b>' + f.paidCount + ' з ' + (f.houseAll || D.totalApts) + '</b> 💛' +
-    (f.gov && f.gov !== f.month && f.curPaidCount && !(f.skip || {})[f.month] ? '<br>За ' + monthName(f.month) + ' вже внесли ' + f.curPaidCount + ' ' + plural(f.curPaidCount, 'квартира', 'квартири', 'квартир') : '') + '</div>';
-  h += fuelHistHtml();
+  h += '<div class="sub" style="font-weight:500">🔑 Активних ключів у будинку: <b>' + (f.paidCount || 0) + '</b></div>';
   if (f.updated) h += '<div style="font-size:11px;color:var(--muted)">Оплати оновлено ' + esc(fmtUpd(f.updated)) + '</div>';
   if (fpubOk()) h += '<button class="btn ghost" onclick="ui.fpm=\'\';go(\'fpub\')">Куди йдуть внески ›</button>';
   return h + '</div>';
@@ -3644,7 +3640,6 @@ function genCard() {
     '<div class="keyrow"><div class="keyic" style="font-size:22px">🔌</div><div><div style="font-size:17px;font-weight:800">' + (done ? 'Внесок на генератор зроблено' : 'Внесено ' + fmtMoney(G.paid) + ' з ' + fmtMoney(G.target) + ' грн') + '</div>' +
     '<div class="sub" style="font-weight:500">' + (done ? 'Дякуємо! ' + fmtMoney(G.target) + ' грн з квартири зібрано' : blk ? 'Довнесіть ' + fmtMoney(G.left) + ' грн — ключ від ліфта заблоковано' : 'Рекомендуємо довнести ' + fmtMoney(G.left) + ' грн до ' + esc(G.due)) + '</div></div></div>' +
     (done ? '' : '<div class="bar" style="height:8px;background:#fff"><i style="width:' + pct + '%;background:var(--yellow-d)"></i></div>' +
-      '<div style="font-size:13px;line-height:1.45;color:var(--graph)">Мета — <b>' + fmtMoney(G.target) + ' грн</b> з кожної квартири на генератор будинку. Це окремий збір, не щомісячне пальне.</div>' +
       (G.block ? '<div style="font-size:13px;line-height:1.45;color:' + (blk ? 'var(--bad)' : 'var(--graph)') + '">⚠️ За рішенням більшості мешканців ' + (blk ? 'з ' + esc(G.block) + ' ключ від ліфта заблоковано, доки не буде внесено ' + fmtMoney(G.target) + ' грн.' : 'з <b>' + esc(G.block) + '</b> у квартир, які не внесли ' + fmtMoney(G.target) + ' грн, буде заблоковано ключ від ліфта.') + '</div>' : '')) + '</div>';
 }
 // адміністратор: таблиця «квартира → внесено всього», хто не довніс, депозити (понад мету) і переказ депозиту на пальне
