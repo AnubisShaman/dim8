@@ -1224,19 +1224,6 @@ body.gamemode .edge{display:none}
 @keyframes hiT2{0%,17%{opacity:0}20%,37%{opacity:1}40%,100%{opacity:0}}
 @keyframes hiT3{0%,38%{opacity:0}42%,61%{opacity:1}64%,100%{opacity:0}}
 @keyframes hiT4{0%,62%{opacity:0}66%,95%{opacity:1}100%{opacity:0}}
-/* «Поділитися з близькими» */
-.shr{display:flex;align-items:center;gap:12px;padding:12px 14px 12px 12px;border-radius:22px;background:var(--card);box-shadow:var(--shadow-1);border:none;font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer}
-.shr .ic{width:44px;height:44px;flex:none;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#4FC3F7,#229ED9);box-shadow:0 4px 12px rgba(34,158,217,.35)}
-.shr .t{display:block;font-weight:800;font-size:15px}.shr .s{display:block;font-size:12.5px;color:var(--muted);font-weight:500;margin-top:2px}
-.shr .go{margin-left:auto;color:var(--muted)}
-.shp{width:100%;padding:12px;border-radius:18px;background:var(--soft)}
-.shp .msg{max-width:92%;padding:9px 11px;border-radius:14px 14px 14px 4px;background:var(--card);box-shadow:var(--shadow-1);font-size:13.5px;line-height:1.4;text-align:left}
-.shp .lnk{color:#229ED9;margin-top:4px}
-.shp .shc{text-align:left;margin-top:6px;display:flex;align-items:center;gap:8px;padding:6px 8px;border-left:3px solid #229ED9;border-radius:6px;background:rgba(34,158,217,.1)}
-.shp .shc div{flex:1;min-width:0}
-.shp .shc b{display:block;color:#229ED9;font-size:12.5px}
-.shp .shc span:not(.ico){display:block;font-size:12px;color:var(--muted)}
-.shp .ico{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD54F,#F2C12E);color:#23262B;flex:none}
 </style>
 </head>
 <body>
@@ -2564,40 +2551,13 @@ function homeSheet() {
   haptic(); fsOpen();
 }
 // на головній банера більше немає — замість нього одноразова шторка
-function homeBanner() { return shareEntry(); }
+function homeBanner() { return ''; }
 // у кабінеті: доки значка немає — кнопка; додано — тиха позначка
 function homeRow() {
   if (homeDesk() && !DEMO) return '';
   if (homeSt === 'added') return '<div class="hsdone">' + ic('check', null, 20) + 'Значок будинку вже на екрані телефону</div>';
   return '<button class="hsc" onclick="homeSheet()"><span class="ic">' + HOME_IC + '</span><span><span class="t" style="display:block">Додати значок на екран</span><span class="s" style="display:block">Відкривати будинок одним дотиком, як звичайну програму</span></span><span class="go">' + ic('chev', null, 18) + '</span></button>';
 }
-// ---------- «Поділитися з близькими» ----------
-// Посилання t.me/<бот>?startapp — Telegram сам показує його карткою (фото, назва й опис бота з BotFather).
-function shareUrl() { return 'https://t.me/' + CONFIG.BOT_USERNAME + '?startapp'; }
-function shareText() {
-  return '🏠 Застосунок мешканців ЖК «Русанівська гавань», ' + (document.title || 'наш будинок') + '.\n' +
-    'Світло по поверхах, ліфти, заявки й оголошення сусідів — усе в Telegram, без зайвих чатів 👇';
-}
-function shareEntry() {
-  return '<button class="shr" onclick="shareSheet()"><span class="ic">' + ic('share', '#fff', 22) + '</span><span><span class="t">Поділитися з близькими</span><span class="s">Надішліть застосунок рідним і сусідам</span></span><span class="go">' + ic('chev', null, 18) + '</span></button>';
-}
-function shareSheet() {
-  fsInit();
-  const nm = esc(document.title || 'Будинок');
-  document.getElementById('fshBody').innerHTML = '<div class="hsp"><div class="h2" id="fshT">Поділитися застосунком</div>' +
-    '<div class="sub" style="font-weight:500">Так виглядатиме повідомлення:</div>' +
-    '<div class="shp"><div class="msg">' + esc(shareText()).replace(/\n/g, '<br>') + '<div class="lnk">' + esc(shareUrl().replace('https://', '')) + '</div>' +
-    '<div class="shc"><div><b>' + esc(CONFIG.BOT_USERNAME) + '</b><span>Застосунок мешканців · ' + nm + '</span></div><span class="ico">' + HOME_IC + '</span></div></div></div>' +
-    '<button class="btn yellow" style="width:100%" onclick="shareSend()">' + ic('share', '#23262B', 18) + 'Надіслати в Telegram</button>' +
-    '<button class="btn ghost" style="width:100%" onclick="shareCopy()">' + ic('copy', null, 18) + 'Скопіювати посилання</button></div>';
-  haptic(); fsOpen();
-}
-function shareSend() {
-  haptic('mid');
-  const u = 'https://t.me/share/url?url=' + encodeURIComponent(shareUrl()) + '&text=' + encodeURIComponent(shareText());
-  if (tg && tg.openTelegramLink && tg.initData) { fsClose(); tg.openTelegramLink(u); } else window.open(u, '_blank');
-}
-function shareCopy() { copyText(shareText() + '\n' + shareUrl(), 'Скопійовано — вставте в будь-який чат'); fsClose(); }
 
 
 // ---------- ПРОЗОРІСТЬ ЗБОРУ НА ПАЛЬНЕ (бачать усі, без номерів квартир) ----------
@@ -3538,7 +3498,7 @@ function cabinet() {
     flatCard() +
     '<div class="label">Мої заявки</div>' +
     (mine.length ? mine.map(p => '<div class="card" role="button" tabindex="0" onclick="ui.ptab=\'' + (p.status === 'Вирішено' ? 'done' : 'open') + '\';go(\'problems\')"><div class="row"><div><div style="font-weight:700">' + esc(p.category) + '</div><div class="sub" style="font-weight:500">№ ' + p.id + ' · ' + ago(p.created) + '</div></div><span class="tag ' + (p.status === 'Вирішено' ? 'ok' : p.status === 'В роботі' ? 'yel' : 'bad') + '">' + esc(p.status) + '</span></div></div>').join('') : '<div class="empty">Заявок ще немає</div>') +
-    '<div class="label">Ще</div>' + boardEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + shareEntry() + themeCard() +
+    '<div class="label">Ще</div>' + boardEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + themeCard() +
     '<div class="chips">' + chatBtn('general', 'Чат будинку') + '</div>' +
     '<div style="font-size:12px;color:var(--muted);line-height:1.5">Телефон і ПІБ бачить лише адміністратор. Змінити квартиру чи статус можна через адміністратора. Сповіщення про ваші заявки приходять у чат із ботом.</div>';
 }
