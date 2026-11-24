@@ -1156,6 +1156,56 @@ body.gamemode .edge{display:none}
 @keyframes hdT2{0%,26%{opacity:0}30%,54%{opacity:1}58%,100%{opacity:0}}
 @keyframes hdT3{0%,56%{opacity:0}60%,94%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.hd *{animation-duration:12s!important}}
+/* iPhone: темний Safari, 4 кроки за 8 с */
+.hi-ph{background:#1C1C1E;color:#F2F2F7}
+.hi-l{position:absolute;inset:0}
+.hi-ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD54F,#F2C12E);color:#23262B;flex:none}
+.hi-ico svg{width:17px;height:17px}
+.hi-a{background:#1C1C1E}
+.hi-big{position:absolute;left:0;right:0;top:56px;display:grid;place-items:center}
+.hi-big .hi-ico{width:62px;height:62px;border-radius:16px;box-shadow:0 0 0 4px #fff}
+.hi-big .hi-ico svg{width:32px;height:32px}
+.hi-t{position:absolute;left:14px;right:14px;top:142px;text-align:center;font-size:12px;font-weight:700;line-height:1.3}
+.hi-bar{position:absolute;left:8px;right:8px;bottom:10px;height:30px;display:flex;align-items:center;gap:6px}
+.hi-bar span{height:30px;border-radius:15px;background:#2C2C2E;display:grid;place-items:center;font-size:11px;color:#C7C7CC}
+.hi-bar .c{width:30px;flex:none;font-size:14px}
+.hi-bar .p{flex:1}
+.hi-bar .hi-dots{font-size:8px;letter-spacing:1px;color:#fff}
+.hi-b{opacity:0;animation:hiB 8s infinite}
+.hi-pop{position:absolute;right:10px;bottom:48px;width:120px;padding:6px 0;border-radius:16px;background:#2C2C2E;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.hi-r{height:24px;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:11px;white-space:nowrap}
+.hi-c{opacity:0;animation:hiC 8s infinite}
+.hi-sh{position:absolute;left:0;right:0;top:20px;bottom:0;border-radius:18px 18px 0 0;background:#2C2C2E;animation:hiUp 8s infinite}
+.hi-h{position:absolute;left:12px;top:10px;display:flex;align-items:center;gap:8px;font-size:11px}
+.hi-h small{display:block;color:#8E8E93;font-size:9.5px}
+.hi-circ{position:absolute;left:12px;right:12px;top:52px;display:flex;justify-content:space-between}
+.hi-circ i{width:30px;height:30px;border-radius:50%;background:#3A3A3C}
+.hi-list{position:absolute;left:8px;right:8px;top:96px;border-radius:12px;background:#3A3A3C;overflow:hidden}
+.hi-list .hi-r{height:26px;border-top:1px solid #48484A}
+.hi-list .hi-r:first-child{border-top:none}
+.hi-d{opacity:0;animation:hiD 8s infinite;background:#1C1C1E}
+.hi-top{position:absolute;left:8px;right:8px;top:28px;display:flex;align-items:center;gap:6px;font-size:10.5px;white-space:nowrap}
+.hi-top .x{width:22px;height:22px;border-radius:50%;background:#2C2C2E;display:grid;place-items:center;font-size:10px}
+.hi-top b{flex:1}
+.hi-top .add{padding:5px 9px;border-radius:12px;background:#0A84FF;color:#fff;font-weight:700}
+.hi-new{position:absolute;left:0;right:0;top:64px;padding:8px 10px;background:#2C2C2E;display:flex;align-items:center;gap:10px;font-size:11.5px}
+.hi-new .hi-ico{width:38px;height:38px;border-radius:9px}
+.hi-hit1{animation:hiH1 8s infinite}.hi-hit2{animation:hiH2 8s infinite}.hi-hit3{animation:hiH3 8s infinite}
+.hi-f{position:absolute;left:0;top:0;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:0 0 0 2px rgba(255,255,255,.9);animation:hiF 8s infinite;opacity:0;z-index:5}
+/* палець: ••• (177,275) → «Поділитися» (130,186) → «На екран «Додому»» (100,183) → «Додати» (165,39) */
+@keyframes hiF{0%{transform:translate(150px,330px);opacity:0}7%{transform:translate(177px,275px);opacity:1}12%{transform:translate(177px,275px) scale(.7)}15%{transform:translate(177px,275px) scale(1)}26%{transform:translate(130px,186px)}33%{transform:translate(130px,186px) scale(.7)}36%{transform:translate(130px,186px) scale(1)}49%{transform:translate(100px,183px)}57%{transform:translate(100px,183px) scale(.7)}60%{transform:translate(100px,183px) scale(1)}73%{transform:translate(165px,39px)}81%{transform:translate(165px,39px) scale(.7)}84%{transform:translate(165px,39px) scale(1);opacity:1}93%{opacity:0}100%{transform:translate(150px,330px);opacity:0}}
+@keyframes hiB{0%,15%{opacity:0}18%,38%{opacity:1}41%,100%{opacity:0}}
+@keyframes hiC{0%,37%{opacity:0}41%,62%{opacity:1}65%,100%{opacity:0}}
+@keyframes hiUp{0%,37%{transform:translateY(100%)}43%,100%{transform:translateY(0)}}
+@keyframes hiD{0%,61%{opacity:0}65%,95%{opacity:1}100%{opacity:0}}
+@keyframes hiH1{0%,32%{background:transparent}33%,38%{background:#3A3A3C}39%,100%{background:transparent}}
+@keyframes hiH2{0%,56%{background:#3A3A3C}57%,62%{background:#55555A}63%,100%{background:#3A3A3C}}
+@keyframes hiH3{0%,80%{background:#0A84FF}81%,86%{background:#64B0FF}87%,100%{background:#0A84FF}}
+.hi-cap span{animation:hiT1 8s infinite}.hi-cap span:nth-child(2){animation-name:hiT2}.hi-cap span:nth-child(3){animation-name:hiT3}.hi-cap span:nth-child(4){animation-name:hiT4}
+@keyframes hiT1{0%,16%{opacity:1}19%,100%{opacity:0}}
+@keyframes hiT2{0%,17%{opacity:0}20%,37%{opacity:1}40%,100%{opacity:0}}
+@keyframes hiT3{0%,38%{opacity:0}42%,61%{opacity:1}64%,100%{opacity:0}}
+@keyframes hiT4{0%,62%{opacity:0}66%,95%{opacity:1}100%{opacity:0}}
 </style>
 </head>
 <body>
@@ -2452,10 +2502,25 @@ function homeDemo(ios) {
   return '<div class="hd ' + (ios ? 'ios' : 'and') + '" aria-hidden="true"><div class="hd-ph">' + A + B + C + '<span class="hd-f"></span></div></div>' +
     '<div class="hd-cap"><span>1 · ' + (ios ? 'Натисніть «Поділитися»' : 'Натисніть «Додати на екран»') + '</span><span>2 · ' + (ios ? '«На початковий екран»' : 'Підтвердіть «Додати»') + '</span><span>3 · ' + (ios ? '«Додати» — готово!' : 'Значок на екрані — готово!') + '</span></div>';
 }
+// iPhone (Safari, як на реальних скрінах): «⋯» → «Поділитися» → «На екран «Додому»» → «Додати». 8 с по колу
+function homeDemoIos() {
+  const ICO = '<span class="hi-ico">' + HOME_IC + '</span>', nm = esc(document.title || 'Будинок');
+  const shareI = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>';
+  const A = '<div class="hi-l hi-a"><div class="hi-big">' + ICO + '</div><div class="hi-t">Додайте ' + nm + ' на екран «Додому»</div>' +
+    '<div class="hi-bar"><span class="c">‹</span><span class="p">t.me</span><span class="c hi-dots">•••</span></div></div>';
+  const B = '<div class="hi-l hi-b"><div class="hi-pop"><div class="hi-r hi-hit1">' + shareI + 'Поділитися</div><div class="hi-r">☆ Закладки</div><div class="hi-r">＋ Нова вкладка</div></div></div>';
+  const C = '<div class="hi-l hi-c"><div class="hi-sh"><div class="hi-h">' + ICO + '<span><b>' + nm + '</b><small>t.me</small></span></div>' +
+    '<div class="hi-circ"><i></i><i></i><i></i><i></i></div>' +
+    '<div class="hi-list"><div class="hi-r">☆ Додати в обране</div><div class="hi-r">⌕ Знайти на сторінці</div><div class="hi-r hi-hit2">⊞ На екран «Додому»</div><div class="hi-r">⎙ Друк</div></div></div></div>';
+  const Dd = '<div class="hi-l hi-d"><div class="hi-top"><span class="x">✕</span><b>На екран «Додому»</b><span class="add hi-hit3">Додати</span></div>' +
+    '<div class="hi-new">' + ICO + '<span>' + nm + '</span></div></div>';
+  return '<div class="hd" aria-hidden="true"><div class="hd-ph hi-ph">' + A + B + C + Dd + '<span class="hi-f"></span></div></div>' +
+    '<div class="hd-cap hi-cap"><span>1 · Внизу праворуч натисніть •••</span><span>2 · «Поділитися»</span><span>3 · «На екран «Додому»»</span><span>4 · «Додати» — готово!</span></div>';
+}
 function homeSheet() {
   fsInit();
   const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (tg && tg.platform === 'ios');
-  document.getElementById('fshBody').innerHTML = '<div class="hsp"><div class="h2" id="fshT">Будинок — одним дотиком</div>' + homeDemo(ios) +
+  document.getElementById('fshBody').innerHTML = '<div class="hsp"><div class="h2" id="fshT">Будинок — одним дотиком</div>' + (ios ? homeDemoIos() : homeDemo(false)) +
     '<button class="btn yellow" style="width:100%" onclick="homeAdd()">' + HOME_IC + 'Додати на екран</button>' +
     '<button class="btn ghost" style="width:100%" onclick="fsClose()">Не зараз</button></div>';
   haptic(); fsOpen();
