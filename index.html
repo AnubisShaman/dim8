@@ -1156,56 +1156,87 @@ body.gamemode .edge{display:none}
 @keyframes hdT2{0%,26%{opacity:0}30%,54%{opacity:1}58%,100%{opacity:0}}
 @keyframes hdT3{0%,56%{opacity:0}60%,94%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.hd *{animation-duration:12s!important}}
-/* iPhone: темний Safari, 4 кроки за 8 с */
+/* iPhone: темний Safari, 4 кроки за 8 с (позиції фіксовані, щоб палець влучав) */
 .hi-ph{background:#1C1C1E;color:#F2F2F7}
 .hi-l{position:absolute;inset:0}
-.hi-ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD54F,#F2C12E);color:#23262B;flex:none}
-.hi-ico svg{width:17px;height:17px}
+.hi-ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD54F,#F2C12E);color:#23262B;flex:none}
+.hi-ico svg{width:16px;height:16px}
 .hi-a{background:#1C1C1E}
-.hi-big{position:absolute;left:0;right:0;top:56px;display:grid;place-items:center}
-.hi-big .hi-ico{width:62px;height:62px;border-radius:16px;box-shadow:0 0 0 4px #fff}
-.hi-big .hi-ico svg{width:32px;height:32px}
-.hi-t{position:absolute;left:14px;right:14px;top:142px;text-align:center;font-size:12px;font-weight:700;line-height:1.3}
+.hi-mock{position:absolute;left:48px;right:48px;top:22px;height:74px;border:3px solid #3A3A3C;border-bottom:none;border-radius:16px 16px 0 0;padding:12px 8px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;align-content:start}
+.hi-mock i{display:block;aspect-ratio:1;border-radius:5px;background:#2C2C2E}
+.hi-mock .hi-ico{width:auto;height:auto;aspect-ratio:1;border-radius:6px;box-shadow:0 0 0 2px #fff;transform:scale(1.25)}
+.hi-mock .hi-ico svg{width:11px;height:11px}
+.hi-t{position:absolute;left:12px;right:12px;top:104px;text-align:center;font-size:11px;font-weight:700;line-height:1.3}
+.hi-st{position:absolute;left:18px;right:10px;top:140px;font-size:8.5px;line-height:1.9}
+.hi-st em{font-style:normal;color:#0A84FF;display:inline-flex;align-items:center;gap:2px;vertical-align:middle}
+.hi-st .pl,.hi-r .pl{display:inline-grid;place-items:center;width:10px;height:10px;border:1.3px solid currentColor;border-radius:3px;font-size:8px;line-height:1}
+.hi-tip{position:absolute;left:50%;top:220px;transform:translateX(-50%);padding:5px 10px;border-radius:12px;background:#0A84FF;color:#fff;font-size:9.5px;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.hi-tip::after{content:"";position:absolute;left:50%;bottom:-4px;margin-left:-4px;border:4px solid transparent;border-bottom:none;border-top-color:#0A84FF}
 .hi-bar{position:absolute;left:8px;right:8px;bottom:10px;height:30px;display:flex;align-items:center;gap:6px}
-.hi-bar span{height:30px;border-radius:15px;background:#2C2C2E;display:grid;place-items:center;font-size:11px;color:#C7C7CC}
-.hi-bar .c{width:30px;flex:none;font-size:14px}
-.hi-bar .p{flex:1}
-.hi-bar .hi-dots{font-size:8px;letter-spacing:1px;color:#fff}
+.hi-bar span{height:30px;border-radius:15px;background:#2C2C2E;display:flex;align-items:center;justify-content:center;font-size:10px;color:#E5E5EA}
+.hi-bar .c{width:30px;flex:none;font-size:14px;color:#8E8E93}
+.hi-bar .p{flex:1;justify-content:space-between;padding:0 9px}
+.hi-bar .p small{font-size:10px;color:#C7C7CC}
+.hi-bar .hi-dots{font-size:7px;letter-spacing:1px;color:#fff}
 .hi-b{opacity:0;animation:hiB 8s infinite}
-.hi-pop{position:absolute;right:10px;bottom:48px;width:120px;padding:6px 0;border-radius:16px;background:#2C2C2E;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-.hi-r{height:24px;display:flex;align-items:center;gap:7px;padding:0 10px;font-size:11px;white-space:nowrap}
+.hi-pop{position:absolute;right:8px;top:108px;width:132px;padding:6px 0;border-radius:16px;background:#2C2C2E;box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 0 1px #3A3A3C}
+.hi-pop hr{border:none;border-top:1px solid #3A3A3C;margin:2px 10px}
+.hi-r{height:20px;display:flex;align-items:center;gap:6px;padding:0 10px;font-size:9.5px;white-space:nowrap;overflow:hidden}
+.hi-ft{display:flex;justify-content:space-around;font-size:8.5px;padding:6px 0 2px;color:#E5E5EA}
 .hi-c{opacity:0;animation:hiC 8s infinite}
-.hi-sh{position:absolute;left:0;right:0;top:20px;bottom:0;border-radius:18px 18px 0 0;background:#2C2C2E;animation:hiUp 8s infinite}
-.hi-h{position:absolute;left:12px;top:10px;display:flex;align-items:center;gap:8px;font-size:11px}
-.hi-h small{display:block;color:#8E8E93;font-size:9.5px}
-.hi-circ{position:absolute;left:12px;right:12px;top:52px;display:flex;justify-content:space-between}
-.hi-circ i{width:30px;height:30px;border-radius:50%;background:#3A3A3C}
-.hi-list{position:absolute;left:8px;right:8px;top:96px;border-radius:12px;background:#3A3A3C;overflow:hidden}
-.hi-list .hi-r{height:26px;border-top:1px solid #48484A}
-.hi-list .hi-r:first-child{border-top:none}
+.hi-sh{position:absolute;left:0;right:0;top:14px;bottom:0;border-radius:18px 18px 0 0;background:#2C2C2E;animation:hiUp 8s infinite}
+.hi-h{position:absolute;left:10px;right:10px;top:8px;display:flex;align-items:flex-start;gap:8px;font-size:10px}
+.hi-h small{display:block;color:#8E8E93;font-size:8.5px}
+.hi-h em{display:inline-block;margin-top:3px;font-style:normal;font-size:7.5px;padding:2px 6px;border-radius:8px;background:#3A3A3C}
+.hi-h .x{margin-left:auto;width:20px;height:20px;border-radius:50%;background:#3A3A3C;display:grid;place-items:center;font-size:9px}
+.hi-circ{position:absolute;left:8px;right:8px;top:52px;display:flex;justify-content:space-between}
+.hi-circ span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:6.5px;color:#C7C7CC;width:40px}
+.hi-circ i{width:24px;height:24px;border-radius:50%;background:#3A3A3C}
+.hi-list{position:absolute;left:8px;right:8px;top:96px;border-radius:11px;background:#3A3A3C;overflow:hidden}
+.hi-list .hi-r{height:19px;box-shadow:inset 0 1px 0 #48484A}
+.hi-list .hi-r:first-child{box-shadow:none}
+.hi-l2{top:199px}
 .hi-d{opacity:0;animation:hiD 8s infinite;background:#1C1C1E}
-.hi-top{position:absolute;left:8px;right:8px;top:28px;display:flex;align-items:center;gap:6px;font-size:10.5px;white-space:nowrap}
+.hi-top{position:absolute;left:8px;right:8px;top:28px;height:22px;display:flex;align-items:center;gap:6px;font-size:10px;white-space:nowrap}
 .hi-top .x{width:22px;height:22px;border-radius:50%;background:#2C2C2E;display:grid;place-items:center;font-size:10px}
 .hi-top b{flex:1}
-.hi-top .add{padding:5px 9px;border-radius:12px;background:#0A84FF;color:#fff;font-weight:700}
-.hi-new{position:absolute;left:0;right:0;top:64px;padding:8px 10px;background:#2C2C2E;display:flex;align-items:center;gap:10px;font-size:11.5px}
-.hi-new .hi-ico{width:38px;height:38px;border-radius:9px}
+.hi-top .add{padding:5px 10px;border-radius:12px;background:#0A84FF;color:#fff;font-weight:700}
+.hi-new{position:absolute;left:0;right:0;top:62px;padding:8px 10px;background:#2C2C2E;display:flex;align-items:center;gap:9px;font-size:10.5px}
+.hi-new small{display:block;color:#8E8E93;font-size:7.5px;white-space:nowrap;overflow:hidden;max-width:130px;text-overflow:ellipsis}
+.hi-new .hi-ico{width:34px;height:34px;border-radius:9px}
+.hi-tg{position:absolute;left:0;right:0;top:118px;padding:8px 10px;background:#2C2C2E;display:flex;align-items:center;justify-content:space-between;font-size:9.5px}
+.hi-tg i{width:28px;height:16px;border-radius:8px;background:#30D158;position:relative}
+.hi-tg i::after{content:"";position:absolute;right:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff}
+.hi-note{position:absolute;left:10px;right:10px;top:154px;font-size:7.5px;color:#8E8E93;line-height:1.4}
 .hi-hit1{animation:hiH1 8s infinite}.hi-hit2{animation:hiH2 8s infinite}.hi-hit3{animation:hiH3 8s infinite}
 .hi-f{position:absolute;left:0;top:0;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:0 0 0 2px rgba(255,255,255,.9);animation:hiF 8s infinite;opacity:0;z-index:5}
-/* палець: ••• (177,275) → «Поділитися» (130,186) → «На екран «Додому»» (100,183) → «Додати» (165,39) */
-@keyframes hiF{0%{transform:translate(150px,330px);opacity:0}7%{transform:translate(177px,275px);opacity:1}12%{transform:translate(177px,275px) scale(.7)}15%{transform:translate(177px,275px) scale(1)}26%{transform:translate(130px,186px)}33%{transform:translate(130px,186px) scale(.7)}36%{transform:translate(130px,186px) scale(1)}49%{transform:translate(100px,183px)}57%{transform:translate(100px,183px) scale(.7)}60%{transform:translate(100px,183px) scale(1)}73%{transform:translate(165px,39px)}81%{transform:translate(165px,39px) scale(.7)}84%{transform:translate(165px,39px) scale(1);opacity:1}93%{opacity:0}100%{transform:translate(150px,330px);opacity:0}}
+/* палець: ••• (177,275) → «Поділитися» (126,124) → «Додати на екран» (100,196) → «Додати» (167,39) */
+@keyframes hiF{0%{transform:translate(150px,330px);opacity:0}7%{transform:translate(177px,275px);opacity:1}12%{transform:translate(177px,275px) scale(.7)}15%{transform:translate(177px,275px) scale(1)}26%{transform:translate(126px,124px)}33%{transform:translate(126px,124px) scale(.7)}36%{transform:translate(126px,124px) scale(1)}49%{transform:translate(100px,196px)}57%{transform:translate(100px,196px) scale(.7)}60%{transform:translate(100px,196px) scale(1)}73%{transform:translate(167px,39px)}81%{transform:translate(167px,39px) scale(.7)}84%{transform:translate(167px,39px) scale(1);opacity:1}93%{opacity:0}100%{transform:translate(150px,330px);opacity:0}}
 @keyframes hiB{0%,15%{opacity:0}18%,38%{opacity:1}41%,100%{opacity:0}}
 @keyframes hiC{0%,37%{opacity:0}41%,62%{opacity:1}65%,100%{opacity:0}}
 @keyframes hiUp{0%,37%{transform:translateY(100%)}43%,100%{transform:translateY(0)}}
 @keyframes hiD{0%,61%{opacity:0}65%,95%{opacity:1}100%{opacity:0}}
-@keyframes hiH1{0%,32%{background:transparent}33%,38%{background:#3A3A3C}39%,100%{background:transparent}}
-@keyframes hiH2{0%,56%{background:#3A3A3C}57%,62%{background:#55555A}63%,100%{background:#3A3A3C}}
+@keyframes hiH1{0%,32%{background:transparent}33%,38%{background:#48484A}39%,100%{background:transparent}}
+@keyframes hiH2{0%,56%{background:#3A3A3C}57%,62%{background:#5A5A5E}63%,100%{background:#3A3A3C}}
 @keyframes hiH3{0%,80%{background:#0A84FF}81%,86%{background:#64B0FF}87%,100%{background:#0A84FF}}
 .hi-cap span{animation:hiT1 8s infinite}.hi-cap span:nth-child(2){animation-name:hiT2}.hi-cap span:nth-child(3){animation-name:hiT3}.hi-cap span:nth-child(4){animation-name:hiT4}
 @keyframes hiT1{0%,16%{opacity:1}19%,100%{opacity:0}}
 @keyframes hiT2{0%,17%{opacity:0}20%,37%{opacity:1}40%,100%{opacity:0}}
 @keyframes hiT3{0%,38%{opacity:0}42%,61%{opacity:1}64%,100%{opacity:0}}
 @keyframes hiT4{0%,62%{opacity:0}66%,95%{opacity:1}100%{opacity:0}}
+/* «Поділитися з близькими» */
+.shr{display:flex;align-items:center;gap:12px;padding:12px 14px 12px 12px;border-radius:22px;background:var(--card);box-shadow:var(--shadow-1);border:none;font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer}
+.shr .ic{width:44px;height:44px;flex:none;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#4FC3F7,#229ED9);box-shadow:0 4px 12px rgba(34,158,217,.35)}
+.shr .t{display:block;font-weight:800;font-size:15px}.shr .s{display:block;font-size:12.5px;color:var(--muted);font-weight:500;margin-top:2px}
+.shr .go{margin-left:auto;color:var(--muted)}
+.shp{width:100%;padding:12px;border-radius:18px;background:var(--soft)}
+.shp .msg{max-width:92%;padding:9px 11px;border-radius:14px 14px 14px 4px;background:var(--card);box-shadow:var(--shadow-1);font-size:13.5px;line-height:1.4;text-align:left}
+.shp .lnk{color:#229ED9;margin-top:4px}
+.shp .shc{text-align:left;margin-top:6px;display:flex;align-items:center;gap:8px;padding:6px 8px;border-left:3px solid #229ED9;border-radius:6px;background:rgba(34,158,217,.1)}
+.shp .shc div{flex:1;min-width:0}
+.shp .shc b{display:block;color:#229ED9;font-size:12.5px}
+.shp .shc span:not(.ico){display:block;font-size:12px;color:var(--muted)}
+.shp .ico{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD54F,#F2C12E);color:#23262B;flex:none}
 </style>
 </head>
 <body>
@@ -2502,20 +2533,27 @@ function homeDemo(ios) {
   return '<div class="hd ' + (ios ? 'ios' : 'and') + '" aria-hidden="true"><div class="hd-ph">' + A + B + C + '<span class="hd-f"></span></div></div>' +
     '<div class="hd-cap"><span>1 · ' + (ios ? 'Натисніть «Поділитися»' : 'Натисніть «Додати на екран»') + '</span><span>2 · ' + (ios ? '«На початковий екран»' : 'Підтвердіть «Додати»') + '</span><span>3 · ' + (ios ? '«Додати» — готово!' : 'Значок на екрані — готово!') + '</span></div>';
 }
-// iPhone (Safari, як на реальних скрінах): «⋯» → «Поділитися» → «На екран «Додому»» → «Додати». 8 с по колу
+// iPhone (Safari, як на реальних скрінах): «•••» → «Поділитися» → «Додати на екран «Додому»» → «Додати». 8 с по колу
 function homeDemoIos() {
   const ICO = '<span class="hi-ico">' + HOME_IC + '</span>', nm = esc(document.title || 'Будинок');
-  const shareI = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>';
-  const A = '<div class="hi-l hi-a"><div class="hi-big">' + ICO + '</div><div class="hi-t">Додайте ' + nm + ' на екран «Додому»</div>' +
-    '<div class="hi-bar"><span class="c">‹</span><span class="p">t.me</span><span class="c hi-dots">•••</span></div></div>';
-  const B = '<div class="hi-l hi-b"><div class="hi-pop"><div class="hi-r hi-hit1">' + shareI + 'Поділитися</div><div class="hi-r">☆ Закладки</div><div class="hi-r">＋ Нова вкладка</div></div></div>';
-  const C = '<div class="hi-l hi-c"><div class="hi-sh"><div class="hi-h">' + ICO + '<span><b>' + nm + '</b><small>t.me</small></span></div>' +
-    '<div class="hi-circ"><i></i><i></i><i></i><i></i></div>' +
-    '<div class="hi-list"><div class="hi-r">☆ Додати в обране</div><div class="hi-r">⌕ Знайти на сторінці</div><div class="hi-r hi-hit2">⊞ На екран «Додому»</div><div class="hi-r">⎙ Друк</div></div></div></div>';
+  const sh = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>';
+  const pl = '<b class="pl">+</b>';
+  const A = '<div class="hi-l hi-a"><div class="hi-mock"><i></i><i></i><i></i><i></i><i></i>' + ICO + '<i></i><i></i></div>' +
+    '<div class="hi-t">Додайте ' + nm + ' на екран «Додому»</div>' +
+    '<div class="hi-st"><div>1. Натисніть <em>' + sh + '</em> у нижній панелі</div><div>2. Оберіть <em>' + pl + ' На екран «Додому»</em></div></div>' +
+    '<div class="hi-tip">Натисніть ' + sh + '</div>' +
+    '<div class="hi-bar"><span class="c">‹</span><span class="p"><small>≡</small>t.me<small>↻</small></span><span class="c hi-dots">•••</span></div></div>';
+  const B = '<div class="hi-l hi-b"><div class="hi-pop"><div class="hi-r hi-hit1">' + sh + 'Поділитися</div><div class="hi-r">🔖 Додати в Закладки</div><div class="hi-r">📖 Закладку в папку…</div><hr>' +
+    '<div class="hi-r">＋ Нова вкладка</div><div class="hi-r">✋ Нова приватна вкладка</div><hr><div class="hi-ft"><span>Закладки</span><span>Усі вкладки</span></div></div></div>';
+  const C = '<div class="hi-l hi-c"><div class="hi-sh"><div class="hi-h">' + ICO + '<span><b>' + nm + '</b><small>t.me</small><em>Параметри ›</em></span><span class="x">✕</span></div>' +
+    '<div class="hi-circ"><span><i></i>Копіювати</span><span><i></i>Закладки</span><span><i></i>Читати</span><span><i></i>Менше</span></div>' +
+    '<div class="hi-list"><div class="hi-r">📖 Додати закладку в папку…</div><div class="hi-r">☆ Додати в Обране</div><div class="hi-r">✎ Додати в нотатку</div><div class="hi-r">⌕ Знайти на сторінці</div><div class="hi-r hi-hit2">' + pl + ' Додати на екран «Додому»</div></div>' +
+    '<div class="hi-list hi-l2"><div class="hi-r">✎ Додати розмітку</div><div class="hi-r">⎙ Друк</div><div class="hi-r">◎ Відкрити в Safari</div></div></div></div>';
   const Dd = '<div class="hi-l hi-d"><div class="hi-top"><span class="x">✕</span><b>На екран «Додому»</b><span class="add hi-hit3">Додати</span></div>' +
-    '<div class="hi-new">' + ICO + '<span>' + nm + '</span></div></div>';
+    '<div class="hi-new">' + ICO + '<span><b>' + nm + '</b><small>https://t.me/' + esc(CONFIG.BOT_USERNAME) + '/?startapp…</small></span></div>' +
+    '<div class="hi-tg"><span>Відкрити як вебзастосунок</span><i></i></div><div class="hi-note">На екран «Додому» буде додано значок для швидкого переходу.</div></div>';
   return '<div class="hd" aria-hidden="true"><div class="hd-ph hi-ph">' + A + B + C + Dd + '<span class="hi-f"></span></div></div>' +
-    '<div class="hd-cap hi-cap"><span>1 · Внизу праворуч натисніть •••</span><span>2 · «Поділитися»</span><span>3 · «На екран «Додому»»</span><span>4 · «Додати» — готово!</span></div>';
+    '<div class="hd-cap hi-cap"><span>1 · Внизу праворуч натисніть •••</span><span>2 · «Поділитися»</span><span>3 · «Додати на екран «Додому»»</span><span>4 · «Додати» — готово!</span></div>';
 }
 function homeSheet() {
   fsInit();
@@ -2526,13 +2564,40 @@ function homeSheet() {
   haptic(); fsOpen();
 }
 // на головній банера більше немає — замість нього одноразова шторка
-function homeBanner() { return ''; }
+function homeBanner() { return shareEntry(); }
 // у кабінеті: доки значка немає — кнопка; додано — тиха позначка
 function homeRow() {
   if (homeDesk() && !DEMO) return '';
   if (homeSt === 'added') return '<div class="hsdone">' + ic('check', null, 20) + 'Значок будинку вже на екрані телефону</div>';
   return '<button class="hsc" onclick="homeSheet()"><span class="ic">' + HOME_IC + '</span><span><span class="t" style="display:block">Додати значок на екран</span><span class="s" style="display:block">Відкривати будинок одним дотиком, як звичайну програму</span></span><span class="go">' + ic('chev', null, 18) + '</span></button>';
 }
+// ---------- «Поділитися з близькими» ----------
+// Посилання t.me/<бот>?startapp — Telegram сам показує його карткою (фото, назва й опис бота з BotFather).
+function shareUrl() { return 'https://t.me/' + CONFIG.BOT_USERNAME + '?startapp'; }
+function shareText() {
+  return '🏠 Застосунок мешканців ЖК «Русанівська гавань», ' + (document.title || 'наш будинок') + '.\n' +
+    'Світло по поверхах, ліфти, заявки й оголошення сусідів — усе в Telegram, без зайвих чатів 👇';
+}
+function shareEntry() {
+  return '<button class="shr" onclick="shareSheet()"><span class="ic">' + ic('share', '#fff', 22) + '</span><span><span class="t">Поділитися з близькими</span><span class="s">Надішліть застосунок рідним і сусідам</span></span><span class="go">' + ic('chev', null, 18) + '</span></button>';
+}
+function shareSheet() {
+  fsInit();
+  const nm = esc(document.title || 'Будинок');
+  document.getElementById('fshBody').innerHTML = '<div class="hsp"><div class="h2" id="fshT">Поділитися застосунком</div>' +
+    '<div class="sub" style="font-weight:500">Так виглядатиме повідомлення:</div>' +
+    '<div class="shp"><div class="msg">' + esc(shareText()).replace(/\n/g, '<br>') + '<div class="lnk">' + esc(shareUrl().replace('https://', '')) + '</div>' +
+    '<div class="shc"><div><b>' + esc(CONFIG.BOT_USERNAME) + '</b><span>Застосунок мешканців · ' + nm + '</span></div><span class="ico">' + HOME_IC + '</span></div></div></div>' +
+    '<button class="btn yellow" style="width:100%" onclick="shareSend()">' + ic('share', '#23262B', 18) + 'Надіслати в Telegram</button>' +
+    '<button class="btn ghost" style="width:100%" onclick="shareCopy()">' + ic('copy', null, 18) + 'Скопіювати посилання</button></div>';
+  haptic(); fsOpen();
+}
+function shareSend() {
+  haptic('mid');
+  const u = 'https://t.me/share/url?url=' + encodeURIComponent(shareUrl()) + '&text=' + encodeURIComponent(shareText());
+  if (tg && tg.openTelegramLink && tg.initData) { fsClose(); tg.openTelegramLink(u); } else window.open(u, '_blank');
+}
+function shareCopy() { copyText(shareText() + '\n' + shareUrl(), 'Скопійовано — вставте в будь-який чат'); fsClose(); }
 
 
 // ---------- ПРОЗОРІСТЬ ЗБОРУ НА ПАЛЬНЕ (бачать усі, без номерів квартир) ----------
@@ -3473,7 +3538,7 @@ function cabinet() {
     flatCard() +
     '<div class="label">Мої заявки</div>' +
     (mine.length ? mine.map(p => '<div class="card" role="button" tabindex="0" onclick="ui.ptab=\'' + (p.status === 'Вирішено' ? 'done' : 'open') + '\';go(\'problems\')"><div class="row"><div><div style="font-weight:700">' + esc(p.category) + '</div><div class="sub" style="font-weight:500">№ ' + p.id + ' · ' + ago(p.created) + '</div></div><span class="tag ' + (p.status === 'Вирішено' ? 'ok' : p.status === 'В роботі' ? 'yel' : 'bad') + '">' + esc(p.status) + '</span></div></div>').join('') : '<div class="empty">Заявок ще немає</div>') +
-    '<div class="label">Ще</div>' + boardEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + themeCard() +
+    '<div class="label">Ще</div>' + boardEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + shareEntry() + themeCard() +
     '<div class="chips">' + chatBtn('general', 'Чат будинку') + '</div>' +
     '<div style="font-size:12px;color:var(--muted);line-height:1.5">Телефон і ПІБ бачить лише адміністратор. Змінити квартиру чи статус можна через адміністратора. Сповіщення про ваші заявки приходять у чат із ботом.</div>';
 }
