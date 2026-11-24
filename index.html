@@ -1100,6 +1100,62 @@ body.gamemode .edge{display:none}
 .hsp .steps li{background:none;padding:4px 2px;font-weight:500}
 .hsp .steps b{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#23262B;font-size:13px}
 .hsdone{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:22px;background:var(--ok-bg);color:var(--ok);font-weight:700;font-size:14px}
+/* анімація «як додати на екран» (6 с по колу) */
+.hd{width:100%;display:grid;place-items:center;padding:4px 0}
+.hd-ph{position:relative;width:200px;height:300px;border-radius:30px;background:#F2F2F7;box-shadow:0 0 0 7px #1C1C1E,0 14px 34px rgba(0,0,0,.35);overflow:hidden;font-family:-apple-system,system-ui,sans-serif;color:#111}
+.hd-l{position:absolute;inset:0}
+.hd-a{padding:30px 14px 0;display:flex;flex-direction:column;gap:9px;background:#fff}
+.hd-a .hd-url{height:22px;border-radius:9px;background:#EDEDF0;font-size:10px;color:#8A8A8E;display:grid;place-items:center}
+.and .hd-a .hd-url{background:#F7D35A;height:30px;border-radius:10px}
+.hd-a i{display:block;height:34px;border-radius:10px;background:#EFEFF3}
+.hd-a i.s{height:16px;width:70%}
+.hd-bar{position:absolute;left:0;right:0;bottom:0;height:40px;background:rgba(249,249,251,.96);border-top:1px solid #DADADF;display:flex;justify-content:space-around;align-items:center;font-size:16px;color:#1C7CF5}
+.hd-share{display:grid;place-items:center}
+.hd-b{opacity:0;animation:hdB 6s infinite;background:rgba(0,0,0,.28)}
+.hd-sheet{position:absolute;left:6px;right:6px;bottom:6px;border-radius:16px;background:#F2F2F7;padding:10px 8px 8px;display:flex;flex-direction:column;gap:5px;animation:hdUp 6s infinite}
+.hd-app{display:flex;align-items:center;gap:8px;padding:2px 4px 6px;font-size:12px}
+.hd-ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD54F,#F2C12E);color:#23262B;flex:none}
+.hd-ico svg{width:17px;height:17px}
+.hd-row{height:28px;border-radius:9px;background:#fff;font-size:11.5px;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
+.hd-row em{font-style:normal;font-size:14px}
+.hd-dlg{position:absolute;left:16px;right:16px;top:90px;border-radius:18px;background:#fff;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.hd-btns{display:flex;gap:16px;align-self:flex-end;font-size:12px;font-weight:700;color:#1C7CF5}
+.hd-btns span{padding:4px 6px;border-radius:8px}
+.hd-c{opacity:0;animation:hdC 6s infinite;background:#F2F2F7}
+.hd-top{display:flex;justify-content:space-between;align-items:center;gap:4px;padding:30px 8px 0;font-size:10.5px;color:#1C7CF5;white-space:nowrap}
+.hd-top b{color:#111;font-size:11px;white-space:nowrap}
+.hd-top span{padding:3px 5px;border-radius:7px}
+.hd-top .hd-hit{font-weight:700}
+.hd-new{margin:26px 14px 0;padding:12px;border-radius:12px;background:#fff;display:flex;align-items:center;gap:10px;font-size:12px}
+.hd-new .hd-ico{width:44px;height:44px;border-radius:11px}
+.hd-home{background:linear-gradient(160deg,#5B6CFF,#9B5BFF)}
+.hd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:40px 16px}
+.hd-grid i{display:block;aspect-ratio:1;border-radius:10px;background:rgba(255,255,255,.35)}
+.hd-grid .hd-ico{width:auto;height:auto;aspect-ratio:1;border-radius:10px;animation:hdPop 6s infinite}
+.hd-b .hd-hit{animation:hdHitB 6s infinite}
+.hd-c .hd-hit{animation:hdHitC 6s infinite}
+.hd-f{position:absolute;left:0;top:0;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:rgba(40,40,45,.35);box-shadow:0 0 0 2px rgba(255,255,255,.9);animation:hdF 6s infinite;opacity:0;z-index:5}
+.ios .hd-f{animation-name:hdFi}
+.and .hd-f{animation-name:hdFa}
+/* палець: iPhone — «Поділитися» (100,280) → рядок (100,272) → «Додати» (170,39) */
+@keyframes hdFi{0%{transform:translate(150px,330px);opacity:0}10%{transform:translate(100px,280px);opacity:1}17%{transform:translate(100px,280px) scale(.7)}21%{transform:translate(100px,280px) scale(1)}33%{transform:translate(100px,272px)}44%{transform:translate(100px,272px) scale(.7)}48%{transform:translate(100px,272px) scale(1)}62%{transform:translate(170px,39px)}72%{transform:translate(170px,39px) scale(.7)}76%{transform:translate(170px,39px) scale(1);opacity:1}88%{opacity:0}100%{transform:translate(150px,330px);opacity:0}}
+/* Android: кнопка застосунку (100,45) → «Додати» (150,178) → значок зʼявився */
+@keyframes hdFa{0%{transform:translate(150px,330px);opacity:0}10%{transform:translate(100px,45px);opacity:1}17%{transform:translate(100px,45px) scale(.7)}21%{transform:translate(100px,45px) scale(1)}33%{transform:translate(150px,178px)}44%{transform:translate(150px,178px) scale(.7)}48%{transform:translate(150px,178px) scale(1);opacity:1}56%{opacity:0}100%{transform:translate(150px,330px);opacity:0}}
+@keyframes hdB{0%,20%{opacity:0}26%,54%{opacity:1}58%,100%{opacity:0}}
+@keyframes hdUp{0%,20%{transform:translateY(100%)}27%,100%{transform:translateY(0)}}
+@keyframes hdC{0%,52%{opacity:0}58%,94%{opacity:1}100%{opacity:0}}
+@keyframes hdHitB{0%,43%{background:transparent}44%,52%{background:#D6E6FF}53%,100%{background:transparent}}
+.hd-row.hd-hit{animation-name:hdHitR}
+@keyframes hdHitR{0%,43%{background:#fff}44%,52%{background:#D6E6FF}53%,100%{background:#fff}}
+@keyframes hdHitC{0%,71%{background:transparent}72%,80%{background:#D6E6FF}81%,100%{background:transparent}}
+@keyframes hdPop{0%,56%{transform:scale(0)}64%{transform:scale(1.15)}70%,100%{transform:scale(1)}}
+.hd-cap{position:relative;height:20px;width:100%;text-align:center;font-size:14px;font-weight:700}
+.hd-cap span{position:absolute;left:0;right:0;opacity:0;animation:hdT1 6s infinite}
+.hd-cap span:nth-child(2){animation-name:hdT2}.hd-cap span:nth-child(3){animation-name:hdT3}
+@keyframes hdT1{0%,24%{opacity:1}28%,100%{opacity:0}}
+@keyframes hdT2{0%,26%{opacity:0}30%,54%{opacity:1}58%,100%{opacity:0}}
+@keyframes hdT3{0%,56%{opacity:0}60%,94%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.hd *{animation-duration:12s!important}}
 </style>
 </head>
 <body>
@@ -1639,6 +1695,7 @@ function lightCounts(sn) {
   return { on, all };
 }
 function genPill() {
+  return '';   // статус генератора поки не показуємо — повідомлення приходять у групу
   const g = D.light && D.light.gen;
   if (!g || !g.state) return '';
   const flash = ui.prevGen && ui.prevGen !== g.state && g.state === 'on';
@@ -2364,7 +2421,7 @@ function homeSet(st) {
 function homeAdd() {
   haptic('mid');
   if (homeCanAdd()) { try { fsClose(); tg.addToHomeScreen(); return; } catch (e) {} }
-  homeSheet(true);
+  toast('Оновіть Telegram — у старій версії цієї функції немає');
 }
 function homeKey() { return 'b8_hsp'; }
 // одноразова пропозиція: після входу, коли Telegram сказав, що значка ще немає
@@ -2380,17 +2437,27 @@ function homeOffer() {
     homeSheet(false);
   }, 1800);
 }
-function homeSheet(manual) {
+// анімація «як додати»: 3 дотики, ~6 с по колу. iPhone — Safari: «Поділитися» → «На початковий екран» → «Додати»;
+// Android — системне вікно Telegram → «Додати» → значок на екрані
+function homeDemo(ios) {
+  const ICO = '<span class="hd-ico">' + HOME_IC + '</span>';
+  const A = '<div class="hd-l hd-a"><div class="hd-url">' + (ios ? 'gavan.app' : '') + '</div><i></i><i></i><i class="s"></i><i></i><i class="s"></i>' +
+    (ios ? '<div class="hd-bar"><span>‹</span><span>›</span><span class="hd-share"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#1C7CF5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg></span><span>▢</span><span>⧉</span></div>' : '') + '</div>';
+  const B = ios
+    ? '<div class="hd-l hd-b"><div class="hd-sheet"><div class="hd-app">' + ICO + '<b>' + esc(document.title || 'Будинок') + '</b></div><div class="hd-row">Скопіювати</div><div class="hd-row">Додати в обране</div><div class="hd-row hd-hit">На початковий екран <em>⊞</em></div></div></div>'
+    : '<div class="hd-l hd-b"><div class="hd-dlg">' + ICO + '<b>Додати на головний екран?</b><div class="hd-btns"><span>Скасувати</span><span class="hd-hit">Додати</span></div></div></div>';
+  const C = ios
+    ? '<div class="hd-l hd-c"><div class="hd-top"><span>Скасувати</span><b>Новий значок</b><span class="hd-hit">Додати</span></div><div class="hd-new">' + ICO + '<span>' + esc(document.title || 'Будинок') + '</span></div></div>'
+    : '<div class="hd-l hd-c hd-home"><div class="hd-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i>' + ICO + '</div></div>';
+  return '<div class="hd ' + (ios ? 'ios' : 'and') + '" aria-hidden="true"><div class="hd-ph">' + A + B + C + '<span class="hd-f"></span></div></div>' +
+    '<div class="hd-cap"><span>1 · ' + (ios ? 'Натисніть «Поділитися»' : 'Натисніть «Додати на екран»') + '</span><span>2 · ' + (ios ? '«На початковий екран»' : 'Підтвердіть «Додати»') + '</span><span>3 · ' + (ios ? '«Додати» — готово!' : 'Значок на екрані — готово!') + '</span></div>';
+}
+function homeSheet() {
   fsInit();
-  const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent), can = homeCanAdd() && !manual;
-  let h = '<div class="hsp"><div class="big">' + HOME_IC + '</div><div class="h2" id="fshT">Будинок — одним дотиком</div>' +
-    '<div class="sub" style="font-weight:500;line-height:1.45">Додайте значок застосунку на екран телефону, поруч з іншими програмами.</div>' +
-    '<ul><li>💡 Світло і генератор — за секунду</li><li>🔔 Ліфт стоїть? Повідомити з одного дотику</li><li>💬 Без пошуку бота в чатах</li></ul>';
-  if (can) h += '<button class="btn yellow" style="width:100%" onclick="homeAdd()">' + HOME_IC + 'Додати на екран</button>';
-  else h += '<ul class="steps"><li><b>1</b>Натисніть <b style="width:auto;padding:0 8px;border-radius:8px">⋯</b> угорі застосунку</li><li><b>2</b>Оберіть «Додати на головний екран»</li><li><b>3</b>Підтвердіть — значок зʼявиться на екрані</li></ul>' +
-    '<div class="sub" style="font-weight:500">Немає такого пункту? Оновіть Telegram' + (ios ? ' в App Store' : ' в Google Play') + '.</div>';
-  h += '<button class="btn ghost" style="width:100%" onclick="fsClose()">Не зараз</button></div>';
-  document.getElementById('fshBody').innerHTML = h;
+  const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (tg && tg.platform === 'ios');
+  document.getElementById('fshBody').innerHTML = '<div class="hsp"><div class="h2" id="fshT">Будинок — одним дотиком</div>' + homeDemo(ios) +
+    '<button class="btn yellow" style="width:100%" onclick="homeAdd()">' + HOME_IC + 'Додати на екран</button>' +
+    '<button class="btn ghost" style="width:100%" onclick="fsClose()">Не зараз</button></div>';
   haptic(); fsOpen();
 }
 // на головній банера більше немає — замість нього одноразова шторка
@@ -2399,7 +2466,7 @@ function homeBanner() { return ''; }
 function homeRow() {
   if (homeDesk() && !DEMO) return '';
   if (homeSt === 'added') return '<div class="hsdone">' + ic('check', null, 20) + 'Значок будинку вже на екрані телефону</div>';
-  return '<button class="hsc" onclick="homeSheet(!homeCanAdd())"><span class="ic">' + HOME_IC + '</span><span><span class="t" style="display:block">Додати значок на екран</span><span class="s" style="display:block">Відкривати будинок одним дотиком, як звичайну програму</span></span><span class="go">' + ic('chev', null, 18) + '</span></button>';
+  return '<button class="hsc" onclick="homeSheet()"><span class="ic">' + HOME_IC + '</span><span><span class="t" style="display:block">Додати значок на екран</span><span class="s" style="display:block">Відкривати будинок одним дотиком, як звичайну програму</span></span><span class="go">' + ic('chev', null, 18) + '</span></button>';
 }
 
 
