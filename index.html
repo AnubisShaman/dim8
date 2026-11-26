@@ -3532,23 +3532,26 @@ function fuelState() { const f = D.fuel; return f && D.me.apt ? f.key : null; }
 // ---------- «Внести внесок»: сума → потрібна банка, коментар з квартирою підставляється сам ----------
 function payJar(sum) { const J = CONFIG.PAY_JARS || []; return J.find(j => sum <= j.max) || J[J.length - 1]; }
 function payOn() { return !!(CONFIG.PAY_JARS && CONFIG.PAY_JARS.length && D.me.apt); }
-function payNote(what) { return 'кв ' + D.me.apt + (what ? ' ' + what : ''); }
-// what: 'генератор' | 'пальне'; sum — рекомендована сума
-function paySheet(sum, what) {
+function payNote() { return 'кв ' + D.me.apt; }
+// сума — довільна, людина вводить сама; ціль — вирівняти внесок квартири до 10 500
+function paySheet() {
   if (!payOn()) return;
   fsInit();
-  ui.pay = { sum: Math.max(0, Math.round(sum || 0)), what: what || '' }; ui.pay.def = ui.pay.sum;
+  ui.pay = { sum: 0 };
   payRender(); haptic(); fsOpen();
+  setTimeout(() => { const i = document.getElementById('payS'); if (i) i.focus(); }, 350);
+}
+function payGoal() {
+  const G = D.genFund; if (!G || G.paid === undefined) return '';
+  return '<div class="sub" style="text-align:center;font-weight:600">Ціль квартири — ' + fmtMoney(G.target) + ' грн · внесено ' + fmtMoney(G.paid) + (G.left > 0 ? ' · залишилось ' + fmtMoney(G.left) : ' ✓') + '</div>';
 }
 function payRender() {
-  const P = ui.pay, s = P.sum, j = payJar(s || 1), note = payNote(P.what);
-  const quick = [P.what === 'пальне' ? 1500 : 0, 2000, 5000, P.def].filter((v, i, a) => v > 0 && a.indexOf(v) === i);
-  document.getElementById('fshBody').innerHTML = '<div class="pay"><div class="h2" id="fshT">' + (P.what === 'генератор' ? 'Внесок на генератор' : P.what === 'пальне' ? 'Внесок на пальне' : 'Внести внесок') + '</div>' +
+  const P = ui.pay, s = P.sum, j = payJar(s || 1), note = payNote();
+  document.getElementById('fshBody').innerHTML = '<div class="pay"><div class="h2" id="fshT">Внести внесок</div>' + payGoal() +
     '<label class="pay-in"><input id="payS" type="number" inputmode="numeric" min="1" step="1" value="' + (s || '') + '" placeholder="0" oninput="payInput(this.value)"><span>грн</span></label>' +
-    (quick.length ? '<div class="pay-q">' + quick.map(v => '<button class="' + (v === s ? 'on' : '') + '" onclick="payInput(' + v + ',1)">' + fmtMoney(v) + '</button>').join('') + '</div>' : '') +
     '<div class="pay-note"><span class="ic">✍️</span><div><b>Коментар до платежу</b><span>Ми вже вписали його в банку — не видаляйте, інакше платіж не знайдемо</span></div></div>' +
     '<div class="pay-row"><div><small>Коментар</small><b>' + esc(note) + '</b></div><button class="btn sm ghost" onclick="copyText(\'' + esc(note) + '\',\'Коментар скопійовано\')">' + ic('copy', null, 16) + '</button></div>' +
-    '<button class="btn yellow" style="width:100%"' + (s > 0 ? '' : ' disabled') + ' onclick="payGo()">Внести ' + (s > 0 ? fmtMoney(s) + ' грн' : '') + ' у банку</button>' +
+    '<button class="btn yellow" style="width:100%"' + (s > 0 ? '' : ' disabled') + ' onclick="payGo()">' + (s > 0 ? 'Внести ' + fmtMoney(s) + ' грн у банку' : 'Введіть суму') + '</button>' +
     '<div class="pay-row"><div><small>Або переказом на картку' + (CONFIG.PAY_JARS.length > 1 ? ' (для ' + (s > CONFIG.PAY_JARS[0].max ? 'суми понад ' : 'суми до ') + fmtMoney(CONFIG.PAY_JARS[0].max) + ' грн)' : '') + '</small><b>' + esc(j.card) + '</b></div><button class="btn sm ghost" onclick="copyText(\'' + esc(j.card.replace(/\s/g, '')) + '\',\'Номер картки скопійовано\')">' + ic('copy', null, 16) + '</button></div>' +
     '<div class="sub" style="font-weight:500;font-size:12px">Платіж зʼявиться в застосунку після звірки адміністратором.</div></div>';
 }
@@ -3558,18 +3561,18 @@ function payInput(v, quick) {
   ui.pay.sum = n;
   if (quick || !was || payJar(n || 1) !== was) { payRender(); if (!quick) { const i = document.getElementById('payS'); if (i) { i.focus(); const l = i.value.length; try { i.setSelectionRange(l, l); } catch (e) {} } } if (quick) haptic('sel'); return; }
   // та сама банка — лише оновити кнопку, не перемальовуючи поле (щоб не стрибала клавіатура)
-  const b = document.querySelector('.pay .btn.yellow'); if (b) { b.disabled = !(n > 0); b.textContent = 'Внести ' + (n > 0 ? fmtMoney(n) + ' грн' : '') + ' у банку'; }
+  const b = document.querySelector('.pay .btn.yellow'); if (b) { b.disabled = !(n > 0); b.textContent = n > 0 ? 'Внести ' + fmtMoney(n) + ' грн у банку' : 'Введіть суму'; }
   document.querySelectorAll('.pay-q button').forEach(x => x.classList.toggle('on', Number(x.textContent.replace(/\D/g, '')) === n));
 }
 function payGo() {
   const s = ui.pay.sum; if (!(s > 0)) return;
-  const j = payJar(s), u = j.link + (j.link.indexOf('?') >= 0 ? '&' : '?') + 'a=' + s + '&t=' + encodeURIComponent(payNote(ui.pay.what));
+  const j = payJar(s), u = j.link + (j.link.indexOf('?') >= 0 ? '&' : '?') + 'a=' + s + '&t=' + encodeURIComponent(payNote());
   haptic('mid'); fsClose();
   if (tg && tg.openLink && tg.initData) tg.openLink(u); else window.open(u, '_blank');
 }
 function payFuel() {
   const f = D.fuel; haptic();
-  if (payOn()) { paySheet(f.key === 'on' ? f.amount : Math.max(0, (f.needAmount || f.amount) - Math.round(f.sum || 0)) || f.amount, ''); return; }
+  if (payOn()) { paySheet(); return; }
   const u = f.link + (f.link.indexOf('?') >= 0 ? '&' : '?') + 'a=' + (f.key === 'on' ? f.amount : (f.needAmount || f.amount)) + '&t=' + encodeURIComponent('кв ' + D.me.apt);
   if (tg && tg.openLink && tg.initData) tg.openLink(u); else window.open(u, '_blank');
 }
@@ -3582,6 +3585,7 @@ function keyTxt(i) {
   if (k === 'grace') return i ? 'Внесок за ' + mn(f.need) + ' ще не надійшов' : 'Ключ працює до ' + f.until;
   if (k === 'gen') return i ? 'Не довнесено ' + fmtMoney(f.genDebt) + ' грн на генератор' : 'Ключ від ліфта заблоковано';
   if (k === 'claimed') return i ? 'Ключ працює. Чекаємо звірки оплати' : 'Оплату заявлено';
+  if (k === 'part' && payOn()) return i ? 'Внесок за ' + mn(f.need) + ' ще не зараховано' : 'Ключ від ліфта неактивний';
   if (k === 'part') return i ? 'Внесено ' + fmtMoney(f.sum) + ' з ' + fmtMoney(f.needAmount) + ' грн за ' + mn(f.need) : 'Ключ від ліфта неактивний';
   return i ? 'Внесок за ' + mn(f.need) + ' ще не надійшов' : 'Ключ від ліфта неактивний';
 }
@@ -3601,11 +3605,16 @@ function fuelCard() {
   let h = '<div class="label">Пальне для генератора · кв.\u00a0' + esc(D.me.apt) + '</div><div class="fuel ' + cls + '">' +
     '<div class="keyrow"><div class="keyic">' + ic('key', cls === 'on' ? '#1E6B4A' : cls === 'off' ? '#8A2E12' : '#23262B', 24) + '</div>' +
     '<div><div style="font-size:17px;font-weight:800">' + esc(keyTxt(0)) + '</div><div class="sub" style="font-weight:500;color:' + (cls === 'off' ? 'var(--bad)' : 'var(--muted)') + '">' + esc(keyTxt(1)) + '</div></div></div>';
-  if (k === 'part') h += '<div class="bar" style="height:8px;background:#fff"><i style="width:' + Math.min(100, Math.round(f.sum / amt * 100)) + '%;background:var(--yellow-d)"></i></div>';
+  if (k === 'part' && !payOn()) h += '<div class="bar" style="height:8px;background:#fff"><i style="width:' + Math.min(100, Math.round(f.sum / amt * 100)) + '%;background:var(--yellow-d)"></i></div>';
   // активний за минулий місяць — нагадати про поточний
-  if (k === 'on' && f.keyMonth !== f.month) h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">Щоб ключ працював і далі, внесіть <b>' + fmtMoney(f.amount) + ' грн</b> за ' + monthName(f.month) + ' до ' + esc(f.dueCur) + '.</div>' +
+  if (k === 'on' && f.keyMonth !== f.month && !payOn()) h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">Щоб ключ працював і далі, внесіть <b>' + fmtMoney(f.amount) + ' грн</b> за ' + monthName(f.month) + ' до ' + esc(f.dueCur) + '.</div>' +
     (f.link ? '<button class="btn ghost" onclick="payFuel()">Внести за ' + monthName(f.month) + '</button>' : '');
   if (k === 'gen') h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">За рішенням більшості мешканців ключ блокується, доки квартира не внесе <b>' + fmtMoney((D.genFund && D.genFund.target) || 10500) + ' грн</b> на генератор. Після внесення та оновлення таблиці ключ запрацює.</div>';
+  else if (k !== 'on' && payOn()) {
+    // кнопка «Внести» вже є в картці генератора, доки квартира не вирівняла внесок до 10 500 — тут не дублюємо
+    if (!(D.genFund && D.genFund.paid !== undefined && D.genFund.left > 0)) h += '<button class="btn yellow" onclick="paySheet()">Внести внесок</button>';
+    if (k !== 'claimed') h += '<button class="btn ghost" onclick="fuelClaim()">Я вже оплатив(ла)</button>';
+  }
   else if (k !== 'on') {
     const left = Math.max(0, amt - Math.round(f.sum || 0));
     h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">Добровільний внесок на пальне — <b>' + fmtMoney(amt) + ' грн</b> з квартири на місяць.</div>';
@@ -3886,7 +3895,7 @@ function genCard() {
   return '<div class="label">Генератор · кв. ' + esc(D.me.apt) + '</div><div class="fuel ' + (done ? 'on' : blk ? 'off' : 'grace') + '">' +
     '<div class="keyrow"><div class="keyic" style="font-size:22px">🔌</div><div><div style="font-size:17px;font-weight:800">' + (done ? (G.paid > G.target + 0.01 ? 'Внесено ' + fmtMoney(G.paid) + ' грн' : 'Внесок на генератор зроблено') : 'Внесено ' + fmtMoney(G.paid) + ' з ' + fmtMoney(G.target) + ' грн') + '</div>' +
     '<div class="sub" style="font-weight:500">' + (done ? 'Дякуємо! ' + fmtMoney(G.target) + ' грн з квартири зібрано' : blk ? 'Довнесіть ' + fmtMoney(G.left) + ' грн — ключ від ліфта заблоковано' : 'Рекомендуємо довнести ' + fmtMoney(G.left) + ' грн до ' + esc(G.due)) + '</div></div></div>' +
-    (!done && payOn() ? '<button class="btn yellow" onclick="paySheet(' + Math.ceil(G.left) + ',\'генератор\')">Внести на генератор</button>' : '') +
+    (!done && payOn() ? '<button class="btn yellow" onclick="paySheet()">Внести внесок</button>' : '') +
     (G.deposit > 0 || G.depUsed > 0 ? '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">💰</span><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Депозит квартири (понад ' + fmtMoney(G.target) + ' грн)</div><div style="font-weight:800;font-size:17px;color:#23262B">' + fmtMoney(G.deposit || 0) + ' грн</div>' + (G.depUsed > 0 ? '<div class="sub" style="font-weight:500">Уже переказано на пальне: ' + fmtMoney(G.depUsed) + ' грн</div>' : '') + '</div></div><div style="font-size:12.5px;line-height:1.45;color:var(--graph)">Депозит адміністратор може зарахувати як ваш внесок на пальне.</div>' : '') +
     (done ? '' : '<div class="bar" style="height:8px;background:#fff"><i style="width:' + pct + '%;background:var(--yellow-d)"></i></div>' +
       (G.block ? '<div style="font-size:13px;line-height:1.45;color:' + (blk ? 'var(--bad)' : 'var(--graph)') + '">⚠️ За рішенням більшості мешканців ' + (blk ? 'з ' + esc(G.block) + ' ключ від ліфта заблоковано, доки не буде внесено ' + fmtMoney(G.target) + ' грн.' : 'з <b>' + esc(G.block) + '</b> у квартир, які не внесли ' + fmtMoney(G.target) + ' грн, буде заблоковано ключ від ліфта.') + '</div>' : '')) + '</div>';
