@@ -3609,7 +3609,7 @@ function fuelCard() {
   // активний за минулий місяць — нагадати про поточний
   if (k === 'on' && f.keyMonth !== f.month && !payOn()) h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">Щоб ключ працював і далі, внесіть <b>' + fmtMoney(f.amount) + ' грн</b> за ' + monthName(f.month) + ' до ' + esc(f.dueCur) + '.</div>' +
     (f.link ? '<button class="btn ghost" onclick="payFuel()">Внести за ' + monthName(f.month) + '</button>' : '');
-  if (k === 'gen') h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">За рішенням більшості мешканців ключ блокується, доки квартира не внесе <b>' + fmtMoney((D.genFund && D.genFund.target) || 10500) + ' грн</b> на генератор. Після внесення та оновлення таблиці ключ запрацює.</div>';
+  if (k === 'gen') h += '<div style="font-size:13px;line-height:1.45;color:var(--graph)">За рішенням більшості мешканців, які проголосували в застосунку, ключ блокується, доки квартира не внесе <b>' + fmtMoney((D.genFund && D.genFund.target) || 10500) + ' грн</b> на генератор. Після внесення та оновлення таблиці ключ запрацює.</div>';
   else if (k !== 'on' && payOn()) {
     // кнопка «Внести» вже є в картці генератора, доки квартира не вирівняла внесок до 10 500 — тут не дублюємо
     if (!(D.genFund && D.genFund.paid !== undefined && D.genFund.left > 0)) h += '<button class="btn yellow" onclick="paySheet()">Внести внесок</button>';
@@ -3898,7 +3898,7 @@ function genCard() {
     (!done && payOn() ? '<button class="btn yellow" onclick="paySheet()">Внести внесок</button>' : '') +
     (G.deposit > 0 || G.depUsed > 0 ? '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">💰</span><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Депозит квартири (понад ' + fmtMoney(G.target) + ' грн)</div><div style="font-weight:800;font-size:17px;color:#23262B">' + fmtMoney(G.deposit || 0) + ' грн</div>' + (G.depUsed > 0 ? '<div class="sub" style="font-weight:500">Уже переказано на пальне: ' + fmtMoney(G.depUsed) + ' грн</div>' : '') + '</div></div><div style="font-size:12.5px;line-height:1.45;color:var(--graph)">Депозит адміністратор може зарахувати як ваш внесок на пальне.</div>' : '') +
     (done ? '' : '<div class="bar" style="height:8px;background:#fff"><i style="width:' + pct + '%;background:var(--yellow-d)"></i></div>' +
-      (G.block ? '<div style="font-size:13px;line-height:1.45;color:' + (blk ? 'var(--bad)' : 'var(--graph)') + '">⚠️ За рішенням більшості мешканців ' + (blk ? 'з ' + esc(G.block) + ' ключ від ліфта заблоковано, доки не буде внесено ' + fmtMoney(G.target) + ' грн.' : 'з <b>' + esc(G.block) + '</b> у квартир, які не внесли ' + fmtMoney(G.target) + ' грн, буде заблоковано ключ від ліфта.') + '</div>' : '')) + '</div>';
+      (G.block ? '<div style="font-size:13px;line-height:1.45;color:' + (blk ? 'var(--bad)' : 'var(--graph)') + '">⚠️ За рішенням більшості мешканців, які проголосували в застосунку, ' + (blk ? 'з ' + esc(G.block) + ' ключ від ліфта заблоковано, доки не буде внесено ' + fmtMoney(G.target) + ' грн.' : 'з <b>' + esc(G.block) + '</b> у квартир, які не внесли ' + fmtMoney(G.target) + ' грн, буде заблоковано ключ від ліфта.') + '</div>' : '')) + '</div>';
 }
 // адміністратор: таблиця «квартира → внесено всього», хто не довніс, депозити (понад мету) і переказ депозиту на пальне
 function genFundScreen() {
