@@ -3825,8 +3825,9 @@ function genCard() {
   const pct = Math.min(100, Math.round(G.paid / G.target * 100)), done = G.left <= 0;
   const blk = !done && G.blocked;
   return '<div class="label">Генератор · кв. ' + esc(D.me.apt) + '</div><div class="fuel ' + (done ? 'on' : blk ? 'off' : 'grace') + '">' +
-    '<div class="keyrow"><div class="keyic" style="font-size:22px">🔌</div><div><div style="font-size:17px;font-weight:800">' + (done ? 'Внесок на генератор зроблено' : 'Внесено ' + fmtMoney(G.paid) + ' з ' + fmtMoney(G.target) + ' грн') + '</div>' +
+    '<div class="keyrow"><div class="keyic" style="font-size:22px">🔌</div><div><div style="font-size:17px;font-weight:800">' + (done ? (G.paid > G.target + 0.01 ? 'Внесено ' + fmtMoney(G.paid) + ' грн' : 'Внесок на генератор зроблено') : 'Внесено ' + fmtMoney(G.paid) + ' з ' + fmtMoney(G.target) + ' грн') + '</div>' +
     '<div class="sub" style="font-weight:500">' + (done ? 'Дякуємо! ' + fmtMoney(G.target) + ' грн з квартири зібрано' : blk ? 'Довнесіть ' + fmtMoney(G.left) + ' грн — ключ від ліфта заблоковано' : 'Рекомендуємо довнести ' + fmtMoney(G.left) + ' грн до ' + esc(G.due)) + '</div></div></div>' +
+    (G.deposit > 0 || G.depUsed > 0 ? '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">💰</span><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Депозит квартири (понад ' + fmtMoney(G.target) + ' грн)</div><div style="font-weight:800;font-size:17px;color:#23262B">' + fmtMoney(G.deposit || 0) + ' грн</div>' + (G.depUsed > 0 ? '<div class="sub" style="font-weight:500">Уже переказано на пальне: ' + fmtMoney(G.depUsed) + ' грн</div>' : '') + '</div></div><div style="font-size:12.5px;line-height:1.45;color:var(--graph)">Депозит адміністратор може зарахувати як ваш внесок на пальне.</div>' : '') +
     (done ? '' : '<div class="bar" style="height:8px;background:#fff"><i style="width:' + pct + '%;background:var(--yellow-d)"></i></div>' +
       (G.block ? '<div style="font-size:13px;line-height:1.45;color:' + (blk ? 'var(--bad)' : 'var(--graph)') + '">⚠️ За рішенням більшості мешканців ' + (blk ? 'з ' + esc(G.block) + ' ключ від ліфта заблоковано, доки не буде внесено ' + fmtMoney(G.target) + ' грн.' : 'з <b>' + esc(G.block) + '</b> у квартир, які не внесли ' + fmtMoney(G.target) + ' грн, буде заблоковано ключ від ліфта.') + '</div>' : '')) + '</div>';
 }
@@ -4435,7 +4436,8 @@ function demoZones(R) {
   return out;
 }
 function demoGen(me, admin) {
-  const g = { target: 10500, due: '31 грудня', block: '5 січня', blocked: false, at: Date.now() - 26 * 3600e3, paid: 6000, left: 4500 };
+  const g = { target: 10500, due: '31 грудня', block: '5 січня', blocked: false, at: Date.now() - 26 * 3600e3, paid: 6000, left: 4500, deposit: 0, depUsed: 0 };
+  if (/dep=1/.test(location.search)) Object.assign(g, { paid: 13500, left: 0, deposit: 1500, depUsed: 1500 });
   if (admin) {
     let seed = 11; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
     g.apts = []; for (let n = 1; n <= 300; n++) { if (rnd() < .35) continue; const s = [3000, 6000, 10500, 10500, 10500, 12000, 13500, 15000][Math.floor(rnd() * 8)]; g.apts.push([String(n), s, Math.max(0, s - 10500), 0]); }
