@@ -1100,6 +1100,24 @@ body.gamemode .edge{display:none}
 .hsp .steps li{background:none;padding:4px 2px;font-weight:500}
 .hsp .steps b{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#23262B;font-size:13px}
 .hsdone{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:22px;background:var(--ok-bg);color:var(--ok);font-weight:700;font-size:14px}
+/* «Внести внесок» */
+.pay{display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.pay .h2{text-align:center}
+.pay-in{display:flex;align-items:baseline;justify-content:center;gap:8px;padding:10px 14px;border-radius:18px;background:var(--soft)}
+.pay-in input{width:100%;max-width:220px;border:none;background:none;font:inherit;font-size:36px;font-weight:800;text-align:right;color:var(--ink);outline:none;-moz-appearance:textfield}
+.pay-in input::-webkit-outer-spin-button,.pay-in input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.pay-in span{font-size:20px;font-weight:700;color:var(--muted);flex:none;margin-right:auto}
+.pay-q{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.pay-q button{border:none;font:inherit;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;background:var(--soft);color:inherit;cursor:pointer}
+.pay-q button.on{background:var(--yellow);color:#23262B}
+.pay-note{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:14px;background:var(--yel-bg);color:var(--yel-ink)}
+.pay-note .ic{font-size:20px;line-height:1}
+.pay-note b{display:block;font-size:14px}.pay-note span{display:block;font-size:12.5px;line-height:1.4;font-weight:500}
+.pay-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--soft)}
+.pay-row div{flex:1;min-width:0}
+.pay-row small{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.pay-row b{display:block;font-weight:800;letter-spacing:.02em}
+.pay .btn:disabled{opacity:.5}
 /* анімація «як додати на екран» (6 с по колу) */
 .hd{width:100%;display:grid;place-items:center;padding:4px 0}
 .hd-ph{position:relative;width:200px;height:300px;border-radius:30px;background:#F2F2F7;box-shadow:0 0 0 7px #1C1C1E,0 14px 34px rgba(0,0,0,.35);overflow:hidden;font-family:-apple-system,system-ui,sans-serif;color:#111}
@@ -1238,6 +1256,8 @@ body.gamemode .edge{display:none}
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbwZusNukQJGfcCYb0bNezcIblO2jTyeeixw_vY1DfL0Q0Dyq79y_-4UGUJPuOYzasYW/exec',
   BOT_USERNAME: 'rusanivgavanbot',          // без @
+  // банки для внесків (як у 10 будинку): [{ max: 2000, link: '...', card: '...' }, { max: Infinity, link, card }]; порожньо — кнопки немає
+  PAY_JARS: [],
   GROUP: '4422230766',                                // ID групи без -100
   // ID тем групи (число з посилання t.me/c/ГРУПА/ЧИСЛО/...). 0 = відкриється просто група
   TOPICS: { general: 1 }
@@ -3509,8 +3529,47 @@ function fmtUpd(t) { const d = new Date(t); return d.getDate() + ' ' + MONTH_GEN
 function monthIn(k) { const m = Number(String(k).slice(5, 7)); return MONTH_IN[m - 1] || monthName(k); }
 function monthName(k) { try { return new Date(k + '-01T12:00:00').toLocaleDateString('uk-UA', { month: 'long' }); } catch (e) { return k; } }
 function fuelState() { const f = D.fuel; return f && D.me.apt ? f.key : null; }
+// ---------- «Внести внесок»: сума → потрібна банка, коментар з квартирою підставляється сам ----------
+function payJar(sum) { const J = CONFIG.PAY_JARS || []; return J.find(j => sum <= j.max) || J[J.length - 1]; }
+function payOn() { return !!(CONFIG.PAY_JARS && CONFIG.PAY_JARS.length && D.me.apt); }
+function payNote(what) { return 'кв ' + D.me.apt + (what ? ' ' + what : ''); }
+// what: 'генератор' | 'пальне'; sum — рекомендована сума
+function paySheet(sum, what) {
+  if (!payOn()) return;
+  fsInit();
+  ui.pay = { sum: Math.max(0, Math.round(sum || 0)), what: what || '' }; ui.pay.def = ui.pay.sum;
+  payRender(); haptic(); fsOpen();
+}
+function payRender() {
+  const P = ui.pay, s = P.sum, j = payJar(s || 1), note = payNote(P.what);
+  const quick = [P.what === 'пальне' ? 1500 : 0, 2000, 5000, P.def].filter((v, i, a) => v > 0 && a.indexOf(v) === i);
+  document.getElementById('fshBody').innerHTML = '<div class="pay"><div class="h2" id="fshT">' + (P.what === 'генератор' ? 'Внесок на генератор' : P.what === 'пальне' ? 'Внесок на пальне' : 'Внести внесок') + '</div>' +
+    '<label class="pay-in"><input id="payS" type="number" inputmode="numeric" min="1" step="1" value="' + (s || '') + '" placeholder="0" oninput="payInput(this.value)"><span>грн</span></label>' +
+    (quick.length ? '<div class="pay-q">' + quick.map(v => '<button class="' + (v === s ? 'on' : '') + '" onclick="payInput(' + v + ',1)">' + fmtMoney(v) + '</button>').join('') + '</div>' : '') +
+    '<div class="pay-note"><span class="ic">✍️</span><div><b>Коментар до платежу</b><span>Ми вже вписали його в банку — не видаляйте, інакше платіж не знайдемо</span></div></div>' +
+    '<div class="pay-row"><div><small>Коментар</small><b>' + esc(note) + '</b></div><button class="btn sm ghost" onclick="copyText(\'' + esc(note) + '\',\'Коментар скопійовано\')">' + ic('copy', null, 16) + '</button></div>' +
+    '<button class="btn yellow" style="width:100%"' + (s > 0 ? '' : ' disabled') + ' onclick="payGo()">Внести ' + (s > 0 ? fmtMoney(s) + ' грн' : '') + ' у банку</button>' +
+    '<div class="pay-row"><div><small>Або переказом на картку' + (CONFIG.PAY_JARS.length > 1 ? ' (для ' + (s > CONFIG.PAY_JARS[0].max ? 'суми понад ' : 'суми до ') + fmtMoney(CONFIG.PAY_JARS[0].max) + ' грн)' : '') + '</small><b>' + esc(j.card) + '</b></div><button class="btn sm ghost" onclick="copyText(\'' + esc(j.card.replace(/\s/g, '')) + '\',\'Номер картки скопійовано\')">' + ic('copy', null, 16) + '</button></div>' +
+    '<div class="sub" style="font-weight:500;font-size:12px">Платіж зʼявиться в застосунку після звірки адміністратором.</div></div>';
+}
+function payInput(v, quick) {
+  const n = Math.max(0, Math.round(Number(String(v).replace(/[^\d.]/g, '')) || 0));
+  const was = ui.pay.sum > 0 ? payJar(ui.pay.sum) : null;
+  ui.pay.sum = n;
+  if (quick || !was || payJar(n || 1) !== was) { payRender(); if (!quick) { const i = document.getElementById('payS'); if (i) { i.focus(); const l = i.value.length; try { i.setSelectionRange(l, l); } catch (e) {} } } if (quick) haptic('sel'); return; }
+  // та сама банка — лише оновити кнопку, не перемальовуючи поле (щоб не стрибала клавіатура)
+  const b = document.querySelector('.pay .btn.yellow'); if (b) { b.disabled = !(n > 0); b.textContent = 'Внести ' + (n > 0 ? fmtMoney(n) + ' грн' : '') + ' у банку'; }
+  document.querySelectorAll('.pay-q button').forEach(x => x.classList.toggle('on', Number(x.textContent.replace(/\D/g, '')) === n));
+}
+function payGo() {
+  const s = ui.pay.sum; if (!(s > 0)) return;
+  const j = payJar(s), u = j.link + (j.link.indexOf('?') >= 0 ? '&' : '?') + 'a=' + s + '&t=' + encodeURIComponent(payNote(ui.pay.what));
+  haptic('mid'); fsClose();
+  if (tg && tg.openLink && tg.initData) tg.openLink(u); else window.open(u, '_blank');
+}
 function payFuel() {
   const f = D.fuel; haptic();
+  if (payOn()) { paySheet(f.key === 'on' ? f.amount : Math.max(0, (f.needAmount || f.amount) - Math.round(f.sum || 0)) || f.amount, ''); return; }
   const u = f.link + (f.link.indexOf('?') >= 0 ? '&' : '?') + 'a=' + (f.key === 'on' ? f.amount : (f.needAmount || f.amount)) + '&t=' + encodeURIComponent('кв ' + D.me.apt);
   if (tg && tg.openLink && tg.initData) tg.openLink(u); else window.open(u, '_blank');
 }
@@ -3827,6 +3886,7 @@ function genCard() {
   return '<div class="label">Генератор · кв. ' + esc(D.me.apt) + '</div><div class="fuel ' + (done ? 'on' : blk ? 'off' : 'grace') + '">' +
     '<div class="keyrow"><div class="keyic" style="font-size:22px">🔌</div><div><div style="font-size:17px;font-weight:800">' + (done ? (G.paid > G.target + 0.01 ? 'Внесено ' + fmtMoney(G.paid) + ' грн' : 'Внесок на генератор зроблено') : 'Внесено ' + fmtMoney(G.paid) + ' з ' + fmtMoney(G.target) + ' грн') + '</div>' +
     '<div class="sub" style="font-weight:500">' + (done ? 'Дякуємо! ' + fmtMoney(G.target) + ' грн з квартири зібрано' : blk ? 'Довнесіть ' + fmtMoney(G.left) + ' грн — ключ від ліфта заблоковано' : 'Рекомендуємо довнести ' + fmtMoney(G.left) + ' грн до ' + esc(G.due)) + '</div></div></div>' +
+    (!done && payOn() ? '<button class="btn yellow" onclick="paySheet(' + Math.ceil(G.left) + ',\'генератор\')">Внести на генератор</button>' : '') +
     (G.deposit > 0 || G.depUsed > 0 ? '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">💰</span><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Депозит квартири (понад ' + fmtMoney(G.target) + ' грн)</div><div style="font-weight:800;font-size:17px;color:#23262B">' + fmtMoney(G.deposit || 0) + ' грн</div>' + (G.depUsed > 0 ? '<div class="sub" style="font-weight:500">Уже переказано на пальне: ' + fmtMoney(G.depUsed) + ' грн</div>' : '') + '</div></div><div style="font-size:12.5px;line-height:1.45;color:var(--graph)">Депозит адміністратор може зарахувати як ваш внесок на пальне.</div>' : '') +
     (done ? '' : '<div class="bar" style="height:8px;background:#fff"><i style="width:' + pct + '%;background:var(--yellow-d)"></i></div>' +
       (G.block ? '<div style="font-size:13px;line-height:1.45;color:' + (blk ? 'var(--bad)' : 'var(--graph)') + '">⚠️ За рішенням більшості мешканців ' + (blk ? 'з ' + esc(G.block) + ' ключ від ліфта заблоковано, доки не буде внесено ' + fmtMoney(G.target) + ' грн.' : 'з <b>' + esc(G.block) + '</b> у квартир, які не внесли ' + fmtMoney(G.target) + ' грн, буде заблоковано ключ від ліфта.') + '</div>' : '')) + '</div>';
