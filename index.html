@@ -1092,6 +1092,23 @@ body.gamemode .edge{display:none}
 .gnews .m>span{font-size:13px;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gnews .more{justify-content:center;font-weight:800;color:var(--ok);padding:12px}
 /* Цифра дня і Новина-усмішка */
+/* цитата дня */
+.dq{display:flex;flex-direction:column;gap:6px;padding:18px 18px 16px;border-radius:24px;background:var(--card);box-shadow:var(--shadow-1);position:relative}
+.dq::before{content:"“";position:absolute;right:14px;top:-6px;font-size:84px;line-height:1;font-family:Georgia,serif;color:var(--yellow);opacity:.35}
+.dq-t{font-size:18px;font-weight:700;line-height:1.35;text-wrap:balance;padding-right:30px}
+.dq-a{font-size:13px;font-weight:600;color:var(--muted)}
+.dq-x{margin-top:6px;padding-top:10px;border-top:1px dashed var(--line2);font-size:15px;font-weight:700;color:var(--ink)}
+.dq-x::before{content:"😏 "}
+.dq-ed,.qd-ed{align-self:flex-start;margin-top:4px;border:none;border-radius:999px;padding:7px 12px;background:var(--soft);font:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+/* адмін: вибір питання */
+.qsseg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:var(--soft)}
+.qsseg button{border:none;border-radius:10px;padding:9px;font:inherit;font-weight:700;font-size:14px;background:none;color:var(--muted);cursor:pointer}
+.qsseg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow-1)}
+.qs-l{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;margin:0 -4px;padding:0 4px}
+.qs-l button{display:flex;flex-direction:column;gap:3px;text-align:left;border:none;border-radius:14px;padding:10px 12px;background:var(--soft);font:inherit;color:inherit;cursor:pointer}
+.qs-l button b{font-size:14px}
+.qs-l button span{font-size:12px;color:var(--muted)}
+.qs-l button.on{box-shadow:inset 0 0 0 2px var(--yellow-d)}
 .gnum,.gsm{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:24px;background:var(--card);box-shadow:var(--shadow-1)}
 .gn-body,.gs-body{display:flex;flex-direction:column;gap:4px;border:none;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
 .gnum small,.gsm small{font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
@@ -2618,7 +2635,7 @@ function fsInit() {
   if (!el || el._init) return; el._init = 1;
   sc.onclick = () => fsClose();
   document.addEventListener('keydown', e => { if (e.key === 'Escape') fsClose(); });
-  el.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; FS.drag = { y0: e.clientY - FS.y, h: [[e.clientY, e.timeStamp]] }; el.setPointerCapture(e.pointerId); cancelAnimationFrame(FS.raf); FS.raf = 0; });
+  el.addEventListener('pointerdown', e => { if (e.target.closest('button, input, textarea, select, label, .qs-l')) return; FS.drag = { y0: e.clientY - FS.y, h: [[e.clientY, e.timeStamp]] }; el.setPointerCapture(e.pointerId); cancelAnimationFrame(FS.raf); FS.raf = 0; });
   el.addEventListener('pointermove', e => {
     if (!FS.drag) return;
     let ny = e.clientY - FS.drag.y0; if (ny < 0) ny = -(-ny * 120 * .55) / (120 + .55 * -ny);
@@ -3006,35 +3023,6 @@ const QD = [
   ['Що спершу робите після пробудження?', ['Вода', 'Телефон', 'Кава', 'Ще 5 хвилин']],
   ['Яка суперсила стала б у пригоді в побуті?', ['Ніколи не губити ключі', 'Висипатись за 4 години', 'Знати, що на вечерю', 'Вимикати будильник силою думки']]
 ];
-// цікаві факти — перевірені, загальновідомі; без побуту й новин
-const TIPS = [
-  'Восьминіг має три серця і блакитну кров.',
-  'Банан з погляду ботаніки — ягода, а полуниця — ні.',
-  'Світло від Сонця долітає до Землі приблизно за 8 хвилин.',
-  'Колібрі — єдині птахи, які вміють літати задом наперед.',
-  'Калани (морські видри) сплять, тримаючись за лапки, щоб їх не розніс течією океан.',
-  'На Венері доба триває довше, ніж рік.',
-  'Дельфіни мають власні «імена» — особливий свист, на який відгукуються.',
-  'У новонародженої дитини близько 300 кісток, а в дорослої — 206: частина з часом зростається.',
-  'Вомбати — єдині тварини, послід яких має форму кубиків.',
-  'Бджоли розповідають одна одній, де знайти квіти, за допомогою танцю.',
-  'Коали сплять до 20 годин на добу.',
-  'Акули зʼявились на Землі раніше, ніж дерева.',
-  'На Місяці немає вітру, тож сліди астронавтів можуть зберегтися мільйони років.',
-  'Ворони запамʼятовують обличчя людей і розповідають про них іншим воронам.',
-  'Сатурн такий легкий для свого розміру, що його середня густина менша за густину води.',
-  'Перший «баг» у компʼютері 1947 року був справжньою міллю, що застрягла в реле.',
-  'У морської зірки немає мозку, а очі — на кінчиках променів.',
-  'У жирафа стільки ж шийних хребців, як у людини, — сім.',
-  'Метелики відчувають смак лапками.',
-  'Блискавка в кілька разів гарячіша за поверхню Сонця.',
-  'Мед майже не псується: археологи знаходили їстівний мед у давніх гробницях.',
-  'Слони впізнають себе в дзеркалі — це вміють лише кілька видів тварин.',
-  'Ейфелева вежа влітку стає вищою на кілька сантиметрів: метал розширюється від тепла.',
-  'Серце синього кита важить понад 150 кілограмів.',
-  'Пінгвіни-самці деяких видів дарують обраниці найгарніший камінчик.',
-  'Дерева в лісі обмінюються поживними речовинами через грибницю під землею.'
-];
 // «Цифра дня»: одна річ, зрозуміла за 3 секунди, і реакція сусідів
 const GOOD_RXI = { wow: '😮', love: '❤️', clap: '👏' };
 function goodCard() {
@@ -3064,6 +3052,90 @@ async function goodReact(k) {
   G.mine = (G.mine || '') + k[0]; G.r = G.r || {}; G.r[k] = (G.r[k] || 0) + 1; haptic('ok'); render();
   run('gnr', { k: k });
 }
+// мудрі цитати з іронічним продовженням: [цитата, автор, наш «переклад на життя»]
+const QUOTES = [
+  ['Я знаю, що нічого не знаю', 'Сократ', 'Особливо, де я поклав(ла) ключі'],
+  ['Все тече, все змінюється', 'Геракліт', 'Крім пароля від Wi-Fi'],
+  ['Мислю, отже, існую', 'Рене Декарт', 'Сплю, отже, понеділок'],
+  ['Подорож у тисячу лі починається з першого кроку', 'Лао-цзи', 'І з пошуку зарядки'],
+  ['Пізнай самого себе', 'напис у Дельфах', 'Але спершу знайди пульт'],
+  ['Бути чи не бути — ось у чім питання', 'Вільям Шекспір', 'Ще 5 хвилин у ліжку — ось у чім питання'],
+  ['Прийшов, побачив, переміг', 'Юлій Цезар', 'Прийшов, побачив холодильник, забув, навіщо прийшов'],
+  ['Дайте мені точку опори — і я переверну Землю', 'Архімед', 'Дайте мені вихідний — і я переверну подушку'],
+  ['Що нас не вбиває, робить нас сильнішими', 'Фрідріх Ніцше', 'Понеділок, ти мене чуєш?'],
+  ['Час — гроші', 'Бенджамін Франклін', 'Тому в мене немає ні того, ні іншого'],
+  ['Будь собою — інші ролі вже зайняті', 'Оскар Вайльд', 'Особливо роль того, хто виносить сміття'],
+  ['Будь зміною, яку хочеш бачити у світі', 'Махатма Ганді', 'Почни з того, що помиєш свою чашку'],
+  ['Простота — найвища витонченість', 'Леонардо да Вінчі', 'Тому сьогодні на вечерю пельмені'],
+  ['Уява важливіша за знання', 'Альберт Ейнштейн', 'Особливо коли пишеш «вже виходжу»'],
+  ['Ми — це те, що ми робимо постійно', 'Арістотель', 'Тобто ми — це скролінг'],
+  ['Людина — істота суспільна', 'Арістотель', 'Але до 10 ранку — ні'],
+  ['Борітеся — поборете!', 'Тарас Шевченко', 'Будильник теж'],
+  ['І чужого научайтесь, й свого не цурайтесь', 'Тарас Шевченко', 'І зарядку сусідові поверніть'],
+  ['Світ ловив мене, та не спіймав', 'Григорій Сковорода', 'Як і мій мобільний оператор у ліфті'],
+  ['Без надії сподіваюсь', 'Леся Українка', 'Що ліфт приїде одразу'],
+  ['Лиш боротись — значить жить', 'Іван Франко', 'Особливо з підковдрою'],
+  ['Де згода в сімействі, там мир і тишина', 'Іван Котляревський', 'І ніхто не питає, хто зʼїв останній сирник'],
+  ['Успіх — це рух від невдачі до невдачі без втрати ентузіазму', 'Вінстон Черчилль', 'Тобто мій звичайний ранок'],
+  ['Щастя твого життя залежить від якості твоїх думок', 'Марк Аврелій', 'І трохи від якості кави'],
+  ['Не важливо, як повільно ти йдеш, головне — не зупинятися', 'Конфуцій', 'Особливо сходами на 20-й поверх'],
+  ['Початок — найважливіша частина справи', 'Платон', 'Тому я вже втретє починаю бігати'],
+  ['Залишайтеся голодними, залишайтеся безрозсудними', 'Стів Джобс', 'Голодними — легко, холодильник уже порожній'],
+  ['Знання — сила', 'Френсіс Бекон', 'А павербанк — ще більша'],
+  ['Хто рано встає, тому Бог дає', 'народна мудрість', 'А хто пізно — тому кава'],
+  ['Тиша — найкраща відповідь', 'приписують Будді', 'Особливо в груповому чаті о 23:00'],
+  ['Найкращий час посадити дерево був 20 років тому. Наступний найкращий — сьогодні', 'китайське прислівʼя', 'Те саме про прибирання на балконі'],
+  ['Терпіння і праця все перетруть', 'народна мудрість', 'Крім чеків у кишені після прання'],
+  ['Не відкладай на завтра те, що можна зробити сьогодні', 'народна мудрість', 'Тому я відклав(ла) на післязавтра'],
+  ['Краще пізно, ніж ніколи', 'народна мудрість', 'Девіз кожного, хто пише «вже виходжу»'],
+  ['Все геніальне — просто', 'народна мудрість', 'Як вимкнути й увімкнути роутер']
+];
+function quoteNow(d) {
+  const Q = D.quote; if (Q && Q.t) return [Q.t, Q.a || '', Q.x || ''];
+  return dayPick(d, 5, QUOTES);
+}
+function tipCard(d) {
+  const q = quoteNow(d);
+  return '<div class="dq"><div class="dq-t">«' + esc(q[0]) + '»</div>' + (q[1] ? '<div class="dq-a">— ' + esc(q[1]) + '</div>' : '') + (q[2] ? '<div class="dq-x">' + esc(q[2]) + '</div>' : '') +
+    (D.me.isAdmin ? '<button class="dq-ed" type="button" onclick="quoteEdit()">' + (D.quote ? 'Змінити свою цитату' : 'Поставити свою цитату') + '</button>' : '') + '</div>';
+}
+// ---------- адміністратор: своя цитата ----------
+function quoteEdit() {
+  fsInit(); const Q = D.quote || {};
+  document.getElementById('fshBody').innerHTML = '<div class="h2" id="fshT">Цитата на «Сьогодні»</div>' +
+    '<label class="field">Цитата<textarea id="qeT" class="input" maxlength="240" placeholder="Я знаю, що нічого не знаю">' + esc(Q.t || '') + '</textarea></label>' +
+    '<label class="field">Автор<input id="qeA" class="input" maxlength="80" placeholder="Сократ" value="' + esc(Q.a || '') + '"></label>' +
+    '<label class="field">Іронічне продовження (можна без нього)<input id="qeX" class="input" maxlength="160" placeholder="Особливо, де я поклав ключі" value="' + esc(Q.x || '') + '"></label>' +
+    '<button class="btn yellow" style="width:100%" onclick="quoteSave()">Поставити</button>' +
+    (D.quote ? '<button class="btn ghost" style="width:100%" onclick="quoteClear()">Повернути щоденні цитати</button>' : '') +
+    '<div class="sub" style="font-weight:500">Ваша цитата висить у всіх, доки ви її не приберете.</div>';
+  haptic(); fsOpen();
+}
+async function quoteSave() {
+  const t = document.getElementById('qeT').value.trim(); if (!t) { toast('Напишіть цитату'); return; }
+  if (await run('quoteSet', { t: t, a: document.getElementById('qeA').value.trim(), x: document.getElementById('qeX').value.trim() }, 'Цитату поставлено')) fsClose();
+}
+async function quoteClear() { if (await run('quoteSet', { clear: 1 }, 'Повернули щоденні цитати')) fsClose(); }
+// ---------- адміністратор: питання тижня ----------
+function qsetOpen() {
+  fsInit(); ui.qs = ui.qs || { mode: 'list' };
+  const Q = D.qday || {}, cur = Q.q ? -1 : ((Q.k || 0) % QD.length + QD.length) % QD.length;
+  const list = '<div class="qs-l">' + QD.map((q, i) => '<button type="button" class="' + (i === cur ? 'on' : '') + '" onclick="qsetPick(' + i + ')"><b>' + esc(q[0]) + '</b><span>' + q[1].map(esc).join(' · ') + '</span></button>').join('') + '</div>';
+  const own = '<label class="field">Питання<input id="qsQ" class="input" maxlength="140" placeholder="Як ви зустрінете Новий рік?"></label>' +
+    [1, 2, 3, 4].map(n => '<label class="field">Варіант ' + n + (n > 2 ? ' (можна пропустити)' : '') + '<input id="qsO' + n + '" class="input" maxlength="50"></label>').join('') +
+    '<button class="btn yellow" style="width:100%" onclick="qsetOwn()">Поставити своє питання</button>';
+  document.getElementById('fshBody').innerHTML = '<div class="h2" id="fshT">Питання тижня</div>' +
+    '<div class="qsseg"><button class="' + (ui.qs.mode === 'list' ? 'on' : '') + '" onclick="ui.qs.mode=\'list\';qsetOpen()">Зі списку</button><button class="' + (ui.qs.mode === 'own' ? 'on' : '') + '" onclick="ui.qs.mode=\'own\';qsetOpen()">Своє</button></div>' +
+    (ui.qs.mode === 'list' ? list : own) +
+    '<div class="sub" style="font-weight:500">Після зміни відповіді починаються з нуля.</div>';
+  haptic(); fsOpen();
+}
+async function qsetPick(k) { if (await run('qset', { k: k }, 'Питання змінено')) fsClose(); }
+async function qsetOwn() {
+  const q = document.getElementById('qsQ').value.trim(), o = [1, 2, 3, 4].map(n => document.getElementById('qsO' + n).value.trim()).filter(Boolean);
+  if (!q || o.length < 2) { toast('Напишіть питання і хоча б 2 варіанти'); return; }
+  if (await run('qset', { q: q, o: o }, 'Питання змінено')) fsClose();
+}
 const HOLI = [[1, 1, 'Нового року', 'Новим роком', '🎆'], [2, 14, 'Дня закоханих', 'Днем закоханих', '💘'], [3, 8, '8 Березня', '8 Березня', '🌷'], [6, 1, 'Дня захисту дітей', 'Днем захисту дітей', '🧸'], [8, 24, 'Дня Незалежності', 'Днем Незалежності', '💙💛'], [9, 1, 'Дня знань', 'Днем знань', '📚'], [10, 1, 'Дня захисників і захисниць', 'Днем захисників і захисниць', '🛡️'], [12, 6, 'Дня ЗСУ', 'Днем ЗСУ', '🇺🇦'], [12, 25, 'Різдва', 'Різдвом', '🎄']];
 const WDAY = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота'];
 const WX_TXT = { clear: 'ясно', cloud: 'хмарно', fog: 'туман', snow: 'сніг', storm: 'гроза', rain: 'дощ' };
@@ -3078,7 +3150,7 @@ function nextHoliday() {
 function greet() { const h = new Date().getHours(); return h < 5 ? 'Доброї ночі' : h < 12 ? 'Доброго ранку' : h < 18 ? 'Доброго дня' : 'Доброго вечора'; }
 function qdayCard() {
   const Q = D.qday; if (!Q) return '';
-  const q = QD[((Q.k || 0) % QD.length + QD.length) % QD.length], opts = q[1], c = Q.c || [], tot = opts.reduce((t, _, i) => t + (c[i] || 0), 0), voted = Q.mine >= 0;
+  const q = Q.q ? [Q.q, Q.o || []] : QD[((Q.k || 0) % QD.length + QD.length) % QD.length], opts = q[1], c = Q.c || [], tot = opts.reduce((t, _, i) => t + (c[i] || 0), 0), voted = Q.mine >= 0;
   let h = '<div class="qd"><div class="qdh"><span class="qdb">Питання тижня</span><span class="sub">' + (tot ? tot + ' ' + plural(tot, 'відповідь', 'відповіді', 'відповідей') : 'будьте першим') + '</span></div><div class="qdt">' + esc(q[0]) + '</div>';
   if (!voted) h += '<div class="qdo">' + opts.map((o, i) => '<button onclick="qdayVote(' + i + ')">' + esc(o) + '</button>').join('') + '</div>';
   else {
@@ -3086,6 +3158,7 @@ function qdayCard() {
     h += '<div class="qdr">' + opts.map((o, i) => { const p = tot ? Math.round((c[i] || 0) / tot * 100) : 0;
       return '<div class="' + (i === Q.mine ? 'me' : '') + ((c[i] || 0) === mx && mx ? ' top' : '') + '"><i style="width:' + p + '%"></i><span>' + esc(o) + (i === Q.mine ? ' · ваш вибір' : '') + '</span><b>' + p + '%</b></div>'; }).join('') + '</div>';
   }
+  if (D.me.isAdmin) h += '<button class="qd-ed" type="button" onclick="qsetOpen()">Змінити питання</button>';
   return h + '</div>';
 }
 async function qdayVote(i) {
@@ -3093,9 +3166,6 @@ async function qdayVote(i) {
   const b = document.querySelector('.qd'), r = b && b.getBoundingClientRect();
   const ok = await run('qday', { i: i });
   if (ok && r) { try { xburst(r.left + r.width / 2, r.top + 60, 26); } catch (e) {} }
-}
-function tipCard(d) {
-  return '<div class="dtip"><span class="ic" aria-hidden="true">🤓</span><span><b>Цікавий факт</b><span>' + esc(dayPick(d, 5, TIPS)) + '</span></span></div>';
 }
 function gameOfDay(d) {
   const g = dayPick(d, 3, GAMES.concat(PARTY));
@@ -5298,6 +5368,8 @@ function demoApi(action, d) {
   }
   delete db.invite; delete db.importResult; delete db.osbbImportResult; delete db.tableResult; delete db.osbbTableResult;
   const L = db.light.sections;
+  if (action === 'qset' && db.qday) db.qday = d.q ? { k: db.qday.k + 1, c: [0, 0, 0, 0], q: d.q, o: d.o, mine: -1 } : { k: d.k, c: [0, 0, 0, 0], mine: -1 };
+  if (action === 'quoteSet') db.quote = d.clear ? null : { t: d.t, a: d.a, x: d.x };
   if (action === 'gnr' && db.good) { const g = db.good; if ((g.mine || '').indexOf(d.k[0]) < 0) { g.mine = (g.mine || '') + d.k[0]; g.r[d.k] = (g.r[d.k] || 0) + 1; } }
   if (action === 'qday' && db.qday) { if (db.qday.mine >= 0) throw new Error('Ви вже відповіли сьогодні'); db.qday.c[d.i]++; db.qday.mine = d.i; }
   if (action === 'genSet') { db.light.gen = { state: d.on ? 'on' : 'off', at: now }; db.light.hist.push(['gen', d.on ? 'on' : 'off', now]); }
