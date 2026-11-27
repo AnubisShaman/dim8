@@ -1983,6 +1983,20 @@ function splGesture(el) {
   SPL.key = e => { if (['ArrowUp', 'Enter', 'PageDown'].includes(e.key) && SPL && SPL.ready && !e.target.closest('button')) { e.preventDefault(); splClose(); } };
   addEventListener('keydown', SPL.key);
 }
+// повернулися в застосунок після згортання (Telegram не перезавантажує сторінку) — знову заставка
+const SPL_AWAY_S = 45;   // через скільки секунд відсутності показувати заставку знову
+let splAwayAt = 0;
+function splAway() { if (!document.body.classList.contains('spl-on')) splAwayAt = Date.now(); }
+function splBack() {
+  if (!splAwayAt || !CONFIG.SPLASH || SPL || DEMO) { splAwayAt = 0; return; }
+  const away = (Date.now() - splAwayAt) / 1000; splAwayAt = 0;
+  if (away < SPL_AWAY_S) return;
+  if (typeof atmClose === 'function') atmClose();
+  try { wxLoad(); } catch (e) {}
+  splShow();
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) splAway(); else splBack(); });
+try { if (tg && tg.onEvent) { tg.onEvent('deactivated', splAway); tg.onEvent('activated', splBack); } } catch (e) {}
 function splClose() {
   if (!SPL || SPL.closed) return;
   const S = SPL; S.closed = true; clearInterval(S.clock); clearInterval(S.msgT); removeEventListener('keydown', S.key);
