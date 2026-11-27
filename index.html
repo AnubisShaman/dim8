@@ -1366,6 +1366,58 @@ body.spl-on #app,body.spl-on .edge{visibility:hidden}
 .spl-up svg{width:20px;height:20px}
 @keyframes splnudge{50%{transform:translateY(-7px)}}
 @media (prefers-reduced-motion:reduce){.spl *,.spl *::before,.spl *::after{animation:none!important}.spl-boot .fr{stroke-dashoffset:0}}
+/* ===== Атмосфери «Космос» і «Леді» ===== */
+:root[data-atmo="cosmos"]{--bg:#07060F;--card:#120E2C;--soft:#1B1640;--line:#262058;--line2:#352C72;--graph:#2B2066;--ink:#ECE8F7;--muted:#A39CC4;--yellow:#E8C77A;--yellow-d:#D2AE5E;
+  --ok:#7EDBB4;--ok-bg:#132A2E;--info-bg:#1B1640;--glass:rgba(18,14,44,.82);--fac1:#141033;--fac2:#0C0A22;--tw1:#221B52;--tw2:#18133C;--twbase:#2F2770;--twtxt:#C9C2EA;--twcnt:#ECE8F7;--sky-end:#141033;--hair:rgba(92,225,230,.2)}
+:root[data-atmo="lady"]{--bg:#090708;--card:#180F11;--soft:#22161A;--line:#2E1E23;--line2:#3D2830;--graph:#3A121E;--ink:#F5EDE2;--muted:#AB988D;--yellow:#DEC092;--yellow-d:#C9A773;
+  --ok:#9FD9B8;--ok-bg:#1C2420;--info-bg:#22161A;--glass:rgba(24,15,17,.84);--fac1:#1C1214;--fac2:#120B0D;--tw1:#2C1B20;--tw2:#22151A;--twbase:#3A2329;--twtxt:#D8C6BB;--twcnt:#F5EDE2;--sky-end:#1C1214;--hair:rgba(222,192,146,.22)}
+:root[data-atmo] body{background:var(--bg)}
+:root[data-atmo="cosmos"] body{background:radial-gradient(60% 50% at 75% 25%,rgba(123,92,255,.26),transparent 70%) fixed,radial-gradient(45% 40% at 15% 80%,rgba(92,225,230,.09),transparent 70%) fixed,radial-gradient(120% 90% at 40% 30%,#1B1446,#07060F 70%) fixed}
+:root[data-atmo="lady"] body{background:radial-gradient(120% 80% at 80% 10%,#2A0C16 0%,#090708 55%) fixed}
+:root[data-atmo] .card,:root[data-atmo] .lightc,:root[data-atmo] .fuel,:root[data-atmo] .gent,:root[data-atmo] .bent,:root[data-atmo] .atmrow{box-shadow:inset 0 0 0 1px var(--hair),0 14px 34px -22px rgba(0,0,0,.8)}
+:root[data-atmo] .btn.yellow{background:linear-gradient(135deg,#F3DC9F,var(--yellow) 50%,#B8893F);color:#140E08;box-shadow:0 10px 26px -12px rgba(232,199,122,.7)}
+:root[data-atmo="lady"] .btn.yellow{background:linear-gradient(135deg,#F6E7C6,#D2B07A 45%,#A9824A);color:#1B0F11}
+:root[data-atmo] nav.tabs .pill{background:linear-gradient(135deg,#F3DC9F,var(--yellow) 55%,#B8893F);box-shadow:0 0 22px -4px rgba(232,199,122,.6)}
+:root[data-atmo] nav.tabs button.on{color:#140E08}
+:root[data-atmo] .h1{background:linear-gradient(180deg,#fff 10%,var(--ink) 45%,var(--yellow) 105%);-webkit-background-clip:text;background-clip:text;color:transparent}
+:root[data-atmo] .toast{background:var(--card);color:var(--ink);box-shadow:var(--shadow-3),inset 0 0 0 1px var(--hair)}
+#atbg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#atbg i{position:absolute;display:block}
+#atbg canvas{position:absolute;inset:0;width:100%;height:100%}
+.bg-cosmos .neb{inset:-20%;background:radial-gradient(35% 30% at 60% 40%,rgba(123,92,255,.16),transparent 70%);animation:atneb 40s ease-in-out infinite alternate}
+@keyframes atneb{to{transform:translate(-6vw,5vh) scale(1.15) rotate(8deg)}}
+.bg-lady .silk{border-radius:50%;will-change:transform}
+.bg-lady .s1{width:90vmax;height:50vmax;left:-30vmax;top:-10vmax;background:conic-gradient(from 200deg,transparent,rgba(222,192,146,.22),transparent 40%,rgba(128,28,56,.35),transparent 75%);filter:blur(50px);animation:atsilk 30s ease-in-out infinite alternate}
+.bg-lady .s2{width:80vmax;height:60vmax;right:-35vmax;bottom:-20vmax;background:conic-gradient(from 20deg,transparent,rgba(128,28,56,.4),transparent 45%,rgba(222,192,146,.16),transparent 80%);filter:blur(60px);animation:atsilk 38s ease-in-out infinite alternate-reverse}
+@keyframes atsilk{to{transform:rotate(25deg) translate(6vw,4vh) scale(1.12)}}
+.bg-lady .sweep{inset:-20% -60%;background:linear-gradient(105deg,transparent 42%,rgba(255,236,200,.07) 50%,transparent 58%);animation:atsweep 11s ease-in-out infinite}
+@keyframes atsweep{0%{transform:translateX(-40%)}60%,100%{transform:translateX(40%)}}
+.bg-lady .grain{inset:0;opacity:.06;background-image:radial-gradient(rgba(255,255,255,.6) .5px,transparent .6px);background-size:3px 3px}
+@media (prefers-reduced-motion:reduce){#atbg *{animation:none!important}}
+/* превʼю тем у панелі і на заставці */
+.pv-cosmos{background:radial-gradient(circle at 70% 30%,#3A2A8A,#07060F 70%)}
+.pv-cosmos::after{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#E8C77A 30%,#8A5A1C);box-shadow:0 0 14px #E8C77A}
+.pv-lady{background:conic-gradient(from 200deg at 30% 40%,#0B0809,#3A0F1D,#0B0809 40%,#2A1A0E 70%,#0B0809)}
+.pv-lady::after{content:"";position:absolute;left:50%;top:50%;width:28px;height:2px;margin:-1px -14px;border-radius:2px;background:linear-gradient(90deg,transparent,#F0DCB4,transparent);box-shadow:0 0 10px #DEC092}
+.pv-auto{background:linear-gradient(135deg,#2A2D33,#17191D)}
+.pv-auto::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px;border-radius:5px;background:#F2C12E;box-shadow:0 0 14px rgba(242,193,46,.7)}
+/* атмосфера на заставці: скляна картка, перемикачі й теми-картки */
+.spl-atm{padding:12px;border-radius:22px;background:rgba(14,16,20,.5);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 0 0 1px rgba(242,193,46,.22),0 20px 40px -20px rgba(0,0,0,.8);gap:10px!important}
+.spl-ah{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.spl-ah b{font-size:10.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#F2C12E}
+.spl-sws{display:flex;gap:14px}
+.spl-sws button{display:flex;align-items:center;gap:7px;border:0;background:none;color:#fff;font:inherit;font-size:13px;font-weight:700;padding:0;cursor:pointer}
+.spl-sws .tg{width:40px;height:24px;border-radius:12px;background:rgba(255,255,255,.18)}
+.spl-sws .tg b{width:18px;height:18px}
+.spl-sws .tg.on{background:#F2C12E}
+.spl-sws .tg.on b{transform:translateX(16px)}
+.spl-cards{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;touch-action:pan-x;scroll-snap-type:x mandatory;margin:0 -12px;padding:2px 12px 2px}
+.spl-cards::-webkit-scrollbar{display:none}
+.spl-cards button{flex:none;width:96px;scroll-snap-align:start;display:flex;flex-direction:column;gap:6px;padding:6px 6px 9px;border:0;border-radius:16px;background:rgba(255,255,255,.06);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);transition:box-shadow .2s,background .2s}
+.spl-cards button .pv{display:block;width:100%;height:46px;border-radius:11px;position:relative;overflow:hidden}
+.spl-cards button b{font-size:13px;font-weight:800;padding:0 3px}
+.spl-cards button span{font-size:10.5px;line-height:1.25;color:rgba(255,255,255,.6);padding:0 3px}
+.spl-cards button.on{background:rgba(242,193,46,.12);box-shadow:inset 0 0 0 2px #F2C12E,0 0 18px -4px rgba(242,193,46,.6)}
 </style>
 </head>
 <body>
@@ -1454,11 +1506,12 @@ function themeResolved() {
   if (p === 'light' || p === 'dark') return p;
   if (p === 'xmas') return 'dark';
   if (p === 'fire' || p === 'water' || p === 'earth' || p === 'air') { try { localStorage.setItem('b8_theme', 'elem'); } catch (e) {} return 'dark'; }
-  if (ELEMS[p]) return 'dark';
+  if (ELEMS[p] || p === 'cosmos' || p === 'lady') return 'dark';
   if (tg && tg.colorScheme) return tg.colorScheme === 'dark' ? 'dark' : 'light';
   return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 function applyTheme() {
+  const p0 = themePref();
   const t = themeResolved();
   document.documentElement.setAttribute('data-theme', t);
   const xm = xmasOn();
@@ -1467,7 +1520,10 @@ function applyTheme() {
   const el = ELEMS[themePref()] ? 'all' : '';
   if (el) document.documentElement.setAttribute('data-el', el); else document.documentElement.removeAttribute('data-el');
   elFx(el);
-  const bg = el ? '#0E1120' : xm ? '#0B181B' : t === 'dark' ? '#111317' : '#F2F3F5';
+  const at = p0 === 'cosmos' || p0 === 'lady' ? p0 : '';
+  if (at) document.documentElement.setAttribute('data-atmo', at); else document.documentElement.removeAttribute('data-atmo');
+  if (typeof atmoBg === 'function' && document.body) atmoBg();
+  const bg = at === 'cosmos' ? '#07060F' : at === 'lady' ? '#090708' : el ? '#0E1120' : xm ? '#0B181B' : t === 'dark' ? '#111317' : '#F2F3F5';
   try { tg && tg.setHeaderColor && tg.setHeaderColor(bg); tg && tg.setBackgroundColor && tg.setBackgroundColor(bg); tg && tg.setBottomBarColor && tg.setBottomBarColor(bg); } catch (e) {}
 }
 function setTheme(p) { const was = xmasOn(); try { localStorage.setItem('b8_theme', p); } catch (e) {} applyTheme(); haptic('sel'); render(); if (p === 'xmas' && !was) setTimeout(() => { xburst(innerWidth / 2, innerHeight * .4, 46); jingle(); toast('Святковий настрій увімкнено'); }, 120); }
@@ -1497,6 +1553,7 @@ function actx() {
 const SND = { on: atmGet('snd', true), last: 0 };
 function sndPlay(kind) {
   if (!SND.on) return;
+  if (atmoKind()) return atmoSfx(kind);
   const ac = actx(); if (!ac) return;
   if (ac.state === 'suspended') ac.resume();
   const now = ac.currentTime, t = now + .005;
@@ -1603,7 +1660,9 @@ function ambStart() {
   if (!AMB.ac) AMB.ac = ambBuild(); if (!AMB.ac) return false;
   AMB.on = true; const ac = AMB.ac.ac; if (ac.state === 'suspended') ac.resume();
   const g = AMB.ac.master.gain, n = ac.currentTime; g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(.55, n + 3);
-  AMB.next = 0; ambTick(); return true;
+  AMB.style = atmoKind() || 'lobby'; AMB.next = 0; AMB.step = 0;
+  if (AMB.style === 'lobby') ambTick(); else atmoTick();
+  return true;
 }
 function ambStop() {
   AMB.on = false; AMB.t.forEach(clearTimeout); AMB.t = [];
@@ -1628,6 +1687,8 @@ const ATM_TH = [
   ['light', 'Світла', 'день, повітря, легкість'],
   ['dark', 'Темна', 'графіт, спокій, вечір'],
   ['xmas', 'Різдвяна', 'гірлянди, сніг, свята'],
+  ['cosmos', 'Космос', 'зорі, туманність, дзвіночки'],
+  ['lady', 'Леді', 'шампань, бордо, шовк, лаунж'],
   ['elem', 'Стихії', 'вогонь, вода, вітер, земля']
 ];
 function atmBtn() { return '<button class="atmb' + (AMB.on ? ' on' : '') + '" type="button" onclick="atmOpen()" aria-label="Атмосфера: музика, звуки, тема">' + ATM_IC + '<span>Атмосфера</span>' + (AMB.on ? '<i class="eq" aria-hidden="true"><b></b><b></b><b></b></i>' : '') + '</button>'; }
@@ -1651,7 +1712,110 @@ function atmPaint() {
   document.querySelectorAll('.atmb').forEach(x => { x.outerHTML = atmBtn(); });
   if (typeof splPaintAtm === 'function') splPaintAtm();
 }
-function atmTheme(p) { setTheme(p); atmPaint(); }
+function atmTheme(p) {
+  const was = AMB.on ? AMB.style : '';
+  setTheme(p); atmPaint();
+  if (atmoKind()) setTimeout(() => SND.on && atmoSfx('theme'), 60);
+  // музика грає — перемикаємо стиль разом із темою
+  if (was && was !== (atmoKind() || 'lobby')) { ambStop(); setTimeout(() => { ambStart(); atmPaint(); }, 450); }
+}
+// ---------- атмосфери «Космос» і «Леді» (з набору Обсерваторії, під наш будинок) ----------
+// Космос: золото й фіолет на темно-синьому, туманність і зорі, повільні пади й дзвіночки.
+// Леді: шампань, бордо, шовк; лаунж-джаз 84 BPM зі свінгом, дзвін келихів.
+function atmoKind() { const p = themePref(); return p === 'cosmos' || p === 'lady' ? p : ''; }
+function sTone(ac, out, f, t, dur, o) {
+  o = o || {};
+  const osc = ac.createOscillator(), g = ac.createGain();
+  osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(f, t);
+  if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(o.gain || .1, t + (o.attack || .005)); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  let n = osc.connect(g);
+  if (o.filter) { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = o.filter; n = n.connect(lp); }
+  n.connect(out); osc.start(t); osc.stop(t + dur + .05);
+}
+function sBell(ac, out, f, t, gain, dur) { dur = dur || 2.4; sTone(ac, out, f, t, dur, { gain: gain }); sTone(ac, out, f * 2.76, t, dur * .4, { gain: gain * .35 }); sTone(ac, out, f * 5.4, t, dur * .15, { gain: gain * .12 }); }
+function sEp(ac, out, f, t, gain, dur) { dur = dur || 2.2; sTone(ac, out, f, t, dur, { gain: gain, attack: .01 }); sTone(ac, out, f * 2, t, dur * .5, { gain: gain * .25 }); sTone(ac, out, f * 7.02, t, .09, { gain: gain * .08 }); }
+function sNoise(ac, out, t, dur, gain, bp, to) {
+  const len = Math.ceil(ac.sampleRate * dur), b = ac.createBuffer(1, len, ac.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  s.buffer = b; f.type = 'bandpass'; f.frequency.setValueAtTime(bp, t); if (to) f.frequency.exponentialRampToValueAtTime(to, t + dur); f.Q.value = 1.2;
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + dur * .3); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  s.connect(f).connect(g).connect(out); s.start(t);
+}
+// звуки дій у темах «Космос» і «Леді» (повтор підряд звучить тихіше)
+const ATMO_LAST = {};
+function atmoSfx(kind) {
+  const ac = actx(); if (!ac) return; if (ac.state === 'suspended') ac.resume();
+  const now = performance.now(), r = ATMO_LAST[kind], n = r && now - r.t < 6000 ? r.n + 1 : 0; ATMO_LAST[kind] = { t: now, n: n };
+  const out = ac.createGain(); out.gain.value = .55 * [1, .45, .15][Math.min(n, 2)]; out.connect(ac.destination);
+  const t = ac.currentTime + .01, th = atmoKind();
+  if (th === 'lady') {
+    if (kind === 'on') { sEp(ac, out, 523.25, t, .05); sEp(ac, out, 783.99, t + .11, .05); }
+    else if (kind === 'off') sEp(ac, out, 392, t, .04, .8);
+    else if (kind === 'nav') sEp(ac, out, 659.25, t, .04, .7);
+    else if (kind === 'theme') { [3136, 4186, 5274, 6272].forEach((f, i) => sTone(ac, out, f * (1 + i * .013), t + i * .004, 1.6 - i * .25, { gain: .06 / (i + 1) })); [261.63, 329.63, 392, 493.88, 659.25].forEach(f => sEp(ac, out, f, t + .25, .035, 3)); }
+    else sEp(ac, out, 523.25, t, .03, .4);
+  } else {
+    if (kind === 'on') { sBell(ac, out, 784, t, .07); sBell(ac, out, 1175, t + .12, .06); }
+    else if (kind === 'off') sBell(ac, out, 659.25, t, .05, .7);
+    else if (kind === 'nav') sBell(ac, out, 988, t, .05, .6);
+    else if (kind === 'theme') { [587, 698, 880, 1175, 1397].forEach((f, i) => sBell(ac, out, f, t + i * .11, .06, 2.6)); sTone(ac, out, 293.7, t, 2.6, { gain: .05, attack: .6 }); }
+    else sTone(ac, out, 1320, t, .06, { gain: .025 });
+  }
+}
+// музика тем: крок 0,5 с (Космос) або восьма 84 BPM (Леді); перемикається разом із темою
+const COSMOS_CH = [[146.83, 220, 261.63, 329.63, 349.23], [116.54, 174.61, 220, 293.66], [174.61, 261.63, 329.63, 440], [130.81, 196, 293.66, 329.63]];
+const COSMOS_PENTA = [587.33, 698.46, 783.99, 880, 1046.5, 1174.66];
+const LADY_CH = [[130.81, 246.94, 329.63, 392, 587.33], [110, 196, 261.63, 329.63, 493.88], [146.83, 261.63, 349.23, 440, 659.25], [98, 174.61, 246.94, 329.63, 440]];
+const LADY_BASS = [[65.41, 98, 130.81, 123.47], [55, 82.41, 110, 103.83], [73.42, 110, 146.83, 138.59], [49, 73.42, 98, 61.74]];
+function atmoTick() {
+  const A = AMB.ac; if (!A || !AMB.on) return;
+  const ac = A.ac, out = A.out, th = AMB.style, dur = th === 'lady' ? 60 / 84 / 2 : .5;
+  if (AMB.next < ac.currentTime) AMB.next = ac.currentTime + .1;
+  while (AMB.next < ac.currentTime + .4) {
+    const t = AMB.next, st = AMB.step;
+    if (th === 'lady') {
+      const bar = Math.floor(st / 8) % 4, s = st % 8, sw = s % 2 ? dur * .18 : 0;
+      if (s === 0 || s === 3) LADY_CH[bar].slice(1).forEach((f, i) => sEp(ac, out, f, t + sw + i * .012, s === 0 ? .018 : .012, s === 0 ? 2.6 : 1.4));
+      if (s % 2 === 0) sTone(ac, out, LADY_BASS[bar][s / 2], t, dur * 1.7, { gain: .09, attack: .01, filter: 700 });
+      if (s === 2 || s === 6) sNoise(ac, out, t + sw, .18, .018, 4500);
+      if (s % 2) sNoise(ac, out, t + sw, .06, .008, 7000);
+    } else {
+      if (st % 16 === 0) COSMOS_CH[(st / 16) % 4].forEach((f, i) => {
+        const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(), lp = ac.createBiquadFilter();
+        o.type = 'triangle'; o2.type = 'sine'; o.frequency.value = f; o2.frequency.value = f * 1.004; lp.type = 'lowpass'; lp.frequency.value = 900;
+        g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.035 / (1 + i * .15), t + 2.6); g.gain.linearRampToValueAtTime(.0001, t + 9.5);
+        o.connect(lp); o2.connect(lp); lp.connect(g).connect(out); o.start(t); o2.start(t); o.stop(t + 10); o2.stop(t + 10);
+      });
+      if (Math.random() < .32) sBell(ac, out, COSMOS_PENTA[Math.random() * 6 | 0] * (Math.random() < .3 ? .5 : 1), t + Math.random() * .3, .022, 3);
+    }
+    AMB.next += dur; AMB.step++;
+  }
+  AMB.t.push(setTimeout(atmoTick, 120));
+}
+// живий фон: зорі (Космос) або шовк (Леді)
+const ATBG = { raf: 0, kind: '' };
+function atmoBg() {
+  const kind = atmoKind(); let el = document.getElementById('atbg');
+  if (!el) { el = document.createElement('div'); el.id = 'atbg'; el.setAttribute('aria-hidden', 'true'); document.body.prepend(el); }
+  if (ATBG.kind === kind) return; ATBG.kind = kind; cancelAnimationFrame(ATBG.raf);
+  el.className = kind ? 'bg-' + kind : '';
+  el.innerHTML = kind === 'lady' ? '<i class="silk s1"></i><i class="silk s2"></i><i class="sweep"></i><i class="grain"></i>' : kind === 'cosmos' ? '<i class="neb"></i><canvas></canvas>' : '';
+  if (kind !== 'cosmos' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = el.querySelector('canvas'), g = cv.getContext('2d'), d = Math.min(devicePixelRatio || 1, 2);
+  const size = () => { cv.width = innerWidth * d; cv.height = innerHeight * d; g.setTransform(d, 0, 0, d, 0, 0); };
+  size(); addEventListener('resize', size);
+  const S = Array.from({ length: 110 }, () => ({ x: Math.random(), y: Math.random(), r: .4 + Math.random() * 1.3, p: Math.random() * 6.28, v: .4 + Math.random() * 1.2, c: Math.random() < .15 ? '232,199,122' : Math.random() < .3 ? '92,225,230' : '236,232,247' }));
+  let last = 0;
+  const tick = t => {
+    if (ATBG.kind !== 'cosmos') return; ATBG.raf = requestAnimationFrame(tick);
+    if (document.hidden || t - last < 50) return; last = t;
+    const W = innerWidth, H = innerHeight; g.clearRect(0, 0, W, H);
+    for (const s of S) { const a = .35 + .65 * Math.abs(Math.sin(s.p + t / 1000 * s.v)); g.fillStyle = 'rgba(' + s.c + ',' + a.toFixed(2) + ')'; g.beginPath(); g.arc(s.x * W, s.y * H, s.r, 0, 6.28); g.fill(); }
+  };
+  ATBG.raf = requestAnimationFrame(tick);
+}
 // =====================================================================
 //  ЗАСТАВКА «Гавань»: фото ЖК за часом доби (день · вечір · ніч), погода, привітання,
 //  атмосфера (музика, звуки, тема) і свайп угору. Лише коли CONFIG.SPLASH заданий.
@@ -1721,11 +1885,13 @@ function splPaint() {
 function splPaintAtm() {
   if (!SPL) return;
   const box = SPL.el.querySelector('[data-spl-atm]'); if (!box) return;
-  const p = themePref(), th = [['auto', 'Авто'], ['light', 'Світла'], ['dark', 'Темна'], ['xmas', 'Різдвяна'], ['elem', 'Стихії']];
-  box.innerHTML = '<div class="spl-sw">' +
-      '<button type="button" data-nosnd class="' + (AMB.on ? 'on' : '') + '" aria-pressed="' + AMB.on + '" onclick="ambToggle()"><i>♪</i>Музика</button>' +
-      '<button type="button" data-nosnd class="' + (SND.on ? 'on' : '') + '" aria-pressed="' + SND.on + '" onclick="sndToggle()"><i>◉</i>Звуки</button></div>' +
-    '<div class="spl-th" role="radiogroup" aria-label="Тема">' + th.map(x => '<button type="button" role="radio" aria-checked="' + (p === x[0]) + '" class="' + (p === x[0] ? 'on' : '') + '" onclick="atmTheme(\'' + x[0] + '\')"><i class="pv pv-' + (x[0] === 'auto' ? 'auto' : x[0]) + '"></i>' + x[1] + '</button>').join('') + '</div>';
+  const p = themePref(), sc = box.querySelector('.spl-cards'), left = sc ? sc.scrollLeft : 0;
+  // на заставці — лише атмосфери (світлу/темну обирають у кабінеті)
+  const th = [['auto', 'Звичайна', 'як у Telegram'], ['cosmos', 'Космос', 'зорі, дзвіночки'], ['lady', 'Леді', 'шампань, лаунж'], ['xmas', 'Різдвяна', 'гірлянди, сніг'], ['elem', 'Стихії', 'вогонь і вода']];
+  const sw = (on, label, fn) => '<button type="button" data-nosnd role="switch" aria-checked="' + on + '" onclick="' + fn + '"><i class="tg' + (on ? ' on' : '') + '"><b></b></i>' + label + '</button>';
+  box.innerHTML = '<div class="spl-ah"><b>Атмосфера</b><div class="spl-sws">' + sw(AMB.on, 'Музика', 'ambToggle()') + sw(SND.on, 'Звуки', 'sndToggle()') + '</div></div>' +
+    '<div class="spl-cards" role="radiogroup" aria-label="Атмосфера">' + th.map(x => '<button type="button" role="radio" aria-checked="' + (p === x[0]) + '" class="' + (p === x[0] ? 'on' : '') + '" onclick="atmTheme(\'' + x[0] + '\')"><i class="pv pv-' + x[0] + '"></i><b>' + x[1] + '</b><span>' + x[2] + '</span></button>').join('') + '</div>';
+  const nc = box.querySelector('.spl-cards'); if (nc) nc.scrollLeft = left;
 }
 // дощ і сніг — один canvas
 function splFx(wx, season) {
@@ -1751,7 +1917,7 @@ function splFx(wx, season) {
 }
 function splGesture(el) {
   let y0 = null, dy = 0, t0 = 0;
-  el.addEventListener('pointerdown', e => { if (!SPL || !SPL.ready || e.target.closest('button, .spl-th')) return; y0 = e.clientY; t0 = performance.now(); dy = 0; el.style.transition = 'none'; try { el.setPointerCapture(e.pointerId); } catch (x) {} });
+  el.addEventListener('pointerdown', e => { if (!SPL || !SPL.ready || e.target.closest('button, .spl-th, .spl-cards')) return; y0 = e.clientY; t0 = performance.now(); dy = 0; el.style.transition = 'none'; try { el.setPointerCapture(e.pointerId); } catch (x) {} });
   el.addEventListener('pointermove', e => { if (y0 == null) return; dy = Math.min(0, e.clientY - y0); const k = dy < -260 ? -260 + (dy + 260) * .4 : dy; el.style.transform = 'translateY(' + k + 'px)'; el.style.setProperty('--drag', Math.min(1, -dy / 300)); });
   const end = () => { if (y0 == null) return; const v = dy / Math.max(1, performance.now() - t0); y0 = null;
     if (dy < -90 || v < -.6) splClose(); else { el.style.transition = 'transform .45s cubic-bezier(.34,1.56,.64,1)'; el.style.transform = ''; el.style.setProperty('--drag', 0); } };
@@ -4250,7 +4416,7 @@ function genCard() {
     '<div class="keyrow"><div class="keyic" style="font-size:22px">🔌</div><div><div style="font-size:17px;font-weight:800">' + (done ? (G.paid > G.target + 0.01 ? 'Внесено ' + fmtMoney(G.paid) + ' грн' : 'Внесок на генератор зроблено') : 'Внесено ' + fmtMoney(G.paid) + ' з ' + fmtMoney(G.target) + ' грн') + '</div>' +
     '<div class="sub" style="font-weight:500">' + (done ? 'Дякуємо! ' + fmtMoney(G.target) + ' грн з квартири зібрано' : blk ? 'Довнесіть ' + fmtMoney(G.left) + ' грн — ключ від ліфта заблоковано' : 'Рекомендуємо довнести ' + fmtMoney(G.left) + ' грн до ' + esc(G.due)) + '</div></div></div>' +
     (!done && payOn() ? '<button class="btn yellow" onclick="paySheet()">Внести внесок</button>' : '') +
-    (G.deposit > 0 || G.depUsed > 0 ? '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">💰</span><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Депозит квартири (понад ' + fmtMoney(G.target) + ' грн)</div><div style="font-weight:800;font-size:17px;color:#23262B">' + fmtMoney(G.deposit || 0) + ' грн</div>' + (G.depUsed > 0 ? '<div class="sub" style="font-weight:500">Уже переказано на пальне: ' + fmtMoney(G.depUsed) + ' грн</div>' : '') + '</div></div><div style="font-size:12.5px;line-height:1.45;color:var(--graph)">Депозит адміністратор може зарахувати як ваш внесок на пальне.</div>' : '') +
+    (G.deposit > 0 || G.depUsed > 0 ? '<div style="background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">💰</span><div style="flex:1;min-width:0"><div class="sub" style="font-weight:500">Депозит квартири</div><div style="font-weight:800;font-size:17px;color:var(--ink)">' + fmtMoney(G.deposit || 0) + ' грн</div>' + (G.depUsed > 0 ? '<div class="sub" style="font-weight:500">Уже переказано на пальне: ' + fmtMoney(G.depUsed) + ' грн</div>' : '') + '</div></div><div style="font-size:12.5px;line-height:1.45;color:var(--graph)">Депозит адміністратор може зарахувати як ваш внесок на пальне.</div>' : '') +
     (done ? '' : '<div class="bar" style="height:8px;background:#fff"><i style="width:' + pct + '%;background:var(--yellow-d)"></i></div>' +
       (G.block ? '<div style="font-size:13px;line-height:1.45;color:' + (blk ? 'var(--bad)' : 'var(--graph)') + '">⚠️ За рішенням більшості мешканців, які проголосували в застосунку, ' + (blk ? 'з ' + esc(G.block) + ' ключ від ліфта заблоковано, доки не буде внесено ' + fmtMoney(G.target) + ' грн.' : 'з <b>' + esc(G.block) + '</b> у квартир, які не внесли ' + fmtMoney(G.target) + ' грн, буде заблоковано ключ від ліфта.') + '</div>' : '')) + '</div>';
 }
