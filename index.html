@@ -1481,13 +1481,29 @@ body.spl-on #app,body.spl-on .edge{visibility:hidden}
 .spl-cards button span{font-size:10.5px;line-height:1.25;color:rgba(255,255,255,.6);padding:0 3px}
 .spl-cards button.on{background:rgba(242,193,46,.12);box-shadow:inset 0 0 0 2px #F2C12E,0 0 18px -4px rgba(242,193,46,.6)}
 /* атмосфера на заставці — один тихий рядок */
-.spl .spl-atm{display:flex!important;align-items:center;justify-content:center;gap:8px;padding:0!important;background:none!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-.sa-t{width:36px;height:36px;border:0;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);cursor:pointer;transition:background .2s,color .2s}
-.sa-t.on{background:rgba(242,193,46,.9);color:#23262B}
-.sa-sep{width:1px;height:18px;background:rgba(255,255,255,.2);margin:0 4px}
-.sa-c{position:relative;width:26px;height:26px;border:0;border-radius:50%;padding:0;cursor:pointer;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.18);transition:transform .2s,box-shadow .2s}
-.sa-c::after{transform:scale(.55)}
-.sa-c.on{transform:scale(1.15);box-shadow:0 0 0 2px #F2C12E,0 0 12px rgba(242,193,46,.5)}
+/* панель секції */
+.spk-st{font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;background:var(--line,#E4E6EA);color:var(--ink)}
+.spk-st.on{background:#FFF3C4;color:#6B5300}
+.spk-st.off{background:#4A4F57;color:#F2F3F5}
+.spk-l{display:grid;gap:6px}
+.spk-r{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:14px;background:var(--bg2,rgba(127,127,127,.08))}
+.spk-i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;background:#FFF3C4}
+.spk-r.off .spk-i{background:#4A4F57}
+.spk-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.spk-t b,.spk-h b{font-size:14px;font-weight:700}
+.spk-t em,.spk-h em{font-style:normal;font-size:12px;opacity:.6;font-weight:600}
+.spk-h{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;flex:none}
+/* атмосфера на заставці — скляна капсула */
+.spl .spl-atm{display:flex!important;flex-direction:column;align-items:center;gap:6px;padding:0!important;background:none!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.sa-bar{display:flex;align-items:center;gap:6px;padding:5px;border-radius:999px;background:rgba(12,14,18,.42);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 10px 30px -12px rgba(0,0,0,.7)}
+.sa-t{width:38px;height:38px;border:0;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.8);background:rgba(255,255,255,.08);cursor:pointer;transition:background .2s,color .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.sa-t:active,.sa-c:active{transform:scale(.9)}
+.sa-t.on{background:#F2C12E;color:#23262B;box-shadow:0 4px 14px -4px rgba(242,193,46,.8)}
+.sa-sep{width:1px;height:22px;background:rgba(255,255,255,.16);margin:0 3px}
+.sa-c{position:relative;width:32px;height:32px;border:0;border-radius:50%;padding:0;cursor:pointer;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;-webkit-tap-highlight-color:transparent}
+.sa-c::after{transform:scale(.6)}
+.sa-c.on{transform:scale(1.08);box-shadow:0 0 0 2px rgba(12,14,18,.6),0 0 0 4px #F2C12E}
+.sa-cap{font-size:11.5px;font-weight:700;letter-spacing:.02em;color:rgba(255,255,255,.72);text-shadow:0 1px 6px rgba(0,0,0,.6);min-height:15px}
 </style>
 </head>
 <body>
@@ -1780,8 +1796,8 @@ function atmHtml() {
   return '<div class="atmph"><span class="ic">' + ATM_IC + '</span><b id="atmT">Атмосфера</b><button class="x" type="button" aria-label="Закрити" onclick="atmClose()">✕</button></div>' +
     sw(AMB.on, 'Фонова музика', 'ambToggle()') + sw(SND.on, 'Звуки натискань', 'sndToggle()') +
     '<div class="atml">Тема</div>' +
-    '<div class="atmg">' + ATM_TH.map(x => '<button type="button" class="atmt' + (p === x[0] ? ' on' : '') + '" aria-pressed="' + (p === x[0]) + '" onclick="atmTheme(\'' + x[0] + '\')"><i class="pv pv-' + x[0] + '" aria-hidden="true"></i><b>' + x[1] + '</b></button>').join('') + '</div>' +
-    '<button type="button" class="atmauto' + (p === 'auto' ? ' on' : '') + '" aria-pressed="' + (p === 'auto') + '" onclick="atmTheme(\'auto\')">' + ic('swap', null, 14) + 'Як у Telegram</button>';
+    '<div class="atmg">' + ATM_TH.map(x => '<button type="button" class="atmt' + (p === x[0] ? ' on' : '') + '" data-nosnd aria-pressed="' + (p === x[0]) + '" onclick="atmTheme(\'' + x[0] + '\')"><i class="pv pv-' + x[0] + '" aria-hidden="true"></i><b>' + x[1] + '</b></button>').join('') + '</div>' +
+    '<button type="button" class="atmauto' + (p === 'auto' ? ' on' : '') + '" data-nosnd aria-pressed="' + (p === 'auto') + '" onclick="atmTheme(\'auto\')">' + ic('swap', null, 14) + 'Як у Telegram</button>';
 }
 function atmOpen(e) {
   if (document.getElementById('atmpop')) { atmClose(); return; }
@@ -1816,7 +1832,7 @@ function atmPaint() {
 function atmTheme(p) {
   const was = AMB.on ? AMB.style : '';
   setTheme(p); atmPaint();
-  if (atmoKind()) setTimeout(() => SND.on && atmoSfx('theme'), 60);
+  if (SND.on) setTimeout(() => atmoKind() ? atmoSfx('theme') : sndPlay('on'), 120);
   // музика грає — перемикаємо стиль разом із темою
   if (was && was !== (atmoKind() || 'lobby')) { ambStop(); setTimeout(() => { ambStart(); atmPaint(); }, 450); }
 }
@@ -1991,10 +2007,17 @@ function splPaintAtm() {
   const th = [['auto', 'Звичайна'], ['cosmos', 'Космос'], ['lady', 'Леді'], ['xmas', 'Різдвяна'], ['elem', 'Стихії']];
   const MUS = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>';
   const SNDI = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
-  box.innerHTML = '<button type="button" class="sa-t' + (AMB.on ? ' on' : '') + '" data-nosnd aria-pressed="' + AMB.on + '" aria-label="Фонова музика" onclick="ambToggle()">' + MUS + '</button>' +
+  const cur = th.filter(x => x[0] === p)[0];
+  box.innerHTML = '<div class="sa-bar"><button type="button" class="sa-t' + (AMB.on ? ' on' : '') + '" data-nosnd aria-pressed="' + AMB.on + '" aria-label="Фонова музика" onclick="ambToggle()">' + MUS + '</button>' +
     '<button type="button" class="sa-t' + (SND.on ? ' on' : '') + '" data-nosnd aria-pressed="' + SND.on + '" aria-label="Звуки натискань" onclick="sndToggle()">' + SNDI + '</button>' +
     '<i class="sa-sep" aria-hidden="true"></i>' +
-    th.map(x => '<button type="button" class="sa-c pv pv-' + x[0] + (p === x[0] ? ' on' : '') + '" role="radio" aria-checked="' + (p === x[0]) + '" aria-label="' + x[1] + '" title="' + x[1] + '" onclick="atmTheme(\'' + x[0] + '\')"></button>').join('');
+    th.map(x => '<button type="button" class="sa-c pv pv-' + x[0] + (p === x[0] ? ' on' : '') + '" data-nosnd data-n="' + x[1] + '" role="radio" aria-checked="' + (p === x[0]) + '" aria-label="' + x[1] + '" title="' + x[1] + '" onclick="splTheme(\'' + x[0] + '\', this)"></button>').join('') + '</div><div class="sa-cap" aria-live="polite">' + (cur ? cur[1] : '') + '</div>';
+}
+// тема на заставці: спершу миттєво показуємо вибір, тоді важка перемальовка й звук
+function splTheme(p, b) {
+  haptic('soft');
+  if (b) { b.parentNode.querySelectorAll('.sa-c').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); }); const c = SPL && SPL.el.querySelector('.sa-cap'); if (c) c.textContent = b.dataset.n; }
+  requestAnimationFrame(() => requestAnimationFrame(() => atmTheme(p)));
 }
 // дощ і сніг — один canvas
 function splFx(wx, season) {
@@ -2490,7 +2513,7 @@ function facadeHtml(animate, link) {
   let h = '<div class="facadec' + (g && g.state === 'on' ? ' gen' : '') + (animate ? ' ign' : '') + '">' + skyHtml() + (link ? '<button class="skylink" onclick="openLight(' + (me.entrance || 1) + ')">Детально' + ic('chev', null, 14) + '</button>' : '') + '<div class="lfac">';
   [1, 2, 3, 4].forEach(sn => {
     const k = lightCounts(sn);
-    h += '<button class="tower' + (me.entrance === sn ? ' me' : '') + '" onclick="openLight(' + sn + ')" aria-label="Секція ' + sn + ': світло на ' + k.on + ' з ' + k.all + ' поверхів"><span class="nm">С' + sn + '</span>';
+    h += '<button class="tower' + (me.entrance === sn ? ' me' : '') + '" onclick="secPeek(' + sn + ')" aria-label="Секція ' + sn + ': світло на ' + k.on + ' з ' + k.all + ' поверхів"><span class="nm">С' + sn + '</span>';
     LFLOORS.forEach((f, i) => {
       const x = floorSt(sn, f), d = (25 - i) * 36 + sn * 55;
       h += '<span class="frw ' + x.status + (x.inf ? ' inf' : '') + (x.pending ? ' pd' : '') + (me.entrance === sn && mf === f ? ' mine' : '') + '" style="--d:' + d + '">' + secLayout(sn)[f].map(() => '<i class="w"></i>').join('') + '</span>';
@@ -2616,6 +2639,21 @@ function histHtml() {
     (hasGen ? '<div class="hrow">Ген<div class="hbar g">' + bar('gen') + '</div></div>' : '') +
     [1, 2, 3, 4].map(n => '<div class="hrow">С' + n + '<div class="hbar">' + bar('s' + n) + '</div></div>').join('') +
     '<div class="hax">' + hrs.map(x => '<span>' + x + '</span>').join('') + '</div></div>';
+}
+// ---------- маленька панель секції: останні відмітки з часом ----------
+function secPeek(sn) {
+  fsInit();
+  const me = D.me;
+  const V = ((D.light && D.light.votes) || {})[sn] || [];
+  const tm = t => { const d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  let h = '<div><div class="h2" id="fshT">Секція ' + sn + (me.entrance === sn ? ' · ваша' : '') + '</div><div class="sub" style="font-weight:600">Останні відмітки світла</div></div>';
+  h += '<div class="spk-l">' + (V.length ? V.map(v => '<div class="spk-r ' + (v[1] ? 'on' : 'off') + '"><span class="spk-i">' + ic(v[1] ? 'bulb' : 'nobulb', v[1] ? '#6B5300' : '#F2F3F5', 16) + '</span>' +
+    '<span class="spk-t"><b>' + (v[1] ? 'Світло є' : 'Світла немає') + '</b>' + (v[0] ? '<em>' + v[0] + ' поверх</em>' : '') + '</span>' +
+    '<span class="spk-h"><b>' + tm(v[2]) + '</b><em>' + (Date.now() - v[2] < 36e5 ? ago(v[2]) : new Date(v[2]).toDateString() === new Date().toDateString() ? 'сьогодні' : 'вчора') + '</em></span></div>').join('')
+    : '<div class="sub" style="font-weight:500;padding:6px 0">За добу ніхто з секції не відмічався.</div>') + '</div>';
+  if (me.entrance === sn && D.light && D.light.myFloor) h += '<div class="grid2"><button class="btn yellow" onclick="fsClose();markLight(true)">' + ic('bulb', '#23262B', 18) + 'Світло є</button><button class="btn graph" onclick="fsClose();markLight(false)">' + ic('nobulb', '#fff', 18) + 'Нема</button></div>';
+  document.getElementById('fshBody').innerHTML = h;
+  haptic('soft'); fsOpen();
 }
 // ---------- шторка поверху (пружина + перетягування) ----------
 const FS = { y: 9999, v: 0, target: 9999, raf: 0, drag: null };
@@ -5320,7 +5358,7 @@ function demoApi(action, d) {
       })), [])),
       online: 14,
       heat: { lo: { state: 'cold', since: now - 3 * H, cold: 4, warm: 0, floors: [4, 6, 9, 11] }, hi: { state: 'ok', since: 0, cold: 1, warm: 0, floors: [19] }, split: 14, need: 3, needWarm: 2, my: 'hi', mine: null },
-      light: { sections: { 1: { status: 'on', since: now - 26 * H, at: now - 6 * 60000, by: 'neighbors' }, 2: { status: 'on', since: now - 3 * H, at: now - 4 * 60000, by: 'neighbors' }, 3: { status: 'off', since: now - 2 * H, at: now - 40 * 60000, by: 'neighbors', pending: { dir: 'on', at: now - 3 * 60000 } }, 4: { status: 'unknown', since: 0, at: 0 } }, mine: null },
+      light: { sections: { 1: { status: 'on', since: now - 26 * H, at: now - 6 * 60000, by: 'neighbors' }, 2: { status: 'on', since: now - 3 * H, at: now - 4 * 60000, by: 'neighbors' }, 3: { status: 'off', since: now - 2 * H, at: now - 40 * 60000, by: 'neighbors', pending: { dir: 'on', at: now - 3 * 60000 } }, 4: { status: 'unknown', since: 0, at: 0 } }, mine: null, votes: { 1: [[12, 1, now - 6 * 60000], [7, 1, now - 38 * 60000], [21, 0, now - 3 * H]], 2: [[18, 1, now - 4 * 60000]], 3: [[9, 1, now - 3 * 60000], [16, 0, now - 40 * 60000], [5, 0, now - 2 * H]] } },
       signals: [
         { id: 2, t: now - 14 * 60000, act: now - 5 * 60000, sec: 2, type: 'lift', det: 'вантажний', n: 4, ok: 0, own: false, too: false, myOk: false, reply: 'Генератор запускається, хвилин 10', replyAt: now - 6 * 60000, closed: '', ticket: 0, apt: '320' },
         { id: 1, t: now - 40 * 60000, act: now - 30 * 60000, sec: 0, type: 'water', det: 'гаряча', n: 7, ok: 1, own: false, too: true, myOk: false, reply: '', replyAt: 0, closed: '', ticket: 0, apt: '45' }
