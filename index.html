@@ -1055,6 +1055,10 @@ body.gamemode .edge{display:none}
 .qdo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .qdo button{border:none;font:inherit;font-weight:700;font-size:14px;color:inherit;background:var(--soft);border-radius:16px;padding:14px 10px;min-height:56px;cursor:pointer;line-height:1.25;transition:transform 120ms ease}
 .qdo button:active{transform:scale(.96);background:var(--yel-bg)}
+.qdo button{transition:transform .15s,background .2s,box-shadow .2s,opacity .2s}
+.qdo button.picked{background:var(--yellow);color:#23262B;transform:scale(1.03);box-shadow:0 6px 18px -6px rgba(242,193,46,.7);animation:qdpick .26s ease-out}
+.qdo button.dim{opacity:.45}
+@keyframes qdpick{0%{transform:scale(.94)}60%{transform:scale(1.06)}100%{transform:scale(1.03)}}
 .qdr{display:flex;flex-direction:column;gap:6px}
 .qdr div{position:relative;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border-radius:14px;background:var(--soft);overflow:hidden;font-size:14px;font-weight:600}
 .qdr div i{position:absolute;left:0;top:0;bottom:0;background:var(--line2);border-radius:14px;animation:qdgrow 700ms cubic-bezier(.2,.8,.2,1) both}
@@ -3161,11 +3165,19 @@ function qdayCard() {
   if (D.me.isAdmin) h += '<button class="qd-ed" type="button" onclick="qsetOpen()">Змінити питання</button>';
   return h + '</div>';
 }
+// відповідь видно одразу: кнопка «натискається», результати показуємо відразу, сервер підтверджує у фоні
 async function qdayVote(i) {
-  if (busy) return; haptic('sel');
-  const b = document.querySelector('.qd'), r = b && b.getBoundingClientRect();
+  const Q = D.qday; if (!Q || Q.mine >= 0 || busy) return;
+  haptic('ok');
+  const btn = document.querySelectorAll('.qdo button')[i], box = document.querySelector('.qd'), r = box && box.getBoundingClientRect();
+  if (btn) { btn.classList.add('picked'); document.querySelectorAll('.qdo button').forEach(b => { b.disabled = true; if (b !== btn) b.classList.add('dim'); }); }
+  const prev = { mine: Q.mine, c: (Q.c || []).slice() };
+  await new Promise(res => setTimeout(res, 260));   // дати побачити натискання
+  Q.mine = i; Q.c = (Q.c || [0, 0, 0, 0]).slice(); Q.c[i] = (Q.c[i] || 0) + 1;
+  render();
+  if (r) { try { xburst(r.left + r.width / 2, r.top + 60, 26); } catch (e) {} }
   const ok = await run('qday', { i: i });
-  if (ok && r) { try { xburst(r.left + r.width / 2, r.top + 60, 26); } catch (e) {} }
+  if (!ok && D.qday) { D.qday.mine = prev.mine; D.qday.c = prev.c; render(); }   // не вдалося — повертаємо кнопки
 }
 function gameOfDay(d) {
   const g = dayPick(d, 3, GAMES.concat(PARTY));
