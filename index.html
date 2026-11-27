@@ -4413,9 +4413,10 @@ function multiPollCard(p) {
 function adminPollBtns(p) {
   if (!D.me.isAdmin) return '';
   return '<div class="row" style="justify-content:flex-start;gap:8px">' +
-    (p.open ? '<button class="btn sm ghost" onclick="run(\'closePoll\',{id:' + p.id + '},\'Опитування завершено\')">Завершити</button>' : '') +
+    (p.open ? '<button class="btn sm ghost" onclick="pollClose(' + p.id + ')">Завершити</button>' : '<button class="btn sm yellow" onclick="run(\'openPoll\',{id:' + p.id + '},\'Голосування відновлено\')">Відновити</button>') +
     '<button class="btn sm ghost" style="color:var(--bad)" onclick="delPoll(' + p.id + ')">Видалити</button></div>';
 }
+function pollClose(id) { ask('Завершити голосування? Голосувати більше не зможуть (потім можна відновити).', ok => { if (ok) run('closePoll', { id: id }, 'Опитування завершено'); }); }
 function pickMulti(id, i) {
   const p = D.polls.find(x => x.id === id); const o = p.options[i];
   const s = ui.sel[id] || (ui.sel[id] = []);
@@ -5729,6 +5730,7 @@ function demoApi(action, d) {
   if (action === 'urgent') db.news.unshift({ time: now, entrance: d.entrance, text: d.text });
   if (action === 'newPoll') db.polls.unshift({ id: 3, question: d.question, options: d.options, counts: d.options.map((_, i) => [3, 2, 4, 6, 5, 4, 3, 4, 5, 7, 9, 14, 18, 21, 19, 12, 6][i] || 0), open: true, ownersOnly: d.ownersOnly, multi: d.multi, voted: null, total: 31 });
   if (action === 'closePoll') db.polls.find(x => x.id === d.id).open = false;
+  if (action === 'openPoll') db.polls.find(x => x.id === d.id).open = true;
   if (action === 'deletePoll') db.polls = db.polls.filter(x => x.id !== d.id);
   const f = db.me.flat;
   if (db.fuel && db.fuel.admin && ui.fMonth) { db.fuel.admin.month = ui.fMonth; if (action === 'fuelTable') { const o = (db.fuel.admin.overview || []).find(x => x.m === ui.fMonth); if (o) { o.tAt = now; o.tRows = d.rows.length; } } }
