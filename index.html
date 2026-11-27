@@ -1541,6 +1541,7 @@ nav.tabs.g3 .pill{width:calc((100% - 24px) / 3)}
 .cabsw button{flex:none;height:38px;padding:0 14px;border:0;border-radius:999px;background:var(--soft);color:var(--ink);font-size:13.5px;font-weight:700;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:background .2s,transform .15s}
 .cabsw button:active{transform:scale(.95)}
 .cabsw button.on{background:var(--yellow);color:#23262B;box-shadow:0 4px 14px -6px rgba(242,193,46,.9)}
+.codebox{display:grid;gap:8px;width:100%;margin-top:8px;padding-top:16px;border-top:1px solid var(--line,rgba(127,127,127,.2));text-align:left}
 </style>
 </head>
 <body>
@@ -2407,7 +2408,7 @@ function gate() {
     : 'Щоб увійти, підтвердіть, що ви живете тут. Це хвилина в боті і робиться один раз.<br><br>Вас запросили мешканці квартири? Відкрийте посилання-запрошення від них.<br><br>Хочете просто подивитися? Попросіть у знайомих мешканців гостьове посилання — без реєстрації.';
   const btn = st === 'pending' ? '<button class="btn ghost" onclick="location.reload()">Перевірити ще раз</button>'
     : '<button class="btn yellow" onclick="openBot()">Пройти реєстрацію</button>';
-  return '<div class="center">' + facade() + '<div class="label">8 будинок</div><div class="h1" role="heading" aria-level="1" style="font-size:30px;line-height:1.1">' + title + '</div><div style="color:var(--graph);line-height:1.5">' + text + '</div>' + btn + '</div>';
+  return '<div class="center">' + facade() + '<div class="label">8 будинок</div><div class="h1" role="heading" aria-level="1" style="font-size:30px;line-height:1.1">' + title + '</div><div style="color:var(--graph);line-height:1.5">' + text + '</div>' + btn + (st === 'pending' ? '' : codeBox()) + '</div>';
 }
 function openBot() {
   const url = 'https://t.me/' + CONFIG.BOT_USERNAME;
@@ -2734,9 +2735,9 @@ function guestOpen() {
   document.getElementById('fshBody').innerHTML = '<div class="h2" id="fshT">Запросити гостя</div>' +
     '<div class="gvw"><div><b>Гість бачить</b><span>Сьогодні: цитата, цифра дня, питання тижня (лише результати)</span><span>Ігри</span><span>Бізнеси поруч і акції</span></div>' +
     '<div class="no"><b>Не бачить</b><span>Світло, опалення, ліфти</span><span>Заявки, сигнали, дошку, голосування</span><span>Квартири, внески, хто онлайн</span></div></div>' +
-    (L ? '<div class="lnk">' + esc(L) + '</div><div class="grid2"><button class="btn yellow" onclick="linkShare(ui.gLink,\'Запрошую в застосунок нашого ЖК — гляньте, що поруч\')">' + ic('share', '#23262B', 18) + 'Надіслати</button><button class="btn ghost" onclick="copyText(ui.gLink)">' + ic('copy', null, 18) + 'Копіювати</button></div>'
+    (L ? '<div class="lnk">' + esc(L) + '</div><div class="grid2"><button class="btn yellow" onclick="linkShare(ui.gLink,\'Запрошую в застосунок нашого ЖК — гляньте, що поруч. \' + LINK_HINT)">' + ic('share', '#23262B', 18) + 'Надіслати</button><button class="btn ghost" onclick="copyText(ui.gLink)">' + ic('copy', null, 18) + 'Копіювати</button></div>'
       : '<button class="btn yellow" style="width:100%" onclick="guestMake()">Створити посилання</button>') +
-    '<div class="sub" style="font-weight:500">Посилання діє 7 днів, ним можна поділитися з кількома людьми. Гість має доступ 30 днів. Реєстрація в боті не потрібна.</div>';
+    '<div class="sub" style="font-weight:500">Посилання діє 7 днів, ним можна поділитися з кількома людьми. Гість має доступ 30 днів. Реєстрація в боті не потрібна. ' + LINK_HINT + '</div>';
   haptic(); fsOpen();
 }
 async function guestMake() {
@@ -2839,6 +2840,34 @@ async function bizAddGo() {
   const n = document.getElementById('bzAddN').value.trim(); if (!n) { toast('Вкажіть назву'); return; }
   if (await run('bizAdd', { name: n })) { const id = D.bizNewId; delete D.bizNewId; fsClose(); if (id) { ui.cab = id; ui.bzEd = id; ui.bzF = null; ui.bzDraft = null; go('bizEdit'); } }
 }
+// ---------- «Маю посилання»: якщо Telegram відкрив чат з ботом замість застосунку ----------
+const LINK_HINT = 'Якщо відкриється чат з ботом — відкрийте застосунок кнопкою бота і вставте це посилання в «Маю посилання».';
+function codeBox() {
+  return '<div class="codebox"><div class="sub" style="font-weight:600">Отримали посилання гостя або бізнесу, а відкрився чат з ботом?</div>' +
+    '<input id="cdIn" class="input" autocomplete="off" placeholder="Вставте посилання або код"><button class="btn ghost" onclick="codeGo()">Увійти за посиланням</button></div>';
+}
+function codeEntry() {
+  return '<button class="gent" onclick="codeOpen()"><span class="ic" style="background:var(--soft);box-shadow:none">' + ic('link', '#23262B', 22) + '</span><span><span class="t" style="display:block">Маю посилання бізнесу</span><span class="s" style="display:block">Вставте, якщо відкрився чат з ботом</span></span><span style="margin-left:auto;color:var(--muted)">' + ic('chev', null, 18) + '</span></button>';
+}
+function codeOpen() {
+  fsInit();
+  document.getElementById('fshBody').innerHTML = '<div class="h2" id="fshT">Посилання бізнесу</div>' +
+    '<label class="field">Посилання або код від адміністратора<input id="cdIn" class="input" autocomplete="off" placeholder="https://t.me/…?startapp=b_…"></label>' +
+    '<button class="btn yellow" style="width:100%" onclick="codeGo()">Додати бізнес</button>' +
+    '<div class="sub" style="font-weight:500">Бізнес зʼявиться у вашому кабінеті. Керувати ним зможуть усі мешканці вашої квартири.</div>';
+  haptic(); fsOpen();
+}
+async function codeGo() {
+  const el = document.getElementById('cdIn'), v = el ? el.value.trim() : '';
+  if (!v) { toast('Вставте посилання або код'); return; }
+  const was = (D.myBizs || []).map(b => b.id);
+  if (await run('code', { code: v })) {
+    fsClose();
+    const nw = (D.myBizs || []).find(b => was.indexOf(b.id) < 0);
+    if (nw) { ui.cab = nw.id; toast('Бізнес додано в кабінет'); haptic('ok'); go('me'); }
+    else if (isGuest()) { toast(D.me.state === 'biz' ? 'Вітаємо! Це ваш бізнес-кабінет' : 'Вітаємо в гостях!'); haptic('ok'); }
+  }
+}
 // адміністратор: бізнеси
 function bizAdminHtml() {
   const A = (D.biz && D.biz.admin) || [];
@@ -2860,8 +2889,8 @@ function bizDel(id) { ask('Видалити бізнес назавжди?', ok 
 function bizShowLink(u, name) {
   fsInit(); ui.bzLink = u;
   document.getElementById('fshBody').innerHTML = '<div class="h2" id="fshT">Посилання для бізнесу</div>' + (name ? '<div class="sub">' + esc(name) + '</div>' : '') +
-    '<div class="lnk">' + esc(u) + '</div><div class="grid2"><button class="btn yellow" onclick="linkShare(ui.bzLink,\'Доступ до картки вашого бізнесу в застосунку ЖК «Русанівська гавань»\')">' + ic('share', '#23262B', 18) + 'Надіслати</button><button class="btn ghost" onclick="copyText(ui.bzLink)">' + ic('copy', null, 18) + 'Копіювати</button></div>' +
-    '<div class="sub" style="font-weight:500">Посилання одноразове: хто відкриє першим, той і власник. Якщо відкрив не той — натисніть «Нове посилання», старий доступ зникне.</div>';
+    '<div class="lnk">' + esc(u) + '</div><div class="grid2"><button class="btn yellow" onclick="linkShare(ui.bzLink,\'Доступ до картки вашого бізнесу в застосунку ЖК «Русанівська гавань». \' + LINK_HINT)">' + ic('share', '#23262B', 18) + 'Надіслати</button><button class="btn ghost" onclick="copyText(ui.bzLink)">' + ic('copy', null, 18) + 'Копіювати</button></div>' +
+    '<div class="sub" style="font-weight:500">Посилання одноразове: хто відкриє першим, той і власник. Якщо відкрив не той — натисніть «Нове посилання», старий доступ зникне. ' + LINK_HINT + '</div>';
   haptic(); fsOpen();
 }
 // ---------- маленька панель секції: останні відмітки з часом ----------
@@ -4494,7 +4523,7 @@ function cabinet() {
     flatCard() +
     '<div class="label">Мої заявки</div>' +
     (mine.length ? mine.map(p => '<div class="card" role="button" tabindex="0" onclick="ui.ptab=\'' + (p.status === 'Вирішено' ? 'done' : 'open') + '\';go(\'problems\')"><div class="row"><div><div style="font-weight:700">' + esc(p.category) + '</div><div class="sub" style="font-weight:500">№ ' + p.id + ' · ' + ago(p.created) + '</div></div><span class="tag ' + (p.status === 'Вирішено' ? 'ok' : p.status === 'В роботі' ? 'yel' : 'bad') + '">' + esc(p.status) + '</span></div></div>').join('') : '<div class="empty">Заявок ще немає</div>') +
-    '<div class="label">Ще</div>' + boardEntry() + bizEntry() + guestEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + atmRow() +
+    '<div class="label">Ще</div>' + boardEntry() + bizEntry() + guestEntry() + codeEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + atmRow() +
     '<div class="chips">' + chatBtn('general', 'Чат будинку') + '</div>' +
     '<div style="font-size:12px;color:var(--muted);line-height:1.5">Телефон і ПІБ бачить лише адміністратор. Змінити квартиру чи статус можна через адміністратора. Сповіщення про ваші заявки приходять у чат із ботом.</div>';
 }
@@ -5625,6 +5654,7 @@ function demoApi(action, d) {
   const db = DEMO_DB;
   if (!db._bz) { db._bz = demoBiz(now); if (/biz=1/.test(location.search) && db.me.state === 'accepted') db._bz[0].apt = db.me.apt; if (db.me.state === 'guest' || db.me.state === 'biz') { ['apt', 'entrance', 'role', 'flat', 'family', 'username'].forEach(k => delete db.me[k]); if (db.me.state === 'biz') db.me.name = 'Ірина Петренко'; else db.me.guestUntil = now + 30 * 864e5; } }
   if (/^biz/.test(action)) demoBizAct(db, action, d, now);
+  if (action === 'code') { const c = String(d.code); if (/b_/.test(c) && db.me.state === 'accepted') { const b = db._bz.find(x => !x.apt && x.id === 'b4') || db._bz[3]; b.apt = db.me.apt; } else if (/g_/.test(c) && db.me.state !== 'accepted') { db.me.state = 'guest'; db.me.guestUntil = now + 30 * 864e5; ['apt', 'entrance', 'role', 'flat', 'family'].forEach(k => delete db.me[k]); } else throw new Error('Посилання недійсне, прострочене або вже використане. Попросіть нове.'); }
   if (db._pub === 1) { db.fuel.pub = demoPub(now, H); db._pub = 2; }
   if (action === 'fuelSpendAdd') { db.fuel.pub.spend.unshift({ row: now, date: d.date ? new Date(d.date + 'T12:00').getTime() : now, sum: Number(d.sum) || 0, liters: Number(d.liters) || 0, note: d.note }); const x = db.fuel.pub[monthKeyJs(db.fuel.pub.spend[0].date)]; if (x) { x.spent += Number(d.sum) || 0; x.liters += Number(d.liters) || 0; } db.fuel.pub.spent += Number(d.sum) || 0; db.fuel.pub.balance -= Number(d.sum) || 0; }
   if (action === 'genToFuel' && db.genFund && db.genFund.apts) { const a = db.genFund.apts.find(x => x[0] === d.apt); if (a) { if (d.sum > a[2] + 0.001) throw new Error('На депозиті кв. ' + d.apt + ' лише ' + a[2] + ' грн'); a[2] -= d.sum; a[3] += d.sum; } }
