@@ -2671,9 +2671,9 @@ function lightScreen() {
       '<span class="fapts" style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr))">' + apts.map(a => '<span class="fa' + (a.length > 4 ? ' s' : '') + '">' + a + '</span>').join('') + '</span>' +
       '<span class="flst ' + x.status + '">' + word + (x.pending ? ' · ?' : '') + '<em>' + (x.inf ? (x.status === 'unknown' ? '—' : 'за секцією') : ago(x.at)) + '</em></span></button>';
   });
-  h += '</div><div class="sub" style="font-weight:500">Блідіше — з поверху ще мало відміток, показано за секцією. • — ваш поверх.</div></div>';
+  h += '</div><div class="sub" style="font-weight:500">Блідіше — з цієї половини секції ще ніхто не відмічався, показано за секцією. • — ваш поверх.</div></div>';
   h += histHtml();
-  h += '<div class="card"><b>Як рахується</b><div class="sub" style="font-weight:500;line-height:1.5">Статус поверху змінюється, коли 2 різні квартири з цього поверху відмітили одне й те саме. Поки відміток з поверху немає, він показує статус своєї секції. Генератор показуємо за даними бота запуску.</div></div>';
+  h += '<div class="card"><b>Як рахується</b><div class="sub" style="font-weight:500;line-height:1.5">Поки застосунком користуються не всі, вистачає однієї відмітки: вона змінює статус усієї половини секції — поверхи 3–14 або з 15-го. Найсвіжіша відмітка перекриває старіші. Генератор показуємо за даними бота запуску.</div></div>';
   return h;
 }
 function histHtml() {
