@@ -1248,9 +1248,9 @@ body.gamemode .edge{display:none}
 .atmb.on{background:linear-gradient(135deg,#2A2D33,#17191D);color:#F6E7B0;box-shadow:0 0 0 1.5px rgba(242,193,46,.45),0 6px 18px rgba(242,193,46,.22)}
 .atmb.on svg{color:#F2C12E}
 .atmb .eq{display:inline-flex;align-items:flex-end;gap:2px;height:12px;margin-left:1px}
-.atmb .eq b{width:2.5px;border-radius:1px;background:#F2C12E;animation:eqb 1.1s ease-in-out infinite}
+.atmb .eq b{width:2.5px;height:12px;border-radius:1px;background:#F2C12E;transform-origin:bottom;animation:eqb 1.1s ease-in-out infinite}
 .atmb .eq b:nth-child(2){animation-delay:-.35s}.atmb .eq b:nth-child(3){animation-delay:-.7s}
-@keyframes eqb{0%,100%{height:3px}50%{height:12px}}
+@keyframes eqb{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
 .atmrow{display:flex;align-items:center;gap:12px;padding:12px 14px 12px 12px;border-radius:22px;background:var(--card);box-shadow:var(--shadow-1);border:none;font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer}
 .atmrow .ic{width:46px;height:46px;flex:none;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#2A2D33,#17191D);color:#F2C12E;box-shadow:0 6px 16px rgba(23,25,29,.3)}
 .atmrow .t{display:block;font-weight:800;font-size:15px}.atmrow .s{display:block;font-size:12.5px;color:var(--muted);font-weight:500;margin-top:2px}
@@ -1278,6 +1278,30 @@ body.gamemode .edge{display:none}
 .atmauto{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;padding:11px;background:var(--soft);font:inherit;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;box-shadow:inset 0 0 0 1.5px transparent}
 .atmauto.on{color:var(--ink);box-shadow:inset 0 0 0 2px var(--yellow-d)}
 @media (prefers-reduced-motion:reduce){.atmb .eq b{animation:none;height:8px}}
+/* віконце «Атмосфера» */
+#atmbd{position:fixed;inset:0;z-index:58;background:transparent}
+.atmpop{position:fixed;z-index:59;width:min(300px,calc(100vw - 24px));overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:20px;background:var(--card);color:var(--ink);box-shadow:0 24px 50px -18px rgba(0,0,0,.55),0 0 0 1px var(--line2);animation:atmin .18s cubic-bezier(.16,1,.3,1) both}
+.atmpop.out{animation:atmout .15s ease-in both}
+@keyframes atmin{from{opacity:0;transform:scale(.94) translateY(-6px)}}
+@keyframes atmout{to{opacity:0;transform:scale(.96) translateY(-4px)}}
+:root[data-atmo] .atmpop{box-shadow:0 24px 50px -18px rgba(0,0,0,.8),inset 0 0 0 1px var(--hair)}
+.atmph{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.atmph .ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(145deg,#2A2D33,#17191D);color:#F2C12E}
+.atmph .ic svg{width:16px;height:16px}
+.atmph b{font-size:15px;font-weight:800}
+.atmph .x{margin-left:auto;width:30px;height:30px;border:none;border-radius:50%;background:var(--soft);color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+.atmpop .atmsw{justify-content:space-between;padding:8px 10px;border-radius:13px}
+.atmpop .atmsw .t{font-size:14px;font-weight:700}
+.atmpop .tg{width:40px;height:24px}
+.atmpop .tg b{width:18px;height:18px}
+.atmpop .tg.on b{transform:translateX(16px)}
+.atmpop .atml{margin-top:2px;font-size:10px}
+.atmpop .atmg{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.atmpop .atmt{padding:5px 5px 7px;border-radius:13px;gap:2px;align-items:center;text-align:center}
+.atmpop .atmt .pv{height:30px;border-radius:9px}
+.atmpop .atmt .pv::after{transform:scale(.75)}
+.atmpop .atmt b{font-size:12px;margin:3px 0 0}
+.atmpop .atmauto{padding:8px;font-size:12.5px;border-radius:12px}
 /* ---------- заставка «Гавань» ---------- */
 body.spl-on{overflow:hidden}
 body.spl-on #app,body.spl-on .edge{visibility:hidden}
@@ -1387,10 +1411,10 @@ body.spl-on #app,body.spl-on .edge{visibility:hidden}
 .bg-cosmos .neb{inset:-20%;background:radial-gradient(35% 30% at 60% 40%,rgba(123,92,255,.16),transparent 70%);animation:atneb 40s ease-in-out infinite alternate}
 @keyframes atneb{to{transform:translate(-6vw,5vh) scale(1.15) rotate(8deg)}}
 .bg-lady .silk{border-radius:50%;will-change:transform}
-.bg-lady .s1{width:90vmax;height:50vmax;left:-30vmax;top:-10vmax;background:conic-gradient(from 200deg,transparent,rgba(222,192,146,.22),transparent 40%,rgba(128,28,56,.35),transparent 75%);filter:blur(50px);animation:atsilk 30s ease-in-out infinite alternate}
-.bg-lady .s2{width:80vmax;height:60vmax;right:-35vmax;bottom:-20vmax;background:conic-gradient(from 20deg,transparent,rgba(128,28,56,.4),transparent 45%,rgba(222,192,146,.16),transparent 80%);filter:blur(60px);animation:atsilk 38s ease-in-out infinite alternate-reverse}
+.bg-lady .s1{width:90vmax;height:50vmax;left:-30vmax;top:-10vmax;background:radial-gradient(closest-side,rgba(222,192,146,.16),rgba(128,28,56,.22) 55%,transparent);opacity:.9}
+.bg-lady .s2{width:80vmax;height:60vmax;right:-35vmax;bottom:-20vmax;background:radial-gradient(closest-side,rgba(128,28,56,.3),rgba(222,192,146,.08) 60%,transparent);opacity:.9}
 @keyframes atsilk{to{transform:rotate(25deg) translate(6vw,4vh) scale(1.12)}}
-.bg-lady .sweep{inset:-20% -60%;background:linear-gradient(105deg,transparent 42%,rgba(255,236,200,.07) 50%,transparent 58%);animation:atsweep 11s ease-in-out infinite}
+.bg-lady .sweep{inset:-20% -60%;background:linear-gradient(105deg,transparent 42%,rgba(255,236,200,.07) 50%,transparent 58%);animation:atsweep 16s ease-in-out infinite;will-change:transform}
 @keyframes atsweep{0%{transform:translateX(-40%)}60%,100%{transform:translateX(40%)}}
 .bg-lady .grain{inset:0;opacity:.06;background-image:radial-gradient(rgba(255,255,255,.6) .5px,transparent .6px);background-size:3px 3px}
 @media (prefers-reduced-motion:reduce){#atbg *{animation:none!important}}
@@ -1544,6 +1568,9 @@ const ATM_K = { mus: 'b8_mus', snd: 'b8_snd' };
 function atmGet(k, def) { try { const v = localStorage.getItem(ATM_K[k]); return v === null ? def : v === '1'; } catch (e) { return def; } }
 function atmSet(k, v) { try { localStorage.setItem(ATM_K[k], v ? '1' : '0'); } catch (e) {} }
 let ACX = null;   // один AudioContext на все
+// аудіо «засинає» через 3 с тиші, якщо музика вимкнена: інакше звуковий потік працює постійно і гріє телефон
+let ACIDLE = 0;
+function acIdle(ms) { clearTimeout(ACIDLE); ACIDLE = setTimeout(() => { if (!AMB.on && ACX && ACX.state === 'running') ACX.suspend(); }, ms || 3000); }
 function actx() {
   if (ACX) return ACX;
   const A = window.AudioContext || window.webkitAudioContext; if (!A) return null;
@@ -1577,6 +1604,7 @@ function sndPlay(kind) {
     s.buffer = n; hp.type = 'highpass'; hp.frequency.value = 2500; g.gain.value = .05;
     s.connect(hp); hp.connect(g); g.connect(out); s.start(t);
   }
+  acIdle();
 }
 document.addEventListener('pointerdown', e => {
   const b = e.target.closest('button, [role="button"], .tabs a, input[type="checkbox"]');
@@ -1667,6 +1695,7 @@ function ambStart() {
 function ambStop() {
   AMB.on = false; AMB.t.forEach(clearTimeout); AMB.t = [];
   if (AMB.ac) { const g = AMB.ac.master.gain, n = AMB.ac.ac.currentTime; g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(0, n + 1.2); }
+  acIdle(1800);
 }
 function ambToggle(force) {
   const want = force === undefined ? !AMB.on : !!force;
@@ -1679,7 +1708,7 @@ function ambToggle(force) {
 function sndToggle() { SND.on = !SND.on; atmSet('snd', SND.on); if (SND.on) sndPlay('on'); atmPaint(); }
 // музика була увімкнена минулого разу — запускаємо з першого дотику (браузери не дають грати без нього)
 if (atmGet('mus', false)) document.addEventListener('pointerdown', function once() { document.removeEventListener('pointerdown', once, true); if (!AMB.on) { ambStart(); atmPaint(); } }, true);
-document.addEventListener('visibilitychange', () => { if (!ACX) return; if (document.hidden) ACX.suspend(); else if (AMB.on || SND.on) ACX.resume(); });
+document.addEventListener('visibilitychange', () => { if (!ACX) return; if (document.hidden) ACX.suspend(); else if (AMB.on) ACX.resume(); });
 
 // ---------- панель «Атмосфера» ----------
 const ATM_IC = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8z"/><path d="M5 15l.6 1.4L7 17l-1.4.6L5 19l-.6-1.4L3 17l1.4-.6z"/></svg>';
@@ -1691,24 +1720,48 @@ const ATM_TH = [
   ['lady', 'Леді', 'шампань, бордо, шовк, лаунж'],
   ['elem', 'Стихії', 'вогонь, вода, вітер, земля']
 ];
-function atmBtn() { return '<button class="atmb' + (AMB.on ? ' on' : '') + '" type="button" onclick="atmOpen()" aria-label="Атмосфера: музика, звуки, тема">' + ATM_IC + '<span>Атмосфера</span>' + (AMB.on ? '<i class="eq" aria-hidden="true"><b></b><b></b><b></b></i>' : '') + '</button>'; }
-function atmRow() { return '<button class="atmrow" type="button" onclick="atmOpen()"><span class="ic">' + ATM_IC + '</span><span><span class="t">Атмосфера</span><span class="s">Музика, звуки натискань і тема</span></span><span style="margin-left:auto;color:var(--muted)">' + ic('chev', null, 18) + '</span></button>'; }
+function atmBtn() { return '<button class="atmb' + (AMB.on ? ' on' : '') + '" type="button" onclick="atmOpen(event)" aria-label="Атмосфера: музика, звуки, тема">' + ATM_IC + '<span>Атмосфера</span>' + (AMB.on ? '<i class="eq" aria-hidden="true"><b></b><b></b><b></b></i>' : '') + '</button>'; }
+function atmRow() { return '<button class="atmrow" type="button" onclick="atmOpen(event)"><span class="ic">' + ATM_IC + '</span><span><span class="t">Атмосфера</span><span class="s">Музика, звуки натискань і тема</span></span><span style="margin-left:auto;color:var(--muted)">' + ic('chev', null, 18) + '</span></button>'; }
 function atmSw(id, on, label, sub, fn) {
   return '<button class="atmsw" type="button" role="switch" aria-checked="' + on + '" data-nosnd onclick="' + fn + '"><i class="tg' + (on ? ' on' : '') + '"><b></b></i><span><span class="t">' + label + '</span><span class="s">' + sub + '</span></span></button>';
 }
+// компактне віконце під кнопкою: закривається дотиком повз нього, ✕ або «Назад»; нічого не тягнеться
 function atmHtml() {
   const p = themePref();
-  return '<div class="atm"><div class="atmh"><span class="ic">' + ATM_IC + '</span><div class="h2" id="fshT">Атмосфера</div></div>' +
-    '<div class="atml">Звук</div>' +
-    atmSw('mus', AMB.on, 'Фонова музика', 'Тихий лаунж, як у лобі готелю', 'ambToggle()') +
-    atmSw('snd', SND.on, 'Звуки натискань', 'Мʼякий клац на кнопках', 'sndToggle()') +
+  const sw = (on, label, fn) => '<button class="atmsw" type="button" role="switch" aria-checked="' + on + '" data-nosnd onclick="' + fn + '"><span class="t">' + label + '</span><i class="tg' + (on ? ' on' : '') + '"><b></b></i></button>';
+  return '<div class="atmph"><span class="ic">' + ATM_IC + '</span><b id="atmT">Атмосфера</b><button class="x" type="button" aria-label="Закрити" onclick="atmClose()">✕</button></div>' +
+    sw(AMB.on, 'Фонова музика', 'ambToggle()') + sw(SND.on, 'Звуки натискань', 'sndToggle()') +
     '<div class="atml">Тема</div>' +
-    '<div class="atmg">' + ATM_TH.map(x => '<button type="button" class="atmt th-' + x[0] + (p === x[0] ? ' on' : '') + '" aria-pressed="' + (p === x[0]) + '" onclick="atmTheme(\'' + x[0] + '\')"><i class="pv pv-' + x[0] + '" aria-hidden="true"></i><b>' + x[1] + '</b><span>' + x[2] + '</span></button>').join('') + '</div>' +
-    '<button type="button" class="atmauto' + (p === 'auto' ? ' on' : '') + '" aria-pressed="' + (p === 'auto') + '" onclick="atmTheme(\'auto\')">' + ic('swap', null, 16) + 'Як у Telegram — світла вдень, темна ввечері</button></div>';
+    '<div class="atmg">' + ATM_TH.map(x => '<button type="button" class="atmt' + (p === x[0] ? ' on' : '') + '" aria-pressed="' + (p === x[0]) + '" onclick="atmTheme(\'' + x[0] + '\')"><i class="pv pv-' + x[0] + '" aria-hidden="true"></i><b>' + x[1] + '</b></button>').join('') + '</div>' +
+    '<button type="button" class="atmauto' + (p === 'auto' ? ' on' : '') + '" aria-pressed="' + (p === 'auto') + '" onclick="atmTheme(\'auto\')">' + ic('swap', null, 14) + 'Як у Telegram</button>';
 }
-function atmOpen() { fsInit(); document.getElementById('fshBody').innerHTML = atmHtml(); haptic(); fsOpen(); }
+function atmOpen(e) {
+  if (document.getElementById('atmpop')) { atmClose(); return; }
+  const src = e && e.currentTarget ? e.currentTarget : document.querySelector('.atmb'), r = src ? src.getBoundingClientRect() : null;
+  const bd = document.createElement('div'); bd.id = 'atmbd'; bd.onclick = atmClose;
+  const pop = document.createElement('div'); pop.id = 'atmpop'; pop.className = 'atmpop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-labelledby', 'atmT');
+  pop.innerHTML = atmHtml();
+  // під кнопкою на головній, або по центру зверху з кабінету
+  const top = r && r.bottom < innerHeight * .5 ? r.bottom + 8 : Math.max(12, innerHeight * .12);
+  pop.style.top = top + 'px';
+  pop.style.maxHeight = (innerHeight - top - 90) + 'px';
+  if (r && r.right > innerWidth * .5) { pop.style.right = Math.max(12, innerWidth - r.right) + 'px'; pop.style.transformOrigin = 'top right'; }
+  else { pop.style.left = '50%'; pop.style.marginLeft = 'calc(min(300px, 100vw - 24px) / -2)'; pop.style.transformOrigin = 'top center'; }
+  document.body.append(bd, pop); haptic();
+  atmOpen.key = ev => { if (ev.key === 'Escape') atmClose(); };
+  addEventListener('keydown', atmOpen.key);
+  if (tg && tg.BackButton) { tg.BackButton.show(); tg.BackButton.offClick && tg.BackButton.offClick(back); tg.BackButton.onClick(atmClose); }
+}
+function atmClose() {
+  const p = document.getElementById('atmpop'), b = document.getElementById('atmbd');
+  if (!p) return;
+  removeEventListener('keydown', atmOpen.key);
+  if (tg && tg.BackButton) { tg.BackButton.offClick && tg.BackButton.offClick(atmClose); tg.BackButton.onClick(back); syncBack(); }
+  p.id = ''; p.classList.add('out'); if (b) b.remove();
+  setTimeout(() => p.remove(), 160);
+}
 function atmPaint() {
-  const b = document.getElementById('fshBody'); if (b && b.querySelector('.atm')) b.innerHTML = atmHtml();
+  const p = document.getElementById('atmpop'); if (p) p.innerHTML = atmHtml();
   document.querySelectorAll('.atmb').forEach(x => { x.outerHTML = atmBtn(); });
   if (typeof splPaintAtm === 'function') splPaintAtm();
 }
@@ -1763,6 +1816,7 @@ function atmoSfx(kind) {
     else if (kind === 'theme') { [587, 698, 880, 1175, 1397].forEach((f, i) => sBell(ac, out, f, t + i * .11, .06, 2.6)); sTone(ac, out, 293.7, t, 2.6, { gain: .05, attack: .6 }); }
     else sTone(ac, out, 1320, t, .06, { gain: .025 });
   }
+  acIdle(atmoKind() ? 4500 : 3000);
 }
 // музика тем: крок 0,5 с (Космос) або восьма 84 BPM (Леді); перемикається разом із темою
 const COSMOS_CH = [[146.83, 220, 261.63, 329.63, 349.23], [116.54, 174.61, 220, 293.66], [174.61, 261.63, 329.63, 440], [130.81, 196, 293.66, 329.63]];
@@ -1803,14 +1857,14 @@ function atmoBg() {
   el.className = kind ? 'bg-' + kind : '';
   el.innerHTML = kind === 'lady' ? '<i class="silk s1"></i><i class="silk s2"></i><i class="sweep"></i><i class="grain"></i>' : kind === 'cosmos' ? '<i class="neb"></i><canvas></canvas>' : '';
   if (kind !== 'cosmos' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const cv = el.querySelector('canvas'), g = cv.getContext('2d'), d = Math.min(devicePixelRatio || 1, 2);
+  const cv = el.querySelector('canvas'), g = cv.getContext('2d'), d = Math.min(devicePixelRatio || 1, 1.25);
   const size = () => { cv.width = innerWidth * d; cv.height = innerHeight * d; g.setTransform(d, 0, 0, d, 0, 0); };
   size(); addEventListener('resize', size);
   const S = Array.from({ length: 110 }, () => ({ x: Math.random(), y: Math.random(), r: .4 + Math.random() * 1.3, p: Math.random() * 6.28, v: .4 + Math.random() * 1.2, c: Math.random() < .15 ? '232,199,122' : Math.random() < .3 ? '92,225,230' : '236,232,247' }));
   let last = 0;
   const tick = t => {
     if (ATBG.kind !== 'cosmos') return; ATBG.raf = requestAnimationFrame(tick);
-    if (document.hidden || t - last < 50) return; last = t;
+    if (document.hidden || document.body.classList.contains('spl-on') || t - last < 80) return; last = t;
     const W = innerWidth, H = innerHeight; g.clearRect(0, 0, W, H);
     for (const s of S) { const a = .35 + .65 * Math.abs(Math.sin(s.p + t / 1000 * s.v)); g.fillStyle = 'rgba(' + s.c + ',' + a.toFixed(2) + ')'; g.beginPath(); g.arc(s.x * W, s.y * H, s.r, 0, 6.28); g.fill(); }
   };
@@ -1959,7 +2013,7 @@ function elFx(kind) {
   if (EL.on === kind) return;
   cancelAnimationFrame(EL.raf); EL.on = kind;
   const ctx = cv.getContext && cv.getContext('2d'); if (!ctx) return;
-  const dpr = Math.min(2, window.devicePixelRatio || 1), size = () => { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; };
+  const dpr = Math.min(1.25, window.devicePixelRatio || 1), size = () => { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; };
   size(); if (!EL.rs) { EL.rs = 1; addEventListener('resize', size); }
   const R = Math.random, KINDS = [].concat(Array(14).fill('fire'), Array(10).fill('water'), Array(8).fill('earth'), Array(7).fill('air'));
   const ZONE = { fire: 0, water: .25, earth: .5, air: .75 };
@@ -1970,7 +2024,7 @@ function elFx(kind) {
   const tick = t => {
     if (EL.on !== kind) return;
     EL.raf = requestAnimationFrame(tick);
-    if (document.hidden || t - last < 33) return; last = t;
+    if (document.hidden || document.body.classList.contains('spl-on') || t - last < 50) return; last = t;
     const W = cv.width, H = cv.height; ctx.clearRect(0, 0, W, H);
     EL.p.forEach((f, i) => {
       f.ph += .03;
@@ -1978,8 +2032,8 @@ function elFx(kind) {
       if (kind === 'fire') {
         f.y -= f.v * .0035; f.x += Math.sin(f.ph * 1.7) * .0012;
         const a = Math.max(0, Math.min(1, f.y * 1.4)) * (.55 + .45 * Math.sin(f.ph * 3 + i));
-        ctx.globalAlpha = a; ctx.fillStyle = COL.fire[i % 3]; ctx.shadowColor = '#FF7A2F'; ctx.shadowBlur = 10 * dpr;
-        ctx.beginPath(); ctx.arc(f.x * W, f.y * H, (1 + f.s * 2.2) * dpr, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
+        ctx.globalAlpha = a * .25; ctx.fillStyle = '#FF7A2F'; ctx.beginPath(); ctx.arc(f.x * W, f.y * H, (4 + f.s * 5) * dpr, 0, 6.283); ctx.fill();
+        ctx.globalAlpha = a; ctx.fillStyle = COL.fire[i % 3]; ctx.beginPath(); ctx.arc(f.x * W, f.y * H, (1 + f.s * 2.2) * dpr, 0, 6.283); ctx.fill();
         if (f.y < -.05) Object.assign(f, mk(kind));
       } else if (kind === 'water') {
         f.y -= f.v * .0016; f.x += Math.sin(f.ph) * .0007;
@@ -2052,7 +2106,7 @@ function xmasFx(on) {
   if (!on || rm) { XS.on = false; cancelAnimationFrame(XS.raf); const c = cv.getContext && cv.getContext('2d'); c && c.clearRect(0, 0, cv.width, cv.height); return; }
   if (XS.on) return; XS.on = true;
   const ctx = cv.getContext && cv.getContext('2d'); if (!ctx) return;
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const dpr = Math.min(1.25, window.devicePixelRatio || 1);
   const size = () => { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; };
   size(); addEventListener('resize', size);
   XS.f = Array.from({ length: 46 }, () => ({ x: Math.random(), y: Math.random(), r: .8 + Math.random() * 2.2, v: .25 + Math.random() * .6, p: Math.random() * 6.28 }));
@@ -2060,7 +2114,7 @@ function xmasFx(on) {
   const tick = t => {
     if (!XS.on) return;
     XS.raf = requestAnimationFrame(tick);
-    if (document.hidden || t - last < 33) return; last = t;
+    if (document.hidden || document.body.classList.contains('spl-on') || t - last < 50) return; last = t;
     const W = cv.width, H = cv.height; ctx.clearRect(0, 0, W, H); ctx.fillStyle = 'rgba(255,255,255,.85)';
     XS.f.forEach(f => {
       f.y += f.v * dpr / H * 2.2; f.p += .02; f.x += Math.sin(f.p) * .0006;
