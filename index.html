@@ -1639,6 +1639,18 @@ body.st-on{overflow:hidden}
 .bzday .pl{margin-left:auto;width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:#F2C12E;color:#23262B;font-size:13px}
 .bzday.sh .bz-e{background:rgba(255,255,255,.1)}
 .bz-e.nw{box-shadow:0 0 0 2px #23262B,0 0 0 4px #F2C12E}
+.prp{display:flex;align-items:center;gap:12px;padding:12px 0 6px}
+.prp-e{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:22px;background:var(--soft)}
+.prp-t{display:flex;flex-direction:column;min-width:0;line-height:1.3}
+.prp-t span{font-size:12.5px;font-weight:700;color:var(--muted)}
+.prp-t span.on{color:var(--ok)}
+.prp-t span.off{color:var(--bad)}
+.prp-b{padding-bottom:10px;border-bottom:1px solid rgba(127,127,127,.15)}
+.prp-b .chip{height:32px;font-size:12.5px;padding:0 12px}
+.bzad-r{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700}
+.bzad-r i{font-style:normal;font-size:12px;font-weight:800;padding:5px 10px;border-radius:999px;flex:none}
+.bzad-r i.on{background:var(--ok-bg);color:var(--ok)}
+.bzad-r i.off{background:var(--soft);color:var(--muted)}
 </style>
 </head>
 <body>
@@ -2863,7 +2875,7 @@ function gCabinet() {
     '<div class="card" style="gap:12px;padding:18px;border-radius:24px"><div style="display:flex;align-items:center;gap:12px"><div class="av y" style="width:52px;height:52px;border-radius:26px;font-size:18px">' + esc(initials(me.name)) + '</div>' +
     '<div><div style="font-size:17px;font-weight:700">' + esc(me.name) + '</div><div class="sub" style="font-weight:500">' + (biz ? 'Бізнес-акаунт' : 'Гість' + (me.guestUntil ? ' · доступ до ' + dmy(me.guestUntil) : '')) + '</div></div></div>' +
     '<div class="gnote">' + (biz ? 'Ви керуєте карткою свого бізнесу. Її бачать мешканці й гості застосунку. Даних мешканців бізнес-акаунт не бачить.' : 'Ви бачите загальні розділи. Світло, заявки, голосування й дані мешканців — лише для мешканців будинку.') + '</div></div>' +
-    (biz && D.myBiz ? bizCardHtml(D.myBiz, true) + '<button class="btn yellow" onclick="ui.bzEd=\'\';go(\'bizEdit\')">Редагувати картку і акцію</button>' : '') +
+    (biz && D.myBiz ? bizCardHtml(D.myBiz, true) + bizAdHtml(D.myBiz) + '<button class="btn yellow" onclick="ui.bzEd=\'\';go(\'bizEdit\')">Редагувати картку і акцію</button>' : '') +
     '<div class="label">Ще</div>' + gamesEntry() + atmRow() +
     '<button class="btn ghost" onclick="openBot()">Я мешканець — пройти реєстрацію</button>';
 }
@@ -3030,17 +3042,19 @@ function kitsParse(t) {
 function bizShowEdScreen() {
   const id = ui.bzSh, b = bizArr().find(x => x.id === id) || ((D.biz && D.biz.admin) || []).find(x => x.id === id);
   if (!D.me.isAdmin || !b) return '<div class="empty">Немає доступу</div>';
-  const S = (ui.bzShD && ui.bzShD.id === id ? ui.bzShD : b.show) || {}, meta = ((D.biz && D.biz.admin) || []).find(x => x.id === id) || {};
+  const meta = ((D.biz && D.biz.admin) || []).find(x => x.id === id) || {}, S = (ui.bzShD && ui.bzShD.id === id ? ui.bzShD : (meta.show || b.show)) || {};
   const f = (k, label, ph, max) => '<label class="field">' + label + '<input id="sh_' + k + '" class="input" maxlength="' + max + '" placeholder="' + esc(ph) + '" value="' + esc(S[k] || '') + '"></label>';
   return '<div class="row" style="justify-content:flex-start"><button class="iconbtn" aria-label="Назад" onclick="back()">' + ic('back', '#23262B', 20) + '</button><div class="h2" role="heading" aria-level="2">Презентація</div></div>' +
     '<div class="sub" style="font-weight:600;margin-top:-6px">' + esc(b.name) + (meta.views ? ' · переглянули ' + meta.views : '') + (meta.announced ? ' · анонс ' + dmy(meta.announced) : '') + '</div>' +
+    (meta.show ? '<div class="card" style="gap:8px"><div class="bzad-r"><span>Реклама ' + adStatus(meta.show.until) + '</span><i class="' + (meta.show.until > Date.now() ? 'on' : 'off') + '">' + (meta.show.until > Date.now() ? 'Активна' : 'Завершилась') + '</i></div>' +
+      '<div class="chips">' + [7, 14, 30].map(d => '<button class="chip" onclick="adExtend(\'' + id + '\',' + d + ')">+' + d + ' днів</button>').join('') + '</div></div>' : '') +
     '<div class="card" style="gap:10px">' + f('t', 'Заголовок', 'Світло без перебоїв', 60) + f('s', 'Підзаголовок', 'Інвертори й акумулятори в наявності в нашому ЖК', 140) +
     f('ok', 'Позначка довіри', 'Перевірено ОСББ · мешканець нашого будинку', 80) +
     '<div class="grid2">' + f('where', 'Де', 'Поруч · ЖК Русанівська гавань', 60) + '<div class="grid2">' + f('pi', 'Значок', '💡', 4) + f('cur', 'Валюта', '$', 4) + '</div></div>' +
     '<label class="field">Чому варто — кожна перевага з нового рядка<textarea id="sh_tags" class="input" rows="4" placeholder="Офіційний експорт&#10;Гарантія 60 місяців">' + esc((S.tags || []).join('\n')) + '</textarea></label>' +
     '<label class="field">Товари: «# Група | одиниця», далі «Модель | ціна | величина»<textarea id="sh_kits" class="input" rows="9" style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px" placeholder="# Інвертори Deye | кВт&#10;SUN-6K-SG06LP1-EU BM2 | 900 | 6">' + esc(kitsToText(S.kits)) + '</textarea></label>' +
     '<div class="grid2"><button class="btn ghost" onclick="shPreview()">▶ Переглянути</button><button class="btn yellow" onclick="shSave()">Зберегти</button></div></div>' +
-    (b.show ? '<div class="card" style="gap:10px"><b>Донести до людей</b><div class="sub" style="font-weight:500">Презентація вже на «Сьогодні» і в «Бізнеси поруч» з позначкою «Нове». Анонс у групі — повідомлення з кнопкою, яка одразу відкриває презентацію.</div>' +
+    (b.show || meta.show ? '<div class="card" style="gap:10px"><b>Донести до людей</b><div class="sub" style="font-weight:500">Презентація вже на «Сьогодні» і в «Бізнеси поруч» з позначкою «Нове». Анонс у групі — повідомлення з кнопкою, яка одразу відкриває презентацію.</div>' +
       '<button class="btn graph" onclick="shAnnounce()">📣 Анонс у групу будинку</button><button class="btn ghost" style="color:var(--bad)" onclick="shClear()">Прибрати презентацію</button></div>' : '');
 }
 function shRead() {
@@ -3060,6 +3074,38 @@ async function shSave() {
 }
 function shAnnounce() { ask('Надіслати анонс у групу будинку? Його побачать усі учасники групи.', ok => { if (ok) run('bizAnnounce', { id: ui.bzSh }, 'Анонс надіслано в групу'); }); }
 function shClear() { ask('Прибрати презентацію? Картка бізнесу лишиться.', ok => { if (ok) run('bizShow', { id: ui.bzSh, clear: 1 }, 'Презентацію прибрано'); }); }
+// ---------- підготовлені презентації (реклама, яку готуємо заздалегідь) ----------
+// Заготовки лежать у Code.gs (PREPARED). Адмін публікує одним натисканням на N днів, потім — «Продовжити».
+function adStatus(until) {
+  if (!until) return '';
+  return until > Date.now() ? 'активна до ' + dmy(until) : 'завершилась ' + dmy(until);
+}
+function prepHtml() {
+  const P = D.prepared || []; if (!P.length) return '';
+  return '<div class="label">Підготовлені презентації</div><div class="card" style="gap:0">' + P.map(p => {
+    const on = p.pub && p.pub.until > Date.now();
+    return '<div class="prp"><span class="prp-e">' + esc(p.em || '📣') + '</span><div class="prp-t"><b>' + esc(p.name) + '</b><span class="' + (on ? 'on' : p.pub ? 'off' : '') + '">' + (p.pub ? '● ' + adStatus(p.pub.until) : 'ще не опублікована · ' + p.days + ' днів') + '</span></div></div>' +
+      '<div class="chips prp-b"><button class="chip" onclick="prepPreview(\'' + p.key + '\')">▶ Переглянути</button>' +
+      (p.pub ? '<button class="chip on" onclick="adExtend(\'' + p.pub.id + '\',30)">Продовжити +30 днів</button>' : '<button class="chip on" onclick="prepPublish(\'' + p.key + '\',' + p.days + ')">Опублікувати на ' + p.days + ' днів</button>') + '</div>';
+  }).join('') + '<div class="sub" style="font-weight:500;padding-top:10px">Нову заготовку готуємо заздалегідь у Code.gs (PREPARED) — тут лише публікуєте. Після строку реклама сама зникає в мешканців.</div></div>';
+}
+function prepPreview(key) {
+  const p = (D.prepared || []).find(x => x.key === key); if (!p) return;
+  storyOpen(null, Object.assign({ id: 'prep_' + key }, p.card, { link: p.card.link2 || '', show: p.show }));
+}
+function prepPublish(key, days) {
+  const p = (D.prepared || []).find(x => x.key === key);
+  ask('Опублікувати «' + (p ? p.name : key) + '» на ' + days + ' днів? Мешканці побачать її на «Сьогодні» і в «Бізнеси поруч».', ok => { if (ok) run('bizPrep', { key: key, days: days }, 'Опубліковано на ' + days + ' днів'); });
+}
+function adExtend(id, days) { run('bizExtend', { id: id, days: days }, 'Продовжено на ' + days + ' днів'); }
+// власник бізнесу: лише статус реклами — без статистики
+function bizAdHtml(b) {
+  if (!b) return '';
+  if (!b.ad) return '<div class="card bzad" style="gap:6px"><b>📣 Реклама в застосунку</b><div class="sub" style="font-weight:500">Зараз немає. Щоб мешканці побачили презентацію ваших товарів — напишіть адміністратору ОСББ, підготуємо.</div></div>';
+  const on = b.ad.until > Date.now();
+  return '<div class="card bzad" style="gap:8px"><b>📣 Реклама в застосунку</b><div class="bzad-r"><span>' + esc(b.ad.t || 'Презентація') + '</span><i class="' + (on ? 'on' : 'off') + '">' + (on ? 'Активна' : 'Завершилась') + '</i></div>' +
+    '<div class="sub" style="font-weight:600">' + (on ? 'Діє до ' + dmy(b.ad.until) + '. Мешканці бачать її на «Сьогодні» і в «Бізнеси поруч».' : 'Завершилась ' + dmy(b.ad.until) + '. Щоб продовжити — напишіть адміністратору ОСББ.') + '</div></div>';
+}
 // ---------- кабінет квартири з бізнесом: перемикач «Квартира / Бізнес» ----------
 // Бізнес належить квартирі: картку змінюють власник і члени сімʼї. Можна додати до 3 бізнесів на квартиру.
 function cabSwitch() {
@@ -3072,7 +3118,7 @@ function cabTo(id) { haptic('sel'); ui.cab = id; render(); }
 function bizCabinet(b) {
   return '<div class="h1" role="heading" aria-level="1">Мій кабінет</div>' + cabSwitch() +
     (b.desc ? bizCardHtml(b, true) : '<div class="card"><b>' + esc(bizEm(b)) + ' ' + esc(b.name) + '</b><div class="sub" style="font-weight:500">Картка ще порожня. Додайте опис — і її побачать мешканці та гості.</div></div>') +
-    (b.on === false ? '<div class="gnote">Адміністратор сховав цю картку. Інші її зараз не бачать.</div>' : '') +
+    (b.on === false ? '<div class="gnote">Адміністратор сховав цю картку. Інші її зараз не бачать.</div>' : '') + bizAdHtml(b) +
     '<button class="btn yellow" onclick="ui.bzEd=\'' + b.id + '\';ui.bzF=null;ui.bzDraft=null;go(\'bizEdit\')">Редагувати картку і акцію</button>' +
     (D.bizCanAdd ? '<button class="btn ghost" onclick="bizAddOpen()">' + ic('plus', null, 18) + 'Додати ще бізнес</button>' : '') +
     '<div class="gnote">Цю картку бачать і змінюють усі мешканці квартири ' + esc(D.me.apt || '') + ': власник і члени сімʼї. Кожен може додати свій бізнес — до 3 на квартиру.</div>' +
@@ -3121,13 +3167,13 @@ async function codeGo() {
 // адміністратор: бізнеси
 function bizAdminHtml() {
   const A = (D.biz && D.biz.admin) || [];
-  return '<div class="label">Бізнеси</div><div class="card" style="gap:10px">' +
+  return prepHtml() + '<div class="label">Бізнеси</div><div class="card" style="gap:10px">' +
     '<div class="sub" style="font-weight:500">Створіть посилання під бізнес і надішліть власнику. Хто відкриє його першим, отримає доступ до картки. Реєстрація не потрібна.</div>' +
     '<div class="bzn"><input id="bzNew" class="input" maxlength="60" placeholder="Назва, напр. Кавʼярня «Гавань»"><button class="btn yellow" onclick="bizNew()">Створити</button></div>' +
-    A.map(b => '<div class="bza"><div class="bza-t"><b>' + esc(b.name) + '</b><span>' + (b.owner ? 'власник: ' + esc(b.ownerName || 'є') : b.linkUrl ? 'посилання ще не відкрили' : 'без власника') + (b.ready ? '' : ' · картка порожня') + (b.on ? '' : ' · сховано') + (b.views ? ' · 👁 ' + b.views : '') + '</span></div>' +
+    A.map(b => '<div class="bza"><div class="bza-t"><b>' + esc(b.name) + '</b><span>' + (b.owner ? 'власник: ' + esc(b.ownerName || 'є') : b.linkUrl ? 'посилання ще не відкрили' : 'без власника') + (b.ready ? '' : ' · картка порожня') + (b.on ? '' : ' · сховано') + (b.show ? ' · реклама ' + adStatus(b.show.until) : '') + (b.views ? ' · 👁 ' + b.views : '') + '</span></div>' +
       '<div class="chips">' + (b.linkUrl ? '<button class="chip" onclick="bizShowLink(\'' + esc(b.linkUrl) + '\',\'' + esc(b.name).replace(/'/g, '') + '\')">Посилання</button>' : '<button class="chip" onclick="bizRelink(\'' + b.id + '\')">Нове посилання</button>') +
       '<button class="chip" onclick="ui.bzEd=\'' + b.id + '\';ui.bzF=null;go(\'bizEdit\')">Редагувати</button>' +
-      '<button class="chip" onclick="ui.bzSh=\'' + b.id + '\';ui.bzShD=null;go(\'bizShowEd\')">' + (bizHasShow(bizArr().find(x => x.id === b.id)) ? '▶ Презентація' : '+ Презентація') + '</button>' +
+      '<button class="chip" onclick="ui.bzSh=\'' + b.id + '\';ui.bzShD=null;go(\'bizShowEd\')">' + (b.show ? '▶ Презентація' : '+ Презентація') + '</button>' +
       '<button class="chip" onclick="run(\'bizHide\',{id:\'' + b.id + '\',on:' + !b.on + '},\'' + (b.on ? 'Сховано' : 'Показано') + '\')">' + (b.on ? 'Сховати' : 'Показати') + '</button>' +
       '<button class="chip" onclick="bizDel(\'' + b.id + '\')">Видалити</button></div></div>').join('') + '</div>';
 }
@@ -5991,6 +6037,10 @@ function demoBiz(now) {
     { id: 'b4', name: 'Пекарня «Хлібна гавань»', cat: 'food', em: '', desc: '', phone: '', link: '', addr: '', on: true }
   ];
 }
+const DEMO_DEYE = { t: 'Світло без перебоїв', s: 'Інвертори й акумулятори Deye — в наявності прямо в нашому ЖК', where: 'Поруч · ЖК Русанівська гавань', ok: 'Перевірено ОСББ · продавець із нашого ЖК', pi: '💡', cur: '$',
+  tags: ['Офіційний експорт', 'Гарантія 60 місяців', 'Усе в наявності', 'Поруч — м. Лівобережна'],
+  kits: [{ g: 'Інвертори Deye', u: 'кВт', items: [['SUN-6K-SG06LP1-EU BM2', 900, 6], ['SUN-8K-SG06LP1-EU BM3', 1250, 8], ['SUN-10K-SG06LP1-EU CM3', 1550, 10], ['SUN-12K-SG06LP1-EU CM3', 1600, 12]] },
+    { g: 'Акумулятори Deye', u: 'кВт·год', items: [['SE-F5 Pro-B', 850, 5], ['SE-F5 Pro-C', 840, 5], ['SE-F12 Pro-C', 1650, 12], ['SE-F16-C', 1910, 16]] }] };
 function demoBizAct(db, action, d, now) {
   const L = db._bz, f = id => L.find(b => b.id === id), cur = d.id ? f(d.id) : L[0];
   if (action === 'bizSave' && cur) { if (!d.name || !d.desc) throw new Error('Вкажіть назву й опис'); let l = d.link || ''; if (/^@?[A-Za-z0-9_]{4,}$/.test(l)) l = 'https://t.me/' + l.replace(/^@/, ''); if (l && !/^https:\/\//.test(l)) throw new Error('Посилання має починатися з https://'); Object.assign(cur, { name: d.name, desc: d.desc, phone: d.phone, em: d.em, link: l, addr: d.addr, cat: d.cat }); }
@@ -6000,17 +6050,21 @@ function demoBizAct(db, action, d, now) {
   if (action === 'bizHide' && cur) cur.on = !!d.on;
   if (action === 'bizShow' && cur) { if (d.clear) delete cur.show; else { const x = Object.assign({}, d); delete x.id; cur.show = x; } }
   if (action === 'bizAnnounce' && cur) cur.announced = now;
+  if (action === 'bizExtend' && cur && cur.show) cur.show.until = Math.max(now, cur.show.until || 0) + (d.days || 30) * 864e5;
+  if (action === 'bizPrep') { let b = L.find(x => x.prep === d.key || x.id === 'b0'); if (!b) { b = { id: 'b0', name: 'Deye · інвертори й акумулятори', cat: 'energy', em: '🔋', desc: 'Офіційний експорт, гарантія 60 місяців.', phone: '+380507137413', addr: 'ЖК Русанівська гавань', on: true }; L.unshift(b); } b.prep = d.key; b.show = Object.assign({}, DEMO_DEYE, { until: now + (d.days || 30) * 864e5 }); }
   if (action === 'bizView' && cur) cur.views = (cur.views || 0) + 1;
   if (action === 'bizAdd') { const mine = L.filter(b => b.apt === db.me.apt); if (mine.length >= 3) throw new Error('На квартиру можна до 3 бізнесів'); const b = { id: 'b' + now, name: d.name, cat: 'other', desc: '', on: true, apt: db.me.apt }; L.push(b); db._bizNewId = b.id; }
   if (action === 'bizDel') db._bz = L.filter(b => b.id !== d.id);
 }
 function demoOut(db, now) {
-  const o = JSON.parse(JSON.stringify(db)), card = b => { const c = { id: b.id, name: b.name, cat: b.cat, desc: b.desc, phone: b.phone, link: b.link, addr: b.addr, em: b.em }; if (b.show) c.show = b.show; if (b.promo && b.promo.until > now) c.promo = b.promo; return c; };
+  const o = JSON.parse(JSON.stringify(db)), card = b => { const c = { id: b.id, name: b.name, cat: b.cat, desc: b.desc, phone: b.phone, link: b.link, addr: b.addr, em: b.em }; if (b.show && (!b.show.until || b.show.until > now)) c.show = b.show; if (b.promo && b.promo.until > now) c.promo = b.promo; return c; };
   const vis = db._bz.filter(b => b.on !== false && b.desc).map(card).sort((x, y) => (!!y.promo - !!x.promo) || x.name.localeCompare(y.name));
-  o.biz = db.me.isAdmin ? { list: vis, admin: db._bz.map(b => ({ id: b.id, name: b.name, on: b.on !== false, ready: !!b.desc, owner: !!b.owner, ownerName: b.ownerName || '', views: b.views || 0, announced: b.announced || 0, linkUrl: b.owner ? '' : 'https://t.me/' + CONFIG.BOT_USERNAME + '/app?startapp=b_demo' + b.id })) } : vis;
-  if (db.me.state === 'biz') o.myBiz = card(db._bz[0]);
+  o.biz = db.me.isAdmin ? { list: vis, admin: db._bz.map(b => ({ id: b.id, name: b.name, on: b.on !== false, ready: !!b.desc, owner: !!b.owner, ownerName: b.ownerName || '', views: b.views || 0, announced: b.announced || 0, show: b.show || null, linkUrl: b.owner ? '' : 'https://t.me/' + CONFIG.BOT_USERNAME + '/app?startapp=b_demo' + b.id })) } : vis;
+  const adOf = b => b.show ? { t: b.show.t, until: b.show.until || 0 } : null;
+  if (db.me.state === 'biz') o.myBiz = Object.assign(card(db._bz[0]), { ad: adOf(db._bz[0]) });
   const mb = db.me.state === 'accepted' ? db._bz.filter(b => b.apt && b.apt === db.me.apt) : [];
-  if (mb.length) { o.myBizs = mb.map(b => Object.assign(card(b), { on: b.on !== false })); o.bizCanAdd = mb.length < 3; }
+  if (mb.length) { o.myBizs = mb.map(b => Object.assign(card(b), { on: b.on !== false, ad: adOf(b) })); o.bizCanAdd = mb.length < 3; }
+  if (db.me.isAdmin) o.prepared = [{ key: 'deye', name: 'Deye · інвертори й акумулятори', em: '🔋', days: 30, card: { name: 'Deye · інвертори й акумулятори', em: '🔋', phone: '+380507137413', addr: 'ЖК Русанівська гавань, м. Лівобережна' }, show: DEMO_DEYE, pub: (() => { const b = db._bz.find(x => x.prep === 'deye' || x.id === 'b0'); return b && b.show ? { id: b.id, until: b.show.until } : null; })() }];
   if (db._bizNewId) { o.bizNewId = db._bizNewId; delete db._bizNewId; }
   if (db._bizLink) { o.bizLink = db._bizLink; delete db._bizLink; }
   delete o._bz;
