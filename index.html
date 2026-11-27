@@ -1536,6 +1536,11 @@ body.spl-on #app,body.spl-on .edge{visibility:hidden}
 .gnote{font-size:13px;line-height:1.45;color:var(--graph,#5F6670);background:var(--soft);border-radius:12px;padding:10px 12px;font-weight:500}
 nav.tabs.g3{grid-template-columns:repeat(3,1fr)}
 nav.tabs.g3 .pill{width:calc((100% - 24px) / 3)}
+.cabsw{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px;margin:-4px 0 2px}
+.cabsw::-webkit-scrollbar{display:none}
+.cabsw button{flex:none;height:38px;padding:0 14px;border:0;border-radius:999px;background:var(--soft);color:var(--ink);font-size:13.5px;font-weight:700;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:background .2s,transform .15s}
+.cabsw button:active{transform:scale(.95)}
+.cabsw button.on{background:var(--yellow);color:#23262B;box-shadow:0 4px 14px -6px rgba(242,193,46,.9)}
 </style>
 </head>
 <body>
@@ -2763,8 +2768,8 @@ function gCabinet() {
 }
 // редагування картки (власник або адміністратор)
 function bizEditScreen() {
-  const adm = D.me.isAdmin && ui.bzEd, meta = adm && D.biz && D.biz.admin ? D.biz.admin.find(x => x.id === ui.bzEd) : null;
-  let b = adm ? (bizArr().find(x => x.id === ui.bzEd) || { id: ui.bzEd, name: meta ? meta.name : '', cat: 'other' }) : D.myBiz;
+  const id = ui.bzEd, own = id && (D.myBizs || []).find(x => x.id === id), adm = D.me.isAdmin && id && !own, meta = adm && D.biz && D.biz.admin ? D.biz.admin.find(x => x.id === id) : null;
+  let b = id ? (own || bizArr().find(x => x.id === id) || (meta ? { id: id, name: meta.name, cat: 'other' } : null)) : D.myBiz;
   if (!b) return '<div class="empty">Картку не знайдено</div>';
   if (ui.bzDraft && ui.bzDraft.id === b.id) b = Object.assign({}, b, ui.bzDraft);
   const cat = ui.bzF && ui.bzF.id === b.id ? ui.bzF.cat : b.cat || 'other'; ui.bzF = { id: b.id, cat: cat };
@@ -2792,7 +2797,7 @@ function bizKeep() {
   if (!ui.bzF || !document.getElementById('bzName')) return;
   ui.bzDraft = { id: ui.bzF.id, name: v('bzName'), desc: v('bzDesc'), phone: v('bzPhone'), em: v('bzEm'), link: v('bzLink'), addr: v('bzAddr') };
 }
-function bizBase() { return D.me.isAdmin && ui.bzEd ? { id: ui.bzEd } : {}; }
+function bizBase() { return ui.bzEd ? { id: ui.bzEd } : {}; }
 async function bizSave() {
   const v = id => document.getElementById(id).value.trim();
   const d = Object.assign(bizBase(), { name: v('bzName'), desc: v('bzDesc'), phone: v('bzPhone'), em: v('bzEm'), link: v('bzLink'), addr: v('bzAddr'), cat: ui.bzF.cat });
@@ -2803,6 +2808,36 @@ async function bizPromo(clear) {
   const t = clear ? '' : document.getElementById('bzPromo').value.trim();
   if (!clear && !t) { toast('Напишіть текст акції'); return; }
   run('bizPromo', Object.assign(bizBase(), clear ? { clear: 1 } : { t: t, days: ui.bzDays || 7 }), clear ? 'Акцію знято' : 'Акцію опубліковано');
+}
+// ---------- кабінет квартири з бізнесом: перемикач «Квартира / Бізнес» ----------
+// Бізнес належить квартирі: картку змінюють власник і члени сімʼї. Можна додати до 3 бізнесів на квартиру.
+function cabSwitch() {
+  const L = D.myBizs || []; if (!L.length) return '';
+  const cur = L.some(b => b.id === ui.cab) ? ui.cab : '';
+  return '<div class="cabsw" role="tablist"><button role="tab" aria-selected="' + !cur + '" class="' + (cur ? '' : 'on') + '" onclick="cabTo(\'\')">🏠 Кв. ' + esc(D.me.apt || '') + '</button>' +
+    L.map(b => '<button role="tab" aria-selected="' + (cur === b.id) + '" class="' + (cur === b.id ? 'on' : '') + '" onclick="cabTo(\'' + b.id + '\')">' + esc(bizEm(b)) + ' ' + esc(b.name) + '</button>').join('') + '</div>';
+}
+function cabTo(id) { haptic('sel'); ui.cab = id; render(); }
+function bizCabinet(b) {
+  return '<div class="h1" role="heading" aria-level="1">Мій кабінет</div>' + cabSwitch() +
+    (b.desc ? bizCardHtml(b, true) : '<div class="card"><b>' + esc(bizEm(b)) + ' ' + esc(b.name) + '</b><div class="sub" style="font-weight:500">Картка ще порожня. Додайте опис — і її побачать мешканці та гості.</div></div>') +
+    (b.on === false ? '<div class="gnote">Адміністратор сховав цю картку. Інші її зараз не бачать.</div>' : '') +
+    '<button class="btn yellow" onclick="ui.bzEd=\'' + b.id + '\';ui.bzF=null;ui.bzDraft=null;go(\'bizEdit\')">Редагувати картку і акцію</button>' +
+    (D.bizCanAdd ? '<button class="btn ghost" onclick="bizAddOpen()">' + ic('plus', null, 18) + 'Додати ще бізнес</button>' : '') +
+    '<div class="gnote">Цю картку бачать і змінюють усі мешканці квартири ' + esc(D.me.apt || '') + ': власник і члени сімʼї. Кожен може додати свій бізнес — до 3 на квартиру.</div>' +
+    '<div class="label">Ще</div>' + bizEntry() + atmRow();
+}
+function bizAddOpen() {
+  fsInit();
+  document.getElementById('fshBody').innerHTML = '<div class="h2" id="fshT">Ще один бізнес</div>' +
+    '<label class="field">Назва<input id="bzAddN" class="input" maxlength="60" placeholder="Напр. Торти на замовлення"></label>' +
+    '<button class="btn yellow" style="width:100%" onclick="bizAddGo()">Створити картку</button>' +
+    '<div class="sub" style="font-weight:500">Картка належатиме вашій квартирі. Після створення заповніть опис і контакти.</div>';
+  haptic(); fsOpen();
+}
+async function bizAddGo() {
+  const n = document.getElementById('bzAddN').value.trim(); if (!n) { toast('Вкажіть назву'); return; }
+  if (await run('bizAdd', { name: n })) { const id = D.bizNewId; delete D.bizNewId; fsClose(); if (id) { ui.cab = id; ui.bzEd = id; ui.bzF = null; ui.bzDraft = null; go('bizEdit'); } }
 }
 // адміністратор: бізнеси
 function bizAdminHtml() {
@@ -4439,14 +4474,15 @@ function aptCard() {
     '<span class="lt ' + x.status + '"><i></i>' + lt + '</span></span><span class="go" aria-hidden="true">' + ic('chev', null, 18) + '</span></button>';
 }
 function cabinet() {
-  const me = D.me;
+  const me = D.me, cb = (D.myBizs || []).find(b => b.id === ui.cab);
+  if (cb) return bizCabinet(cb);
   const mine = D.problems.filter(p => p.own);
   const apt = aptCard();
   const closedPolls = D.polls.filter(p => !p.open).length;
   const pollsRow = D.polls.length ? '<button class="gent" onclick="go(\'polls\')"><span class="ic" style="background:var(--soft)">' + ic('vote', '#23262B', 22) + '</span><span><span class="t" style="display:block">Голосування</span><span class="s" style="display:block">' +
     (D.polls.some(p => p.open) ? 'Триває голосування' : 'Завершені: ' + closedPolls) + '</span></span><span style="margin-left:auto;color:var(--muted)">' + ic('chev', null, 18) + '</span></button>' : '';
   // профіль: квартира/секція вже є в картці квартири — тут лише імʼя і підтвердження
-  return '<div class="h1" role="heading" aria-level="1">Мій кабінет</div>' + apt +
+  return '<div class="h1" role="heading" aria-level="1">Мій кабінет</div>' + cabSwitch() + apt +
     '<div class="card" style="gap:14px;padding:18px;border-radius:24px"><div style="display:flex;align-items:center;gap:12px">' +
     '<div class="av y" style="width:52px;height:52px;border-radius:26px;font-size:18px">' + esc(initials(me.name)) + '</div>' +
     '<div><div style="font-size:17px;font-weight:700">' + esc(me.name) + '</div><div class="sub" style="font-weight:500">' + (me.username ? '@' + esc(me.username) : '') + '</div></div></div>' +
@@ -4458,7 +4494,7 @@ function cabinet() {
     flatCard() +
     '<div class="label">Мої заявки</div>' +
     (mine.length ? mine.map(p => '<div class="card" role="button" tabindex="0" onclick="ui.ptab=\'' + (p.status === 'Вирішено' ? 'done' : 'open') + '\';go(\'problems\')"><div class="row"><div><div style="font-weight:700">' + esc(p.category) + '</div><div class="sub" style="font-weight:500">№ ' + p.id + ' · ' + ago(p.created) + '</div></div><span class="tag ' + (p.status === 'Вирішено' ? 'ok' : p.status === 'В роботі' ? 'yel' : 'bad') + '">' + esc(p.status) + '</span></div></div>').join('') : '<div class="empty">Заявок ще немає</div>') +
-    '<div class="label">Ще</div>' + myBizEntry() + boardEntry() + bizEntry() + guestEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + atmRow() +
+    '<div class="label">Ще</div>' + boardEntry() + bizEntry() + guestEntry() + usefulEntry() + pollsRow + gamesEntry() + homeRow() + atmRow() +
     '<div class="chips">' + chatBtn('general', 'Чат будинку') + '</div>' +
     '<div style="font-size:12px;color:var(--muted);line-height:1.5">Телефон і ПІБ бачить лише адміністратор. Змінити квартиру чи статус можна через адміністратора. Сповіщення про ваші заявки приходять у чат із ботом.</div>';
 }
@@ -5587,7 +5623,7 @@ function demoApi(action, d) {
     };
   }
   const db = DEMO_DB;
-  if (!db._bz) { db._bz = demoBiz(now); if (db.me.state === 'guest' || db.me.state === 'biz') { ['apt', 'entrance', 'role', 'flat', 'family', 'username'].forEach(k => delete db.me[k]); if (db.me.state === 'biz') db.me.name = 'Ірина Петренко'; else db.me.guestUntil = now + 30 * 864e5; } }
+  if (!db._bz) { db._bz = demoBiz(now); if (/biz=1/.test(location.search) && db.me.state === 'accepted') db._bz[0].apt = db.me.apt; if (db.me.state === 'guest' || db.me.state === 'biz') { ['apt', 'entrance', 'role', 'flat', 'family', 'username'].forEach(k => delete db.me[k]); if (db.me.state === 'biz') db.me.name = 'Ірина Петренко'; else db.me.guestUntil = now + 30 * 864e5; } }
   if (/^biz/.test(action)) demoBizAct(db, action, d, now);
   if (db._pub === 1) { db.fuel.pub = demoPub(now, H); db._pub = 2; }
   if (action === 'fuelSpendAdd') { db.fuel.pub.spend.unshift({ row: now, date: d.date ? new Date(d.date + 'T12:00').getTime() : now, sum: Number(d.sum) || 0, liters: Number(d.liters) || 0, note: d.note }); const x = db.fuel.pub[monthKeyJs(db.fuel.pub.spend[0].date)]; if (x) { x.spent += Number(d.sum) || 0; x.liters += Number(d.liters) || 0; } db.fuel.pub.spent += Number(d.sum) || 0; db.fuel.pub.balance -= Number(d.sum) || 0; }
@@ -5676,6 +5712,7 @@ function demoBizAct(db, action, d, now) {
   if (action === 'bizNew') { const b = { id: 'b' + now, name: d.name, cat: 'other', desc: '', on: true }; L.push(b); db._bizLink = 'https://t.me/' + CONFIG.BOT_USERNAME + '/app?startapp=b_demo' + b.id; }
   if (action === 'bizLink' && cur) { delete cur.owner; delete cur.ownerName; db._bizLink = 'https://t.me/' + CONFIG.BOT_USERNAME + '/app?startapp=b_demo' + cur.id + now; }
   if (action === 'bizHide' && cur) cur.on = !!d.on;
+  if (action === 'bizAdd') { const mine = L.filter(b => b.apt === db.me.apt); if (mine.length >= 3) throw new Error('На квартиру можна до 3 бізнесів'); const b = { id: 'b' + now, name: d.name, cat: 'other', desc: '', on: true, apt: db.me.apt }; L.push(b); db._bizNewId = b.id; }
   if (action === 'bizDel') db._bz = L.filter(b => b.id !== d.id);
 }
 function demoOut(db, now) {
@@ -5683,6 +5720,9 @@ function demoOut(db, now) {
   const vis = db._bz.filter(b => b.on !== false && b.desc).map(card).sort((x, y) => (!!y.promo - !!x.promo) || x.name.localeCompare(y.name));
   o.biz = db.me.isAdmin ? { list: vis, admin: db._bz.map(b => ({ id: b.id, name: b.name, on: b.on !== false, ready: !!b.desc, owner: !!b.owner, ownerName: b.ownerName || '', linkUrl: b.owner ? '' : 'https://t.me/' + CONFIG.BOT_USERNAME + '/app?startapp=b_demo' + b.id })) } : vis;
   if (db.me.state === 'biz') o.myBiz = card(db._bz[0]);
+  const mb = db.me.state === 'accepted' ? db._bz.filter(b => b.apt && b.apt === db.me.apt) : [];
+  if (mb.length) { o.myBizs = mb.map(b => Object.assign(card(b), { on: b.on !== false })); o.bizCanAdd = mb.length < 3; }
+  if (db._bizNewId) { o.bizNewId = db._bizNewId; delete db._bizNewId; }
   if (db._bizLink) { o.bizLink = db._bizLink; delete db._bizLink; }
   delete o._bz;
   if (db.me.state === 'guest' || db.me.state === 'biz') { const g = {}; ['me', 'biz', 'myBiz', 'qday', 'good', 'quote', 'now', 'bizLink'].forEach(k => { if (o[k] !== undefined) g[k] = o[k]; }); return g; }
